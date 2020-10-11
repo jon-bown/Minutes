@@ -1,0 +1,1005 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		FC357E1424E641F600377C0D /* MinutesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC357E1324E641F600377C0D /* MinutesApp.swift */; };
+		FC357E1824E641F800377C0D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FC357E1724E641F800377C0D /* Assets.xcassets */; };
+		FC357E1B24E641F900377C0D /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FC357E1A24E641F900377C0D /* Preview Assets.xcassets */; };
+		FC357E2624E641F900377C0D /* MinutesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC357E2524E641F900377C0D /* MinutesTests.swift */; };
+		FC357E3124E641F900377C0D /* MinutesUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC357E3024E641F900377C0D /* MinutesUITests.swift */; };
+		FC357E3624E641F900377C0D /* Minutes WatchKit App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = FC357E3524E641F900377C0D /* Minutes WatchKit App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		FC357E3B24E641FA00377C0D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FC357E3A24E641FA00377C0D /* Assets.xcassets */; };
+		FC357E4224E641FA00377C0D /* Minutes WatchKit Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = FC357E4124E641FA00377C0D /* Minutes WatchKit Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		FC357E4724E641FA00377C0D /* MinutesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC357E4624E641FA00377C0D /* MinutesApp.swift */; };
+		FC357E4924E641FA00377C0D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC357E4824E641FA00377C0D /* ContentView.swift */; };
+		FC357E4B24E641FA00377C0D /* NotificationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC357E4A24E641FA00377C0D /* NotificationController.swift */; };
+		FC357E4D24E641FA00377C0D /* NotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC357E4C24E641FA00377C0D /* NotificationView.swift */; };
+		FC357E4F24E641FA00377C0D /* ComplicationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC357E4E24E641FA00377C0D /* ComplicationController.swift */; };
+		FC357E5124E641FB00377C0D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FC357E5024E641FB00377C0D /* Assets.xcassets */; };
+		FC357E5424E641FB00377C0D /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FC357E5324E641FB00377C0D /* Preview Assets.xcassets */; };
+		FC357E6C24E6422300377C0D /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = FC357E6A24E6422300377C0D /* Model.xcdatamodeld */; };
+		FC357E7124E642A800377C0D /* GoalRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC357E6D24E642A800377C0D /* GoalRow.swift */; };
+		FC357E7224E642A800377C0D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC357E6E24E642A800377C0D /* ContentView.swift */; };
+		FC357E7324E642A800377C0D /* NewGoalForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC357E6F24E642A800377C0D /* NewGoalForm.swift */; };
+		FC357E7424E642A800377C0D /* GoalList.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC357E7024E642A800377C0D /* GoalList.swift */; };
+		FC357E7924E6430700377C0D /* Goal+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC357E7724E6430700377C0D /* Goal+CoreDataClass.swift */; };
+		FC357E7A24E6430700377C0D /* Goal+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC357E7824E6430700377C0D /* Goal+CoreDataProperties.swift */; };
+		FC357E7C24E6432600377C0D /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC357E7B24E6432600377C0D /* Extensions.swift */; };
+		FC4850DC2511BB8000C37789 /* GoalDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC4850DB2511BB8000C37789 /* GoalDetailView.swift */; };
+		FC4850DE2512CEDD00C37789 /* ProgressRingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC4850DD2512CEDD00C37789 /* ProgressRingsView.swift */; };
+		FC4850E02512CF6600C37789 /* ProgressRing.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC4850DF2512CF6600C37789 /* ProgressRing.swift */; };
+		FC4850E22512DEDC00C37789 /* ColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC4850E12512DEDC00C37789 /* ColorExtension.swift */; };
+		FCB6C445252E191800F50445 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCB6C444252E191800F50445 /* SettingsView.swift */; };
+		FCB6C44C252E1EDB00F50445 /* StopWatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCB6C44B252E1EDB00F50445 /* StopWatch.swift */; };
+		FCB6C45425310C3800F50445 /* StopWatchButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCB6C45325310C3800F50445 /* StopWatchButton.swift */; };
+		FCC1F1642519141C00A325EB /* CompletionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCC1F1632519141C00A325EB /* CompletionView.swift */; };
+		FCC94E852522A0690049DCB0 /* GoalEditForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCC94E842522A0690049DCB0 /* GoalEditForm.swift */; };
+		FCE913DE24EEEE45004A45C2 /* RoundedButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCE913DD24EEEE45004A45C2 /* RoundedButton.swift */; };
+		FCE913E124EF1C9D004A45C2 /* ProgressRings.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCE913E024EF1C9D004A45C2 /* ProgressRings.swift */; };
+		FCE913E524EF1F98004A45C2 /* MainProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCE913E424EF1F98004A45C2 /* MainProgressView.swift */; };
+		FCE913E924EF1FC9004A45C2 /* GoalListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCE913E824EF1FC9004A45C2 /* GoalListView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		FC357E2224E641F900377C0D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FC357E0824E641F500377C0D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FC357E0F24E641F500377C0D;
+			remoteInfo = Minutes;
+		};
+		FC357E2D24E641F900377C0D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FC357E0824E641F500377C0D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FC357E0F24E641F500377C0D;
+			remoteInfo = Minutes;
+		};
+		FC357E3724E641F900377C0D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FC357E0824E641F500377C0D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FC357E3424E641F900377C0D;
+			remoteInfo = "Minutes WatchKit App";
+		};
+		FC357E4324E641FA00377C0D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FC357E0824E641F500377C0D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FC357E4024E641FA00377C0D;
+			remoteInfo = "Minutes WatchKit Extension";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		FC357E5C24E641FB00377C0D /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				FC357E4224E641FA00377C0D /* Minutes WatchKit Extension.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FC357E6024E641FB00377C0D /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				FC357E3624E641F900377C0D /* Minutes WatchKit App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		FC357E1024E641F500377C0D /* Minutes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Minutes.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FC357E1324E641F600377C0D /* MinutesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinutesApp.swift; sourceTree = "<group>"; };
+		FC357E1724E641F800377C0D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		FC357E1A24E641F900377C0D /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		FC357E1C24E641F900377C0D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FC357E2124E641F900377C0D /* MinutesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MinutesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FC357E2524E641F900377C0D /* MinutesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinutesTests.swift; sourceTree = "<group>"; };
+		FC357E2724E641F900377C0D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FC357E2C24E641F900377C0D /* MinutesUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MinutesUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FC357E3024E641F900377C0D /* MinutesUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinutesUITests.swift; sourceTree = "<group>"; };
+		FC357E3224E641F900377C0D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FC357E3524E641F900377C0D /* Minutes WatchKit App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Minutes WatchKit App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FC357E3A24E641FA00377C0D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		FC357E3C24E641FA00377C0D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FC357E4124E641FA00377C0D /* Minutes WatchKit Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Minutes WatchKit Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FC357E4624E641FA00377C0D /* MinutesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinutesApp.swift; sourceTree = "<group>"; };
+		FC357E4824E641FA00377C0D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		FC357E4A24E641FA00377C0D /* NotificationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationController.swift; sourceTree = "<group>"; };
+		FC357E4C24E641FA00377C0D /* NotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationView.swift; sourceTree = "<group>"; };
+		FC357E4E24E641FA00377C0D /* ComplicationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComplicationController.swift; sourceTree = "<group>"; };
+		FC357E5024E641FB00377C0D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		FC357E5324E641FB00377C0D /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		FC357E5524E641FB00377C0D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FC357E5624E641FB00377C0D /* PushNotificationPayload.apns */ = {isa = PBXFileReference; lastKnownFileType = text; path = PushNotificationPayload.apns; sourceTree = "<group>"; };
+		FC357E6B24E6422300377C0D /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
+		FC357E6D24E642A800377C0D /* GoalRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GoalRow.swift; sourceTree = "<group>"; };
+		FC357E6E24E642A800377C0D /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		FC357E6F24E642A800377C0D /* NewGoalForm.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewGoalForm.swift; sourceTree = "<group>"; };
+		FC357E7024E642A800377C0D /* GoalList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GoalList.swift; sourceTree = "<group>"; };
+		FC357E7724E6430700377C0D /* Goal+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Goal+CoreDataClass.swift"; sourceTree = "<group>"; };
+		FC357E7824E6430700377C0D /* Goal+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Goal+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		FC357E7B24E6432600377C0D /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		FC4850DB2511BB8000C37789 /* GoalDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalDetailView.swift; sourceTree = "<group>"; };
+		FC4850DD2512CEDD00C37789 /* ProgressRingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressRingsView.swift; sourceTree = "<group>"; };
+		FC4850DF2512CF6600C37789 /* ProgressRing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressRing.swift; sourceTree = "<group>"; };
+		FC4850E12512DEDC00C37789 /* ColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorExtension.swift; sourceTree = "<group>"; };
+		FCB6C444252E191800F50445 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		FCB6C44B252E1EDB00F50445 /* StopWatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StopWatch.swift; sourceTree = "<group>"; };
+		FCB6C45325310C3800F50445 /* StopWatchButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StopWatchButton.swift; sourceTree = "<group>"; };
+		FCC1F1632519141C00A325EB /* CompletionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionView.swift; sourceTree = "<group>"; };
+		FCC94E842522A0690049DCB0 /* GoalEditForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalEditForm.swift; sourceTree = "<group>"; };
+		FCE913DD24EEEE45004A45C2 /* RoundedButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundedButton.swift; sourceTree = "<group>"; };
+		FCE913E024EF1C9D004A45C2 /* ProgressRings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressRings.swift; sourceTree = "<group>"; };
+		FCE913E424EF1F98004A45C2 /* MainProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainProgressView.swift; sourceTree = "<group>"; };
+		FCE913E824EF1FC9004A45C2 /* GoalListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalListView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		FC357E0D24E641F500377C0D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FC357E1E24E641F900377C0D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FC357E2924E641F900377C0D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FC357E3E24E641FA00377C0D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		FC357E0724E641F500377C0D = {
+			isa = PBXGroup;
+			children = (
+				FC357E7724E6430700377C0D /* Goal+CoreDataClass.swift */,
+				FC357E7824E6430700377C0D /* Goal+CoreDataProperties.swift */,
+				FC357E1224E641F500377C0D /* Minutes */,
+				FC357E2424E641F900377C0D /* MinutesTests */,
+				FC357E2F24E641F900377C0D /* MinutesUITests */,
+				FC357E3924E641F900377C0D /* Minutes WatchKit App */,
+				FC357E4524E641FA00377C0D /* Minutes WatchKit Extension */,
+				FC357E1124E641F500377C0D /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		FC357E1124E641F500377C0D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FC357E1024E641F500377C0D /* Minutes.app */,
+				FC357E2124E641F900377C0D /* MinutesTests.xctest */,
+				FC357E2C24E641F900377C0D /* MinutesUITests.xctest */,
+				FC357E3524E641F900377C0D /* Minutes WatchKit App.app */,
+				FC357E4124E641FA00377C0D /* Minutes WatchKit Extension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FC357E1224E641F500377C0D /* Minutes */ = {
+			isa = PBXGroup;
+			children = (
+				FCC94E832522A0340049DCB0 /* Forms */,
+				FCE913DF24EF192C004A45C2 /* Views */,
+				FCE913DC24EEEE30004A45C2 /* Utilities */,
+				FC357E7B24E6432600377C0D /* Extensions.swift */,
+				FC357E6E24E642A800377C0D /* ContentView.swift */,
+				FCE913E024EF1C9D004A45C2 /* ProgressRings.swift */,
+				FC4850DF2512CF6600C37789 /* ProgressRing.swift */,
+				FC357E7024E642A800377C0D /* GoalList.swift */,
+				FC357E6D24E642A800377C0D /* GoalRow.swift */,
+				FC357E1324E641F600377C0D /* MinutesApp.swift */,
+				FC357E1724E641F800377C0D /* Assets.xcassets */,
+				FC357E1C24E641F900377C0D /* Info.plist */,
+				FC357E1924E641F900377C0D /* Preview Content */,
+				FC357E6A24E6422300377C0D /* Model.xcdatamodeld */,
+			);
+			path = Minutes;
+			sourceTree = "<group>";
+		};
+		FC357E1924E641F900377C0D /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				FC357E1A24E641F900377C0D /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		FC357E2424E641F900377C0D /* MinutesTests */ = {
+			isa = PBXGroup;
+			children = (
+				FC357E2524E641F900377C0D /* MinutesTests.swift */,
+				FC357E2724E641F900377C0D /* Info.plist */,
+			);
+			path = MinutesTests;
+			sourceTree = "<group>";
+		};
+		FC357E2F24E641F900377C0D /* MinutesUITests */ = {
+			isa = PBXGroup;
+			children = (
+				FC357E3024E641F900377C0D /* MinutesUITests.swift */,
+				FC357E3224E641F900377C0D /* Info.plist */,
+			);
+			path = MinutesUITests;
+			sourceTree = "<group>";
+		};
+		FC357E3924E641F900377C0D /* Minutes WatchKit App */ = {
+			isa = PBXGroup;
+			children = (
+				FC357E3A24E641FA00377C0D /* Assets.xcassets */,
+				FC357E3C24E641FA00377C0D /* Info.plist */,
+			);
+			path = "Minutes WatchKit App";
+			sourceTree = "<group>";
+		};
+		FC357E4524E641FA00377C0D /* Minutes WatchKit Extension */ = {
+			isa = PBXGroup;
+			children = (
+				FC357E4624E641FA00377C0D /* MinutesApp.swift */,
+				FC357E4824E641FA00377C0D /* ContentView.swift */,
+				FC357E4A24E641FA00377C0D /* NotificationController.swift */,
+				FC357E4C24E641FA00377C0D /* NotificationView.swift */,
+				FC357E4E24E641FA00377C0D /* ComplicationController.swift */,
+				FC357E5024E641FB00377C0D /* Assets.xcassets */,
+				FC357E5524E641FB00377C0D /* Info.plist */,
+				FC357E5624E641FB00377C0D /* PushNotificationPayload.apns */,
+				FC357E5224E641FB00377C0D /* Preview Content */,
+			);
+			path = "Minutes WatchKit Extension";
+			sourceTree = "<group>";
+		};
+		FC357E5224E641FB00377C0D /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				FC357E5324E641FB00377C0D /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		FCC94E832522A0340049DCB0 /* Forms */ = {
+			isa = PBXGroup;
+			children = (
+				FC357E6F24E642A800377C0D /* NewGoalForm.swift */,
+				FCC94E842522A0690049DCB0 /* GoalEditForm.swift */,
+			);
+			path = Forms;
+			sourceTree = "<group>";
+		};
+		FCE913DC24EEEE30004A45C2 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				FCE913DD24EEEE45004A45C2 /* RoundedButton.swift */,
+				FC4850E12512DEDC00C37789 /* ColorExtension.swift */,
+				FCB6C44B252E1EDB00F50445 /* StopWatch.swift */,
+				FCB6C45325310C3800F50445 /* StopWatchButton.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		FCE913DF24EF192C004A45C2 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				FCE913E424EF1F98004A45C2 /* MainProgressView.swift */,
+				FCE913E824EF1FC9004A45C2 /* GoalListView.swift */,
+				FC4850DB2511BB8000C37789 /* GoalDetailView.swift */,
+				FC4850DD2512CEDD00C37789 /* ProgressRingsView.swift */,
+				FCC1F1632519141C00A325EB /* CompletionView.swift */,
+				FCB6C444252E191800F50445 /* SettingsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		FC357E0F24E641F500377C0D /* Minutes */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FC357E6124E641FB00377C0D /* Build configuration list for PBXNativeTarget "Minutes" */;
+			buildPhases = (
+				FC357E0C24E641F500377C0D /* Sources */,
+				FC357E0D24E641F500377C0D /* Frameworks */,
+				FC357E0E24E641F500377C0D /* Resources */,
+				FC357E6024E641FB00377C0D /* Embed Watch Content */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FC357E3824E641F900377C0D /* PBXTargetDependency */,
+			);
+			name = Minutes;
+			productName = Minutes;
+			productReference = FC357E1024E641F500377C0D /* Minutes.app */;
+			productType = "com.apple.product-type.application";
+		};
+		FC357E2024E641F900377C0D /* MinutesTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FC357E6424E641FB00377C0D /* Build configuration list for PBXNativeTarget "MinutesTests" */;
+			buildPhases = (
+				FC357E1D24E641F900377C0D /* Sources */,
+				FC357E1E24E641F900377C0D /* Frameworks */,
+				FC357E1F24E641F900377C0D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FC357E2324E641F900377C0D /* PBXTargetDependency */,
+			);
+			name = MinutesTests;
+			productName = MinutesTests;
+			productReference = FC357E2124E641F900377C0D /* MinutesTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		FC357E2B24E641F900377C0D /* MinutesUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FC357E6724E641FB00377C0D /* Build configuration list for PBXNativeTarget "MinutesUITests" */;
+			buildPhases = (
+				FC357E2824E641F900377C0D /* Sources */,
+				FC357E2924E641F900377C0D /* Frameworks */,
+				FC357E2A24E641F900377C0D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FC357E2E24E641F900377C0D /* PBXTargetDependency */,
+			);
+			name = MinutesUITests;
+			productName = MinutesUITests;
+			productReference = FC357E2C24E641F900377C0D /* MinutesUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		FC357E3424E641F900377C0D /* Minutes WatchKit App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FC357E5D24E641FB00377C0D /* Build configuration list for PBXNativeTarget "Minutes WatchKit App" */;
+			buildPhases = (
+				FC357E3324E641F900377C0D /* Resources */,
+				FC357E5C24E641FB00377C0D /* Embed App Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FC357E4424E641FA00377C0D /* PBXTargetDependency */,
+			);
+			name = "Minutes WatchKit App";
+			productName = "Minutes WatchKit App";
+			productReference = FC357E3524E641F900377C0D /* Minutes WatchKit App.app */;
+			productType = "com.apple.product-type.application.watchapp2";
+		};
+		FC357E4024E641FA00377C0D /* Minutes WatchKit Extension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FC357E5924E641FB00377C0D /* Build configuration list for PBXNativeTarget "Minutes WatchKit Extension" */;
+			buildPhases = (
+				FC357E3D24E641FA00377C0D /* Sources */,
+				FC357E3E24E641FA00377C0D /* Frameworks */,
+				FC357E3F24E641FA00377C0D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Minutes WatchKit Extension";
+			productName = "Minutes WatchKit Extension";
+			productReference = FC357E4124E641FA00377C0D /* Minutes WatchKit Extension.appex */;
+			productType = "com.apple.product-type.watchkit2-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		FC357E0824E641F500377C0D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1200;
+				LastUpgradeCheck = 1200;
+				TargetAttributes = {
+					FC357E0F24E641F500377C0D = {
+						CreatedOnToolsVersion = 12.0;
+					};
+					FC357E2024E641F900377C0D = {
+						CreatedOnToolsVersion = 12.0;
+						TestTargetID = FC357E0F24E641F500377C0D;
+					};
+					FC357E2B24E641F900377C0D = {
+						CreatedOnToolsVersion = 12.0;
+						TestTargetID = FC357E0F24E641F500377C0D;
+					};
+					FC357E3424E641F900377C0D = {
+						CreatedOnToolsVersion = 12.0;
+					};
+					FC357E4024E641FA00377C0D = {
+						CreatedOnToolsVersion = 12.0;
+					};
+				};
+			};
+			buildConfigurationList = FC357E0B24E641F500377C0D /* Build configuration list for PBXProject "Minutes" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = FC357E0724E641F500377C0D;
+			productRefGroup = FC357E1124E641F500377C0D /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				FC357E0F24E641F500377C0D /* Minutes */,
+				FC357E2024E641F900377C0D /* MinutesTests */,
+				FC357E2B24E641F900377C0D /* MinutesUITests */,
+				FC357E3424E641F900377C0D /* Minutes WatchKit App */,
+				FC357E4024E641FA00377C0D /* Minutes WatchKit Extension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		FC357E0E24E641F500377C0D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FC357E1B24E641F900377C0D /* Preview Assets.xcassets in Resources */,
+				FC357E1824E641F800377C0D /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FC357E1F24E641F900377C0D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FC357E2A24E641F900377C0D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FC357E3324E641F900377C0D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FC357E3B24E641FA00377C0D /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FC357E3F24E641FA00377C0D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FC357E5424E641FB00377C0D /* Preview Assets.xcassets in Resources */,
+				FC357E5124E641FB00377C0D /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		FC357E0C24E641F500377C0D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FC4850DE2512CEDD00C37789 /* ProgressRingsView.swift in Sources */,
+				FC357E1424E641F600377C0D /* MinutesApp.swift in Sources */,
+				FC4850E02512CF6600C37789 /* ProgressRing.swift in Sources */,
+				FCE913DE24EEEE45004A45C2 /* RoundedButton.swift in Sources */,
+				FC4850DC2511BB8000C37789 /* GoalDetailView.swift in Sources */,
+				FCB6C445252E191800F50445 /* SettingsView.swift in Sources */,
+				FC357E7C24E6432600377C0D /* Extensions.swift in Sources */,
+				FCB6C45425310C3800F50445 /* StopWatchButton.swift in Sources */,
+				FCC1F1642519141C00A325EB /* CompletionView.swift in Sources */,
+				FC4850E22512DEDC00C37789 /* ColorExtension.swift in Sources */,
+				FCE913E924EF1FC9004A45C2 /* GoalListView.swift in Sources */,
+				FC357E7924E6430700377C0D /* Goal+CoreDataClass.swift in Sources */,
+				FC357E7124E642A800377C0D /* GoalRow.swift in Sources */,
+				FC357E7224E642A800377C0D /* ContentView.swift in Sources */,
+				FC357E7324E642A800377C0D /* NewGoalForm.swift in Sources */,
+				FC357E7424E642A800377C0D /* GoalList.swift in Sources */,
+				FCB6C44C252E1EDB00F50445 /* StopWatch.swift in Sources */,
+				FCE913E124EF1C9D004A45C2 /* ProgressRings.swift in Sources */,
+				FC357E7A24E6430700377C0D /* Goal+CoreDataProperties.swift in Sources */,
+				FCC94E852522A0690049DCB0 /* GoalEditForm.swift in Sources */,
+				FCE913E524EF1F98004A45C2 /* MainProgressView.swift in Sources */,
+				FC357E6C24E6422300377C0D /* Model.xcdatamodeld in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FC357E1D24E641F900377C0D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FC357E2624E641F900377C0D /* MinutesTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FC357E2824E641F900377C0D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FC357E3124E641F900377C0D /* MinutesUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FC357E3D24E641FA00377C0D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FC357E4B24E641FA00377C0D /* NotificationController.swift in Sources */,
+				FC357E4924E641FA00377C0D /* ContentView.swift in Sources */,
+				FC357E4F24E641FA00377C0D /* ComplicationController.swift in Sources */,
+				FC357E4724E641FA00377C0D /* MinutesApp.swift in Sources */,
+				FC357E4D24E641FA00377C0D /* NotificationView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		FC357E2324E641F900377C0D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FC357E0F24E641F500377C0D /* Minutes */;
+			targetProxy = FC357E2224E641F900377C0D /* PBXContainerItemProxy */;
+		};
+		FC357E2E24E641F900377C0D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FC357E0F24E641F500377C0D /* Minutes */;
+			targetProxy = FC357E2D24E641F900377C0D /* PBXContainerItemProxy */;
+		};
+		FC357E3824E641F900377C0D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FC357E3424E641F900377C0D /* Minutes WatchKit App */;
+			targetProxy = FC357E3724E641F900377C0D /* PBXContainerItemProxy */;
+		};
+		FC357E4424E641FA00377C0D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FC357E4024E641FA00377C0D /* Minutes WatchKit Extension */;
+			targetProxy = FC357E4324E641FA00377C0D /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		FC357E5724E641FB00377C0D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		FC357E5824E641FB00377C0D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+		FC357E5A24E641FB00377C0D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"Minutes WatchKit Extension/Preview Content\"";
+				DEVELOPMENT_TEAM = D4H5587ATG;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = "Minutes WatchKit Extension/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.appfactorial.Minutes.watchkitapp.watchkitextension;
+				PRODUCT_NAME = "${TARGET_NAME}";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 7.0;
+			};
+			name = Debug;
+		};
+		FC357E5B24E641FB00377C0D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"Minutes WatchKit Extension/Preview Content\"";
+				DEVELOPMENT_TEAM = D4H5587ATG;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = "Minutes WatchKit Extension/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.appfactorial.Minutes.watchkitapp.watchkitextension;
+				PRODUCT_NAME = "${TARGET_NAME}";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 7.0;
+			};
+			name = Release;
+		};
+		FC357E5E24E641FB00377C0D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = D4H5587ATG;
+				IBSC_MODULE = Minutes_WatchKit_Extension;
+				INFOPLIST_FILE = "Minutes WatchKit App/Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = com.appfactorial.Minutes.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 7.0;
+			};
+			name = Debug;
+		};
+		FC357E5F24E641FB00377C0D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = D4H5587ATG;
+				IBSC_MODULE = Minutes_WatchKit_Extension;
+				INFOPLIST_FILE = "Minutes WatchKit App/Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = com.appfactorial.Minutes.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 7.0;
+			};
+			name = Release;
+		};
+		FC357E6224E641FB00377C0D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"Minutes/Preview Content\"";
+				DEVELOPMENT_TEAM = D4H5587ATG;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = Minutes/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.appfactorial.Minutes;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		FC357E6324E641FB00377C0D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"Minutes/Preview Content\"";
+				DEVELOPMENT_TEAM = D4H5587ATG;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = Minutes/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.appfactorial.Minutes;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		FC357E6524E641FB00377C0D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = D4H5587ATG;
+				INFOPLIST_FILE = MinutesTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.appfactorial.MinutesTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Minutes.app/Minutes";
+			};
+			name = Debug;
+		};
+		FC357E6624E641FB00377C0D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = D4H5587ATG;
+				INFOPLIST_FILE = MinutesTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.appfactorial.MinutesTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Minutes.app/Minutes";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		FC357E6824E641FB00377C0D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = D4H5587ATG;
+				INFOPLIST_FILE = MinutesUITests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.appfactorial.MinutesUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Minutes;
+			};
+			name = Debug;
+		};
+		FC357E6924E641FB00377C0D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = D4H5587ATG;
+				INFOPLIST_FILE = MinutesUITests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.appfactorial.MinutesUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Minutes;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		FC357E0B24E641F500377C0D /* Build configuration list for PBXProject "Minutes" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FC357E5724E641FB00377C0D /* Debug */,
+				FC357E5824E641FB00377C0D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FC357E5924E641FB00377C0D /* Build configuration list for PBXNativeTarget "Minutes WatchKit Extension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FC357E5A24E641FB00377C0D /* Debug */,
+				FC357E5B24E641FB00377C0D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FC357E5D24E641FB00377C0D /* Build configuration list for PBXNativeTarget "Minutes WatchKit App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FC357E5E24E641FB00377C0D /* Debug */,
+				FC357E5F24E641FB00377C0D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FC357E6124E641FB00377C0D /* Build configuration list for PBXNativeTarget "Minutes" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FC357E6224E641FB00377C0D /* Debug */,
+				FC357E6324E641FB00377C0D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FC357E6424E641FB00377C0D /* Build configuration list for PBXNativeTarget "MinutesTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FC357E6524E641FB00377C0D /* Debug */,
+				FC357E6624E641FB00377C0D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FC357E6724E641FB00377C0D /* Build configuration list for PBXNativeTarget "MinutesUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FC357E6824E641FB00377C0D /* Debug */,
+				FC357E6924E641FB00377C0D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		FC357E6A24E6422300377C0D /* Model.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				FC357E6B24E6422300377C0D /* Model.xcdatamodel */,
+			);
+			currentVersion = FC357E6B24E6422300377C0D /* Model.xcdatamodel */;
+			path = Model.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = FC357E0824E641F500377C0D /* Project object */;
+}
