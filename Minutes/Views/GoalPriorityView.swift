@@ -164,8 +164,10 @@ struct GoalPriorityView: View {
 
 }
 
+#if DEBUG
 struct GoalPriorityView_Previews: PreviewProvider {
     static var previews: some View {
         GoalPriorityView()
     }
 }
+#endif

@@ -12,19 +12,15 @@ import SwiftUI
 
 
 
-// 1. Subclass from `NSSecureUnarchiveFromDataTransformer`
 @objc(UIColorValueTransformer)
 final class UIColorValueTransformer: NSSecureUnarchiveFromDataTransformer {
 
-    /// The name of the transformer. This is the name used to register the transformer using `ValueTransformer.setValueTrandformer(_"forName:)`.
     static let name = NSValueTransformerName(rawValue: String(describing: UIColorValueTransformer.self))
 
-    // 2. Make sure `UIColor` is in the allowed class list.
     override static var allowedTopLevelClasses: [AnyClass] {
         return [UIColor.self]
     }
 
-    /// Registers the transformer.
     public static func register() {
         let transformer = UIColorValueTransformer()
         ValueTransformer.setValueTransformer(transformer, forName: name)
@@ -86,15 +82,12 @@ extension Date {
 
 
 extension UIColor {
-
     func lighter(by percentage: CGFloat = 30.0) -> UIColor? {
         return self.adjust(by: abs(percentage) )
     }
-
     func darker(by percentage: CGFloat = 30.0) -> UIColor? {
         return self.adjust(by: -1 * abs(percentage) )
     }
-
     func adjust(by percentage: CGFloat = 30.0) -> UIColor? {
         var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0, alpha: CGFloat = 0
         if self.getRed(&red, green: &green, blue: &blue, alpha: &alpha) {
@@ -130,7 +123,6 @@ extension Calendar {
                 }
             }
         }
-
         return dates
     }
 }

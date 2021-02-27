@@ -52,7 +52,7 @@ struct StopwatchButtonSubView: View {
                         Text("Save").opacity(0.5)
                     }
                     
-                }.buttonStyle(WatchStopWatchStyle()).disabled(self.stopWatch.isRunning)
+                }.buttonStyle(WatchStopWatchSaveStyle()).disabled(self.stopWatch.isRunning)
             }
         }.navigationTitle("Goals")
 

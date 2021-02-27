@@ -21,7 +21,7 @@ class StopWatch: ObservableObject {
             self.update()
         }
     }
-    
+
     var paused = true {
         didSet {
             self.update()

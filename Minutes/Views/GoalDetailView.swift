@@ -31,13 +31,10 @@ struct GoalDetailView: View {
     @Environment(\.presentationMode) var presentationMode
     
     @FetchRequest(
-        // 2
         entity: GoalRecord.entity(),
-        // 3
         sortDescriptors: [
             NSSortDescriptor(keyPath: \GoalRecord.name, ascending: true)
         ]
-        // 4
     ) var goalRecords: FetchedResults<GoalRecord>
     
     @ObservedObject var goal: Goal
@@ -118,9 +115,6 @@ struct GoalDetailView: View {
                 //Align text properly
                 VStack(alignment: .leading, spacing: 0) {
                     HStack(spacing: 30) {
-                        //                        VStack(alignment: .leading, spacing: 0) {
-                        //
-                        //                        }
                         VStack(alignment: .leading, spacing: 0) {
                             Text("Started").font(Font.system(size: 18, weight: .regular, design: .default)).kerning(0.05).foregroundColor(Color.white)
                             (
@@ -182,7 +176,7 @@ struct GoalDetailView: View {
                         Text("Save").opacity(0.5)
                     }
                     
-                }.buttonStyle(SaveStyle()).disabled(self.stopWatch.isRunning)
+                }.buttonStyle(CircleStopWatchSaveStyle()).disabled(self.stopWatch.isRunning)
                 Spacer()
                 StopWatchButton(actions: [self.stopWatch.start, self.stopWatch.pause, self.startLoading],
                                 labels: ["Start", "Pause"],

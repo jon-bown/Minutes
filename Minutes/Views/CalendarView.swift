@@ -188,7 +188,7 @@ struct RootView: View {
             }
             }
             
-        }.frame(width: screenSize.width-100)
+        }.frame(width: screenSize.width-80)
             
     }
     }

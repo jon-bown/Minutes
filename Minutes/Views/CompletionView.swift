@@ -13,8 +13,10 @@ struct CompletionView: View {
     }
 }
 
+#if DEBUG
 struct CompletionView_Previews: PreviewProvider {
     static var previews: some View {
         CompletionView()
     }
 }
+#endif

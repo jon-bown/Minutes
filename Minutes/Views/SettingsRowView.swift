@@ -35,8 +35,10 @@ struct SettingsRowView: View {
     }
 }
 
+#if DEBUG
 struct SettingsRowView_Previews: PreviewProvider {
     static var previews: some View {
         SettingsRowView(name: "Developer", content: "App Factorial").previewLayout(.fixed(width: 375, height: 60)).padding()
     }
 }
+#endif

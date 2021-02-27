@@ -106,8 +106,10 @@ struct ResetAppView: View {
     
 }
 
+#if DEBUG
 struct ResetAppView_Previews: PreviewProvider {
     static var previews: some View {
         ResetAppView()
     }
 }
+#endif

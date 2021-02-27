@@ -56,7 +56,7 @@ struct GoalForm: View {
         
     }
 
-    
+    //MARK: - BODY
     var body: some View {
         NavigationView{
             VStack{
@@ -170,6 +170,7 @@ struct GoalForm: View {
         }
     }
     
+    //MARK: - FUNCTIONS
     private func updateNotificationFields(id: UUID) {
         UNUserNotificationCenter.current().getPendingNotificationRequests { (notificationRequests) in
            for notification:UNNotificationRequest in notificationRequests {
@@ -199,7 +200,7 @@ struct GoalForm: View {
     }
     
     private func checkNotificationsExist(id: UUID) {
-            //remove any reminders of this id
+            //Check if any notifications exist, if they do set reminders to true
             UNUserNotificationCenter.current().getPendingNotificationRequests { (notificationRequests) in
                for notification:UNNotificationRequest in notificationRequests {
                 if notification.identifier == id.uuidString {

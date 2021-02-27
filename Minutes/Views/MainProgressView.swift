@@ -13,13 +13,10 @@ struct MainProgressView: View {
     @Environment(\.managedObjectContext) var managedObjectContext
     
     @FetchRequest(
-      // 2
       entity: Goal.entity(),
-      // 3
       sortDescriptors: [
         NSSortDescriptor(keyPath: \Goal.priority, ascending: true)
       ]
-    // 4
     ) var goals: FetchedResults<Goal>
     
     @FetchRequest(
@@ -159,8 +156,10 @@ struct MainProgressView: View {
     }
 }
 
+#if DEBUG
 struct MainProgressView_Previews: PreviewProvider {
     static var previews: some View {
         MainProgressView()
     }
 }
+#endif

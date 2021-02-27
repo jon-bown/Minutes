@@ -44,10 +44,10 @@ struct BarChartView: View {
                 .padding([.bottom], 2)
             self.createLegend()
                 .frame(width: Constants.barChartColumnWidth * CGFloat(Constants.barChartColumns) + (Constants.barChartColumnSpacing * CGFloat(Constants.barChartColumns - 1)), height: 14)
-            Text("TOTAL \(total)")
-                .font(Font.system(size: 12, weight: .regular, design: .default))
-                .kerning(0.3)
-                .foregroundColor(textColor)
+//            Text("TOTAL \(total)")
+//                .font(Font.system(size: 12, weight: .regular, design: .default))
+//                .kerning(0.3)
+//                .foregroundColor(textColor)
         }
     }
     

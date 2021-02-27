@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ProgressRingView: View {
     
-    @State private var currentPercentage: Double = 0
+    @State private var currentPercentage: Double = 0.001
     @State private var shadowOffset: CGPoint = CGPoint(x: 0, y: 0)
     
     @Binding var progress: Double
@@ -23,13 +23,13 @@ struct ProgressRingView: View {
     var backgroundColor = UIColor.red
     
     var animation: Animation {
-        Animation.easeInOut(duration: 1)
+        Animation.easeInOut(duration: 0.5)
     }
     
     
     
     var body: some View {
-        let gradient = AngularGradient(gradient: Gradient(colors: [startColor, endColor]), center: .center, startAngle: Angle(degrees: 0), endAngle: Angle(degrees: 360 * progress))
+        let gradient = AngularGradient(gradient: Gradient(colors: [startColor, endColor]), center: .center, startAngle: Angle(degrees: 0), endAngle: Angle(degrees: self.currentPercentage > 0.1 ? 360 * currentPercentage: 0))
         
         return GeometryReader{ geometry in
             ZStack {
@@ -57,7 +57,7 @@ struct ProgressRingView: View {
                 //                RingBackgroundShape(thickness: thickness)
                 //                    .fill(Color(backgroundColor))
                 //            }
-                RingShape(currentPercentage: progress, thickness: thickness)
+                RingShape(currentPercentage: currentPercentage, thickness: thickness)
                     .fill(gradient)
                     .rotationEffect(.init(degrees: -90))
                     .shadow(radius: 2)
@@ -71,20 +71,21 @@ struct ProgressRingView: View {
                     }
                 RingTipShape(currentPercentage: progress+0.01, thickness: thickness)
                     .fill(progress > 0.96 ? Color.black.opacity(0.7) : Color.clear).blur(radius: 1).rotationEffect(.init(degrees: -90))
-                RingTipShape(currentPercentage: progress, thickness: thickness)
+                RingTipShape(currentPercentage: currentPercentage, thickness: thickness)
                     .foregroundColor(progress > 0.96 ? endColor : .clear)
                     
                     .rotationEffect(.init(degrees: -90))
                     .onAppear() {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                        DispatchQueue.main.asyncAfter(deadline: .now()+0.5) {
                             withAnimation(self.animation) {
                                 self.currentPercentage = self.progress
                                 //self.shadowOffset = self.ringTipShadowOffset(progress: self.progress, radius: Double(geometry.size.width), thickness: self.thickness)
                             }
                         }
                     }.onChange(of: self.progress, perform: { value in
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                        DispatchQueue.main.asyncAfter(deadline: .now()+0.5) {
                             withAnimation(self.animation) {
+                                self.currentPercentage = self.progress
                                 //self.shadowOffset = self.ringTipShadowOffset(progress: self.progress, radius: Double(geometry.size.width), thickness: self.thickness)
                             }
                         }
