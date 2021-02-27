@@ -19,6 +19,7 @@ struct StopwatchButtonSubView: View {
     @ObservedObject var goal: Goal
     @Binding var progress: Double
     @Binding var dayTime: Double
+    @Binding var selectedTab: Int
     
     
     var body: some View {
@@ -41,6 +42,7 @@ struct StopwatchButtonSubView: View {
                 Button(action: {
                     if(!self.stopWatch.isRunning){
                         self.updateGoalRecord()
+                        //self.delegate?.scheduleBAR(first: false)
                     }
                 }){
                     if(!self.stopWatch.isRunning){
@@ -58,6 +60,7 @@ struct StopwatchButtonSubView: View {
     
     
     private func startLoading() {
+        self.selectedTab = 1
         _ = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { timer in
             withAnimation() {
                 self.progress = (Double(self.stopWatch.seconds) + self.dayTime)/(self.goal.goalTime*60)

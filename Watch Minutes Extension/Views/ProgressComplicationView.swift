@@ -13,6 +13,8 @@ struct ProgressComplicationView: View {
     @Environment(\.managedObjectContext) var managedObjectContext
     
     var dateProvided: Date
+    
+    var compFamily: CLKComplicationFamily
   
     var body: some View {
 //        GeometryReader { proxy in
@@ -24,8 +26,32 @@ struct ProgressComplicationView: View {
 //        }
 //        }
         
-        ProgressRings(dateProvided: dateProvided, maxWidth: Int(30.0), maxLineWidth: 5, maxRingLimit: 3).frame(width: 120, height: 120)
-            .aspectRatio(contentMode: .fill).environment(\.managedObjectContext, managedObjectContext)
+
+//                ZStack{
+//
+//
+//
+//
+//                    ProgressView(value: 0.7){
+//                        ProgressView(value: 0.9){
+//
+//                        }.frame(width: 30, height: 30, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/).progressViewStyle(CircularProgressViewStyle(tint: .red))
+//                    }.progressViewStyle(CircularProgressViewStyle(tint: .green))
+//
+//
+//
+//                }
+
+        if(compFamily == .graphicCircular){
+            ProgressRings(dateProvided: dateProvided, maxWidth: Int(37.0), maxLineWidth: 5, maxRingLimit: 3).frame(width: 50, height: 50)
+                .aspectRatio(contentMode: .fill).environment(\.managedObjectContext, managedObjectContext)
+        }
+        else {
+            ProgressRings(dateProvided: dateProvided, maxWidth: Int(25.0), maxLineWidth: 3, maxRingLimit: 3).frame(width: 50, height: 50)
+                .aspectRatio(contentMode: .fill).environment(\.managedObjectContext, managedObjectContext)
+        }
+        
+
         
     }
 }
@@ -33,11 +59,11 @@ struct ProgressComplicationView: View {
 struct ProgressComplicationView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            ProgressComplicationView(dateProvided: Date()).previewDevice(PreviewDevice(rawValue: "Apple Watch Series 5 - 44mm"))
+            ProgressComplicationView(dateProvided: Date(), compFamily: .graphicCircular).previewDevice(PreviewDevice(rawValue: "Apple Watch Series 5 - 44mm"))
             
-            CLKComplicationTemplateGraphicCircularView(ProgressComplicationView(dateProvided: Date())).previewContext()
+            CLKComplicationTemplateGraphicCircularView(ProgressComplicationView(dateProvided: Date(), compFamily: .graphicCircular)).previewContext()
 
-            CLKComplicationTemplateGraphicCornerCircularView(ProgressComplicationView(dateProvided: Date())).previewContext().previewDevice(PreviewDevice(rawValue: "Apple Watch Series 5 - 44mm"))
+            CLKComplicationTemplateGraphicCornerCircularView(ProgressComplicationView(dateProvided: Date(), compFamily: .graphicCorner)).previewContext().previewDevice(PreviewDevice(rawValue: "Apple Watch Series 5 - 44mm"))
             
      
         }

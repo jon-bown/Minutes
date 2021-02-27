@@ -23,16 +23,15 @@ struct StopwatchTimeSubview: View {
     @ObservedObject var goal: Goal
     @Binding var progress: Double
     @Binding var dayTime: Double
+    @Binding var selectedTab: Int
     
     var body: some View {
         VStack{
             if(filteredGoalRecords.isEmpty){
-                ProgressView(value: 0.0)
-
-                    .accentColor(Color(self.goal.color!)).padding()
+                ProgressView(value: 0.0).progressViewStyle(LinearProgressViewStyle(tint: Color(self.goal.color!))).padding()
             }
             else{
-                ProgressView(value: filteredGoalRecords[0].progress).accentColor(Color(self.goal.color!)).foregroundColor(Color(self.goal.color!)).padding()
+                ProgressView(value: filteredGoalRecords[0].progress >= 1.0 ? 1.0:filteredGoalRecords[0].progress).accentColor(Color(self.goal.color!)).foregroundColor(Color(self.goal.color!)).padding()
             }
             //Timer UI
             RoundedRectangle(cornerRadius: 10)
@@ -41,18 +40,7 @@ struct StopwatchTimeSubview: View {
 
             
             Spacer()
-//            WatchStopWatchButton(actions: [self.stopWatch.reset, self.stopWatch.lap],
-//                            labels: ["Reset", "Reset"],
-//                            color: Color.red,
-//                            isPaused: self.stopWatch.isPaused(), playPause: false, degreeRotation: -90).padding(.trailing, 10).padding(.leading, 1)
-//
-//            WatchStopWatchButton(actions: [self.stopWatch.start, self.stopWatch.pause, self.startLoading],
-//                            labels: ["Reset", "Save"],
-//                            color: Color.red,
-//                            isPaused: self.stopWatch.isPaused(), playPause: true, degreeRotation: 90).padding(.leading, 10).padding(.trailing,1)
-//
 
-            
 
         }.onAppear { self.updateProgress()}.navigationTitle("Goals")
         

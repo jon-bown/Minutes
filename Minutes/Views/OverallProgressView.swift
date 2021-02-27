@@ -82,7 +82,7 @@ struct OverallProgressView: View {
                 ForEach(filteredGoals, id: \.self){ goal in
                     BarChartView(
                         title: goal.name!, //goalRecord.name
-                        progress: "\(filteredGoalRecords.first(where: {$0.name == goal.name}) == nil ? 0:Int(filteredGoalRecords.first(where: {$0.name == goal.name})!.dayTime/60) )", //goalRecord.progress
+                        progress: "\(Double(filteredGoalRecords.first(where: {$0.name == goal.name}) == nil ? 0:filteredGoalRecords.first(where: {$0.name == goal.name})!.dayTime)/Double(60.0)) )", //goalRecord.progress
                         goal: "\(Int(goal.goalTime))",
                         total: "",
                         average: "",

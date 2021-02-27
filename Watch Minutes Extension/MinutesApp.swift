@@ -10,11 +10,12 @@ import SwiftUI
 @main
 struct MinutesApp: App {
     let persistenceController = PersistenceController.shared
+    @WKExtensionDelegateAdaptor(ExtensionDelegate.self) var delegate
     
     @SceneBuilder var body: some Scene {
         WindowGroup {
             NavigationView {
-                ContentView().environment(\.managedObjectContext, persistenceController.container.viewContext)
+                ContentView().environment(\.managedObjectContext, persistenceController.container.viewContext).environment(\.appDelegate, delegate)
             }
         }
 
@@ -25,3 +26,19 @@ struct MinutesApp: App {
     
 }
 
+
+struct DelegateKey: EnvironmentKey {
+    typealias Value = ExtensionDelegate?
+    static let defaultValue: ExtensionDelegate? = nil
+}
+
+extension EnvironmentValues {
+    var appDelegate: DelegateKey.Value {
+        get {
+            return self[DelegateKey.self]
+        }
+        set {
+            self[DelegateKey.self] = newValue
+        }
+    }
+}

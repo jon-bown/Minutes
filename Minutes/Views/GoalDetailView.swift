@@ -182,7 +182,7 @@ struct GoalDetailView: View {
                         Text("Save").opacity(0.5)
                     }
                     
-                }.buttonStyle(StopWatchStyle()).disabled(self.stopWatch.isRunning)
+                }.buttonStyle(SaveStyle()).disabled(self.stopWatch.isRunning)
                 Spacer()
                 StopWatchButton(actions: [self.stopWatch.start, self.stopWatch.pause, self.startLoading],
                                 labels: ["Start", "Pause"],

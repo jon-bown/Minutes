@@ -29,9 +29,9 @@ struct SettingsView: View {
  
                 }
                 // MARK: - SECTION 3
-                Section(header: Text("NOTIFICATIONS")){
-                    
-                }
+//                Section(header: Text("NOTIFICATIONS")){
+//                    
+//                }
             }.navigationBarTitle(Text("Settings"), displayMode: .large).padding()   
 
         }

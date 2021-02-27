@@ -36,12 +36,7 @@ struct StopWatchButton : View {
                 Text(self.labels[1])
                     .foregroundColor(self.playPause ? .red:.white).clipped().frame(width: 100, height: 100)
             }
-        }.background(Circle()
-                        .fill(self.playPause ? (self.isPaused ? Color.green: Color.red) : .gray).clipped().opacity(0.3)        .overlay(
-                            Circle()
-                                .stroke(self.playPause ? (self.isPaused ? Color.green: Color.red) : .gray, lineWidth: 2).frame(width: 80, height: 80)
-                        )
-                        .frame(width: 75, height: 75))
+        }.buttonStyle(CircleStopWatchStyle(isPaused: self.isPaused, playPause: self.playPause))
         
     }
     
@@ -88,19 +83,37 @@ struct WatchStopWatchButton : View {
 }
 
 
-struct StopWatchStyle: ButtonStyle {
+struct SaveStyle: ButtonStyle {
     
     func makeBody(configuration: Self.Configuration) -> some View {
         configuration.label
             .padding().background(Circle().fill(Color .blue).clipped().opacity(0.3)        .overlay(Circle().stroke(Color.blue, lineWidth: 2).frame(width: 80, height: 80)
             )
-            .frame(width: 75, height: 75))
-        //.background(Circle()
-        //              .fill(configuration.isPressed ? Color.clear:.black)
-        //             .frame(width: 75, height: 75)).clipped()
-        
-        
-        //frame
+            .frame(width: 75, height: 75)).scaleEffect(configuration.isPressed ? 0.8 : 1.0)
+
+    }
+    
+}
+
+
+struct CircleStopWatchStyle: ButtonStyle {
+    
+    var isPaused: Bool
+    var playPause: Bool
+    
+    init(isPaused: Bool, playPause: Bool) {
+        self.isPaused = isPaused
+        self.playPause = playPause
+    }
+    
+    func makeBody(configuration: Self.Configuration) -> some View {
+        configuration.label.background(Circle()
+                                        .fill(self.playPause ? (self.isPaused ? Color.green: Color.red) : .gray).clipped().opacity(0.3)        .overlay(
+                                            Circle()
+                                                .stroke(self.playPause ? (self.isPaused ? Color.green: Color.red) : .gray, lineWidth: 2).frame(width: 80, height: 80)
+                                        )
+                                        .frame(width: 75, height: 75))
+            .scaleEffect(configuration.isPressed ? 0.9 : 1.0)
     }
     
 }
@@ -111,12 +124,6 @@ struct WatchStopWatchStyle: ButtonStyle {
     func makeBody(configuration: Self.Configuration) -> some View {
         configuration.label
             .padding().background(Capsule().foregroundColor(Color.blue)).frame(width: 80, height: 50)
-        //.background(Circle()
-        //              .fill(configuration.isPressed ? Color.clear:.black)
-        //             .frame(width: 75, height: 75)).clipped()
-        
-        
-        //frame
     }
     
 }
