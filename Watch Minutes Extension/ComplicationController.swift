@@ -132,7 +132,8 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
             handler(template)
             break
         default:
-            handler(nil)
+            let template = CLKComplicationTemplateGraphicCircularView(ProgressComplicationView(dateProvided: Date(), compFamily: complication.family).environment(\.managedObjectContext, moc))
+            handler(template)
         }
         
     }

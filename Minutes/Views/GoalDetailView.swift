@@ -102,7 +102,7 @@ struct GoalDetailView: View {
                         Spacer()
                         
                         ZStack(alignment: .center){
-                            ProgressRingView(progress: self.$progress, thickness: 20, startColor: Color(self.goal.color!.darker(by: 10.0)!), endColor: Color(self.goal.color!.lighter(by: 15)!), backgroundColor: self.goal.color!).frame(width: 175, height: 175).aspectRatio(contentMode: .fit).animatableProgressText(progress: progress)
+                            ProgressRingView(progress: self.progress, thickness: 20, startColor: Color(self.goal.color!.darker(by: 10.0)!), endColor: Color(self.goal.color!.lighter(by: 15)!), backgroundColor: self.goal.color!).frame(width: 175, height: 175).aspectRatio(contentMode: .fit).animatableProgressText(progress: progress)
                         }
                         
                         
@@ -187,6 +187,10 @@ struct GoalDetailView: View {
             }.padding()
             
             VStack{
+                
+                
+                
+                //TODO: Add ability to just log minutes directly and display it as a list
                 //List laps completed in the goal today
                 
                 
@@ -316,7 +320,7 @@ struct GoalDetailView: View {
             else {
                 quadrant = 4
             }
-            let minutes = newGoalRecord.progress * 60
+            let minutes = (newGoalRecord.progress * 60).truncatingRemainder(dividingBy: 60)
             var entry = [Int:Double]()
             hour = hour + quadrant
             entry[hour] = Double(minutes)
@@ -355,7 +359,7 @@ struct GoalDetailView: View {
             else {
                 quadrant = 4
             }
-            let minutes = records[0].progress * 60
+            let minutes = (records[0].progress * 60).truncatingRemainder(dividingBy: 60)
             hour = hour + quadrant
             
             let keyExists = records[0].goalUpdates![hour] != nil

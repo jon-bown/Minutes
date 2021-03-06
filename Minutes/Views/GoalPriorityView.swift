@@ -42,20 +42,22 @@ struct GoalPriorityView: View {
     
     var body: some View {
         NavigationView{
-            VStack{
+
                 List {
                     ForEach(filteredGoals, id: \.priority) { goal in
-                        HStack{
-                            Text(goal.name!).padding()
-                            Spacer()
-                            Text("\(goal.priority)").padding()
+                        GroupBox{
+                            HStack{
+                                Text(goal.name!)
+                                Spacer()
+                                Text("\(goal.priority)")
+                            }
                         }
-
+                        
                     }
                     .onMove(perform: onMove).onDelete(perform: onDelete)
-                }.environment(\.editMode, isEditable ? .constant(.active) : .constant(.inactive))
-                Spacer()
-            }
+                }.environment(\.editMode, isEditable ? .constant(.active) : .constant(.inactive)).padding()
+
+            
             
             //Spacer()
         }.navigationBarItems(trailing: Button(self.isEditable ? "Done":"Edit"){

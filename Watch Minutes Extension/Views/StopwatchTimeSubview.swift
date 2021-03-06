@@ -31,7 +31,7 @@ struct StopwatchTimeSubview: View {
                 ProgressView(value: 0.0).progressViewStyle(LinearProgressViewStyle(tint: Color(self.goal.color!))).padding()
             }
             else{
-                ProgressView(value: filteredGoalRecords[0].progress >= 1.0 ? 1.0:filteredGoalRecords[0].progress).accentColor(Color(self.goal.color!)).foregroundColor(Color(self.goal.color!)).padding()
+                ProgressView(value: filteredGoalRecords[0].progress >= 1.0 ? 1.0:filteredGoalRecords[0].progress).progressViewStyle(LinearProgressViewStyle(tint: Color(self.goal.color!))).padding()
             }
             //Timer UI
             RoundedRectangle(cornerRadius: 10)
@@ -48,13 +48,7 @@ struct StopwatchTimeSubview: View {
     }
     
     
-    private func startLoading() {
-        _ = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { timer in
-            withAnimation() {
-                self.progress = (Double(self.stopWatch.seconds) + self.dayTime)/(self.goal.goalTime*60)
-            }
-        }
-    }
+
     
     private func updateProgress() {
         let records = self.goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs: $0.date!) && $0.name == goal.name})

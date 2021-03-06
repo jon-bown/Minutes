@@ -120,7 +120,7 @@ struct WatchStopWatchStyle: ButtonStyle {
     
     func makeBody(configuration: Self.Configuration) -> some View {
         configuration.label
-            .padding().frame(width: 80, height: 50)            .scaleEffect(configuration.isPressed ? 0.9 : 1.0)
+            .padding().frame(width: 60, height: 40)            .scaleEffect(configuration.isPressed ? 0.8 : 1.0)
     }
     
 }
@@ -129,7 +129,7 @@ struct WatchStopWatchSaveStyle: ButtonStyle {
     
     func makeBody(configuration: Self.Configuration) -> some View {
         configuration.label
-            .padding().background(Capsule().foregroundColor(Color.blue)).frame(width: 80, height: 50)
+            .padding().frame(width: 80, height: 50).scaleEffect(configuration.isPressed ? 0.8 : 1.0)
     }
     
 }

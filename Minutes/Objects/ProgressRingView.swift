@@ -12,7 +12,7 @@ struct ProgressRingView: View {
     @State private var currentPercentage: Double = 0.001
     @State private var shadowOffset: CGPoint = CGPoint(x: 0, y: 0)
     
-    @Binding var progress: Double
+    var progress: Double
     
     var thickness: CGFloat = 30.0
     //var width: CGFloat = 250.0
@@ -21,9 +21,11 @@ struct ProgressRingView: View {
     var endColor: Color
     var startAngle = -90.0
     var backgroundColor = UIColor.red
+    var animate: Bool = true
+    
     
     var animation: Animation {
-        Animation.easeInOut(duration: 0.5)
+        Animation.easeOut(duration: 2)
     }
     
     
@@ -62,34 +64,44 @@ struct ProgressRingView: View {
                     .rotationEffect(.init(degrees: -90))
                     .shadow(radius: 2)
                     .drawingGroup()
-                    .onAppear() {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                            withAnimation(self.animation) {
-                                self.currentPercentage = self.progress
+                    .onChange(of: self.progress){ value in
+                        DispatchQueue.main.asyncAfter(deadline: .now()+0.3) {
+                            if(animate){
+                                withAnimation(self.animation) {
+                                    
+                                    self.currentPercentage = value
+                                    
+                                    //self.shadowOffset = self.ringTipShadowOffset(progress: self.progress, radius: Double(geometry.size.width), thickness: self.thickness)
+                                }
                             }
+                            else {
+                                self.currentPercentage = value
+                            }
+     
                         }
                     }
-                RingTipShape(currentPercentage: progress+0.01, thickness: thickness)
+                RingTipShape(currentPercentage: currentPercentage+0.01, thickness: thickness)
                     .fill(progress > 0.96 ? Color.black.opacity(0.7) : Color.clear).blur(radius: 1).rotationEffect(.init(degrees: -90))
                 RingTipShape(currentPercentage: currentPercentage, thickness: thickness)
                     .foregroundColor(progress > 0.96 ? endColor : .clear)
                     
                     .rotationEffect(.init(degrees: -90))
                     .onAppear() {
-                        DispatchQueue.main.asyncAfter(deadline: .now()+0.5) {
-                            withAnimation(self.animation) {
-                                self.currentPercentage = self.progress
-                                //self.shadowOffset = self.ringTipShadowOffset(progress: self.progress, radius: Double(geometry.size.width), thickness: self.thickness)
+                        DispatchQueue.main.asyncAfter(deadline: .now()+0.2) {
+                            if(animate){
+                                withAnimation(self.animation) {
+                                    
+                                    self.currentPercentage = progress
+                                    
+                                    //self.shadowOffset = self.ringTipShadowOffset(progress: self.progress, radius: Double(geometry.size.width), thickness: self.thickness)
+                                }
+                            }
+                            else {
+                                self.currentPercentage = progress
                             }
                         }
-                    }.onChange(of: self.progress, perform: { value in
-                        DispatchQueue.main.asyncAfter(deadline: .now()+0.5) {
-                            withAnimation(self.animation) {
-                                self.currentPercentage = self.progress
-                                //self.shadowOffset = self.ringTipShadowOffset(progress: self.progress, radius: Double(geometry.size.width), thickness: self.thickness)
-                            }
-                        }
-                    })
+                    }
+
                 
                 
                 

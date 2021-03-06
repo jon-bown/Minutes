@@ -43,11 +43,11 @@ struct ProgressComplicationView: View {
 //                }
 
         if(compFamily == .graphicCircular){
-            ProgressRings(dateProvided: dateProvided, maxWidth: Int(37.0), maxLineWidth: 5, maxRingLimit: 3).frame(width: 50, height: 50)
+            ProgressRingsStatic(dateProvided: dateProvided, maxWidth: Int(37.0), maxLineWidth: 5, maxRingLimit: 3, animate: false).frame(width: 50, height: 50)
                 .aspectRatio(contentMode: .fill).environment(\.managedObjectContext, managedObjectContext)
         }
         else {
-            ProgressRings(dateProvided: dateProvided, maxWidth: Int(25.0), maxLineWidth: 3, maxRingLimit: 3).frame(width: 50, height: 50)
+            ProgressRingsStatic(dateProvided: dateProvided, maxWidth: Int(25.0), maxLineWidth: 3, maxRingLimit: 3, animate: false).frame(width: 50, height: 50)
                 .aspectRatio(contentMode: .fill).environment(\.managedObjectContext, managedObjectContext)
         }
         
@@ -55,7 +55,7 @@ struct ProgressComplicationView: View {
         
     }
 }
-
+#if DEBUG
 struct ProgressComplicationView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
@@ -70,3 +70,4 @@ struct ProgressComplicationView_Previews: PreviewProvider {
  
     }
 }
+#endif

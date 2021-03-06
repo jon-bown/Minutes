@@ -26,17 +26,17 @@ struct OverallProgressView: View {
     ) var goalRecords: FetchedResults<GoalRecord>
     
     var filteredGoals: [Goal] {
-        return goals.filter({(Date() > $0.startDate! ||  calendar.isDate(Date(), inSameDayAs:$0.startDate!)) && ((Date().dayOfTheWeek == $0.weekDay && $0.frequency == "Weekly") || ($0.frequency == "Monthly" && $0.monthDay == Date().dayOfTheMonth) || $0.frequency == "Daily")}).sorted(by: {$0.priority < $1.priority})
+        return goals.filter({(self.selectedDate > $0.startDate! ||  calendar.isDate(self.selectedDate, inSameDayAs:$0.startDate!)) && ((self.selectedDate.dayOfTheWeek == $0.weekDay && $0.frequency == "Weekly") || ($0.frequency == "Monthly" && $0.monthDay == self.selectedDate.dayOfTheMonth) || $0.frequency == "Daily")}).sorted(by: {$0.priority < $1.priority})
     }
     
     //goalRecords created today
     var filteredGoalRecords: [GoalRecord] {
-        return self.goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs:$0.date!)})
+        return self.goalRecords.filter({Calendar.current.isDate(self.selectedDate, inSameDayAs:$0.date!)})
     }
     
     private var days: [Date] {
         guard
-            let weekInterval = calendar.dateInterval(of: .weekOfYear, for: dateProvided)
+            let weekInterval = calendar.dateInterval(of: .weekOfYear, for: self.selectedDate)
             else { return [] }
         return calendar.generateDates(
             inside: weekInterval,
@@ -45,6 +45,12 @@ struct OverallProgressView: View {
     }
     
     var dateProvided: Date
+    @State private var selectedDate: Date
+    
+    init(dateProvided: Date){
+        self.dateProvided = dateProvided
+        _selectedDate = State(initialValue: dateProvided)
+    }
     
     
     var body: some View {
@@ -55,14 +61,14 @@ struct OverallProgressView: View {
                             VStack {
                                 Spacer(minLength: Constants.navigationBarHeight).frame(width: geometry.size.width, height: Constants.navigationBarHeight+20, alignment: .top)
                                 //self.createRings()
-                                ProgressRings(dateProvided: dateProvided, maxWidth: 200, maxLineWidth: Int(Constants.mainRingThickness), maxRingLimit: 3).padding(10)
+                                ProgressRings(dateProvided: self.selectedDate, maxWidth: 200, maxLineWidth: Int(Constants.mainRingThickness), maxRingLimit: 3).padding(10)
                                 self.createCharts()
                                 //self.createFooter()
                             }
                         }
                         self.createNavigationBar(geometry.size)
                     }
-                }
+        }
 //        ScrollView{
 //            VStack{
 //                //Weekly view of goals
@@ -82,7 +88,7 @@ struct OverallProgressView: View {
                 ForEach(filteredGoals, id: \.self){ goal in
                     BarChartView(
                         title: goal.name!, //goalRecord.name
-                        progress: "\(Double(filteredGoalRecords.first(where: {$0.name == goal.name}) == nil ? 0:filteredGoalRecords.first(where: {$0.name == goal.name})!.dayTime)/Double(60.0))", //goalRecord.progress
+                        progress: "\(round(Double(filteredGoalRecords.first(where: {$0.name == goal.name}) == nil ? 0:filteredGoalRecords.first(where: {$0.name == goal.name})!.dayTime/Double(60.0))*100)/100)", //goalRecord.progress
                         goal: "\(Int(goal.goalTime))",
                         total: "",
                         average: "",
@@ -194,7 +200,7 @@ struct OverallProgressView: View {
                         //Use weekdays here
                         ForEach(days, id:\.self) { item in
                             VStack(spacing: 1) {
-                                if(item.dayOfTheWeek == self.dateProvided.dayOfTheWeek){
+                                if(item.dayOfTheWeek == self.selectedDate.dayOfTheWeek){
                                     ZStack{
                                         Circle().fill(Color.pink).clipped().opacity(0.9).frame(width: 15, height: 15)
                                         Text(String(item.dayOfTheWeek[item.dayOfTheWeek.startIndex]))
@@ -213,12 +219,15 @@ struct OverallProgressView: View {
                                         .frame(width: 45, height: 45)
                                         .aspectRatio(contentMode: .fit)
                                 }
+                            }.contentShape(Rectangle()).onTapGesture {
+                                self.selectedDate = item
+                            
                             }
                         }
                     }
                 }
             }
-            .frame(width: geometrySize.width, height: Constants.navigationBarHeight, alignment: .top).navigationTitle(self.dateProvided.mediumDate).navigationBarTitleDisplayMode(.inline)
+            .frame(width: geometrySize.width, height: Constants.navigationBarHeight, alignment: .top).navigationTitle(self.selectedDate.mediumDate).navigationBarTitleDisplayMode(.inline)
         }
 }
 

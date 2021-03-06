@@ -17,28 +17,36 @@ struct SettingsRowView: View {
     
     //MARK: - BODY
     var body: some View {
-        HStack{
-            Text(name).foregroundColor(Color.gray)
-            Spacer()
-            if (content != nil){
-                Text(content!)
+        VStack{
+            Divider().padding(.vertical,4)
+            HStack{
+                Text(name).foregroundColor(Color.gray)
+                Spacer()
+                if (content != nil){
+                    Text(content!)
+                }
+                else if (linkLabel != nil && linkDestination != nil){
+                    Link(linkLabel!, destination: URL(string: "https://\(linkDestination!)")!)
+                    Image(systemName: "arrow.up.right.square").foregroundColor(.red)
+                }
+                else {
+                    EmptyView()
+                }
+                
             }
-            else if (linkLabel != nil && linkDestination != nil){
-                Link(linkLabel!, destination: URL(string: "https://\(linkDestination!)")!)
-                Image(systemName: "arrow.up.right.square").foregroundColor(.pink)
-            }
-            else {
-                EmptyView()
-            }
-            
         }
+
     }
 }
 
 #if DEBUG
 struct SettingsRowView_Previews: PreviewProvider {
     static var previews: some View {
-        SettingsRowView(name: "Developer", content: "App Factorial").previewLayout(.fixed(width: 375, height: 60)).padding()
+        Group{
+            SettingsRowView(name: "Developer", content: "App Factorial").previewLayout(.fixed(width: 375, height: 60)).padding()
+            SettingsRowView(name: "Website", linkLabel: "App Factorial", linkDestination: "appfactorial.com").previewLayout(.fixed(width: 375, height: 60)).padding()
+        }
+
     }
 }
 #endif

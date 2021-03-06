@@ -17,6 +17,7 @@ struct StopwatchButtonSubView: View {
     ) var goalRecords: FetchedResults<GoalRecord>
     @ObservedObject var stopWatch: StopWatch
     @ObservedObject var goal: Goal
+    @State var timer: Timer?
     @Binding var progress: Double
     @Binding var dayTime: Double
     @Binding var selectedTab: Int
@@ -26,7 +27,7 @@ struct StopwatchButtonSubView: View {
         VStack{
             HStack(alignment: .center){
                 
-                WatchStopWatchButton(actions: [self.stopWatch.reset, self.stopWatch.lap],
+                WatchStopWatchButton(actions: [self.stopWatch.reset, self.stopWatch.reset, self.resetProgress],
                                 labels: ["Reset", "Reset"],
                                 color: Color.red,
                                 isPaused: self.stopWatch.isPaused(), playPause: false, degreeRotation: -90).padding(.trailing, 8).padding(.leading, 5)
@@ -46,26 +47,38 @@ struct StopwatchButtonSubView: View {
                     }
                 }){
                     if(!self.stopWatch.isRunning){
-                        Text("Save")
+                        Text("Save").foregroundColor(.white)
                     }
                     else {
-                        Text("Save").opacity(0.5)
+                        Text("Save").foregroundColor(.gray)
                     }
                     
-                }.buttonStyle(WatchStopWatchSaveStyle()).disabled(self.stopWatch.isRunning)
-            }
+                }.background(Capsule().foregroundColor(Color.blue).opacity(0.7)).buttonStyle(WatchStopWatchSaveStyle()).disabled(self.stopWatch.isRunning)
+            }.padding(.top, 20)
+            
         }.navigationTitle("Goals")
 
     }
     
     
+    
+    
     private func startLoading() {
         self.selectedTab = 1
-        _ = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { timer in
+        self.timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { timer in
             withAnimation() {
                 self.progress = (Double(self.stopWatch.seconds) + self.dayTime)/(self.goal.goalTime*60)
             }
         }
+    }
+    
+    func resetProgress() {
+        _ = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: false) { timer in
+            withAnimation() {
+                self.timer?.invalidate()
+            }
+        }
+        
     }
     
     
@@ -116,7 +129,7 @@ struct StopwatchButtonSubView: View {
             else {
                 quadrant = 4
             }
-            let minutes = self.stopWatch.seconds / 60
+            let minutes = (newGoalRecord.progress * 60).truncatingRemainder(dividingBy: 60)
             var entry = [Int:Double]()
             hour = hour + quadrant
             entry[hour] = Double(minutes)
@@ -136,8 +149,27 @@ struct StopwatchButtonSubView: View {
             records[0].progress = self.progress
             records[0].dayTime += Double(self.stopWatch.seconds)
             
-            let hour = Calendar.current.component(.hour, from: Date())
-            let minutes = self.stopWatch.seconds / 60
+            
+            var hour = Calendar.current.component(.hour, from: Date())*4
+            let minute = Calendar.current.component(.minute, from: Date())
+            var quadrant = 0
+            if(minute == 0){
+                quadrant = 0
+            }
+            else if(minute > 0 && minute < 15) {
+                quadrant = 1
+            }
+            else if(minute >= 15 && minute < 30){
+                quadrant = 2
+            }
+            else if(minute >= 30 && minute < 45){
+                quadrant = 3
+            }
+            else {
+                quadrant = 4
+            }
+            let minutes = (records[0].progress * 60).truncatingRemainder(dividingBy: 60) 
+            hour = hour + quadrant
             
             let keyExists = records[0].goalUpdates![hour] != nil
             if(keyExists){
@@ -146,6 +178,8 @@ struct StopwatchButtonSubView: View {
             else{
                 records[0].goalUpdates![hour] = Double(minutes)
             }
+            
+        
             
             self.goal.totalTime += Double(self.stopWatch.seconds)
             saveContext()

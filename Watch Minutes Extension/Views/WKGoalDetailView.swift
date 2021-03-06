@@ -17,10 +17,10 @@ struct WKGoalDetailView: View {
     @State private var selectedTab = 0
     
     var body: some View {
-    
+
         TabView(selection: $selectedTab) {
             StopwatchButtonSubView(stopWatch: self.stopWatch, goal: self.goal, progress: self.$progress, dayTime: self.$dayTime, selectedTab: self.$selectedTab).environment(\.managedObjectContext, managedObjectContext).tag(0)
-                StopwatchTimeSubview(stopWatch: self.stopWatch, goal: self.goal, progress: self.$progress, dayTime: self.$dayTime, selectedTab: self.$selectedTab).environment(\.managedObjectContext, managedObjectContext).tag(1)
+            StopwatchTimeSubview(stopWatch: self.stopWatch, goal: self.goal, progress: self.$progress, dayTime: self.$dayTime, selectedTab: self.$selectedTab).environment(\.managedObjectContext, managedObjectContext).tag(1)
             }.tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
     }
     
