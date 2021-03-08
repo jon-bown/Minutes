@@ -49,10 +49,57 @@ struct GoalDetailView: View {
     @State private var showGoalEditForm: Bool = false
     @State private var showSaveButton: Bool = false
     @State private var goalUpdatedSuccess: Bool = false
+    @State private var showCustomMinuteSheet: Bool = false
+    @State private var newSessionText: String = ""
     //Just check the list view model if the goal record exists
     
     var filteredGoalRecordsToday: [GoalRecord] {
         return self.goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs:$0.date!) && goal.name == $0.name})
+    }
+    
+    //Extract dictionary used to display todays sessions
+    var filteredGoalRecordsUpdatesToday: [String: Double] {
+        if(self.goalRecords.isEmpty){
+            return [:]
+        }
+        else if(self.goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs:$0.date!) && goal.name == $0.name}).isEmpty){
+            return [:]
+        }
+        else {
+            
+            let firstItem = (self.goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs:$0.date!) && goal.name == $0.name}).first!)
+            if(!(firstItem.goalUpdates == nil)){
+                //it has goal updates
+                var finalDict = [String:Double]()
+                let intArray = Array(firstItem.goalUpdates!.keys)
+                for int in intArray {
+                    let timeDouble = Double(int)/4.0
+                    var timeString = "\(Int(floor(timeDouble))):"
+                    if(timeDouble.truncatingRemainder(dividingBy: 1) == 0){
+                        timeString += "00"
+                    }
+                    else if(timeDouble.truncatingRemainder(dividingBy: 1) == 0.25) {
+                        timeString += "15"
+                    }
+                    else if(timeDouble.truncatingRemainder(dividingBy: 1) == 0.5) {
+                        timeString += "30"
+                    }
+                    else {
+                        timeString += "45"
+                    }
+                    
+                    finalDict[timeString] = firstItem.goalUpdates![int]
+                    
+                }
+                return finalDict
+            }
+            else {
+                return [:]
+            }
+            
+            
+        }
+        
     }
     
     var filteredGoalRecordsCurrentGoal: [GoalRecord] {
@@ -60,97 +107,9 @@ struct GoalDetailView: View {
     }
     
     var body: some View {
-        ScrollView{
-            VStack{
-                GroupBox{
-                    HStack{
-                        VStack(alignment: .leading, spacing: 2) {
-                            
-                            Text("Today").font(Font.system(size: 20, weight: .regular, design: .default)).kerning(0.05).foregroundColor(Color.white)
-                            (
-                                Text(self.filteredGoalRecordsToday.isEmpty ? "0/\(Int(self.goal.goalTime))":"\(Int(self.filteredGoalRecordsToday[0].dayTime/60))/\(Int(self.goal.goalTime))")
-                                    .font(Font.system(size: 20, weight: .semibold, design: .rounded))
-                                    .kerning(0.25)
-                                    .foregroundColor(Color(goal.color!))
-                                    + Text("MIN")
-                                    .font(Font.system(size: 20, weight: .semibold, design: .rounded))
-                                    .kerning(0.3).foregroundColor(Color(goal.color!))
-                            )
-                            .padding([.top], -3).padding(.bottom, 2)
-                            
-                            Text("Streak").font(Font.system(size: 20, weight: .regular, design: .default)).kerning(0.05).foregroundColor(Color.white)
-                            (
-                                Text(String(self.calculateCurrentStreak()))
-                                    .font(Font.system(size: 20, weight: .semibold, design: .rounded))
-                                    .kerning(0.3).foregroundColor(Color(goal.color!))
-                                
-                            )
-                            Text("Total Time")
-                                .font(Font.system(size: 18, weight: .regular, design: .default))
-                                .kerning(0.05)
-                                .foregroundColor(Color.white)
-                            (
-                                Text("\(self.getHoursFromSeconds(seconds: self.goal.totalTime)):\(self.getMinutesFromSeconds(seconds: self.goal.totalTime)):\(self.getSecondsFromSeconds(seconds: self.goal.totalTime))")
-                                    .font(Font.system(size: 20, weight: .regular, design: .rounded))
-                                    .kerning(0.25)
-                                    .foregroundColor(Color(goal.color!))
-                            )
-                            .padding([.top], -3)
-                            
-                            
-                        }
-                        Spacer()
-                        
-                        ZStack(alignment: .center){
-                            ProgressRingView(progress: self.progress, thickness: 20, startColor: Color(self.goal.color!.darker(by: 10.0)!), endColor: Color(self.goal.color!.lighter(by: 15)!), backgroundColor: self.goal.color!).frame(width: 175, height: 175).aspectRatio(contentMode: .fit).animatableProgressText(progress: progress)
-                        }
-                        
-                        
-                    }.padding(2)
-                }.cornerRadius(15).padding()
-                
-                
-                
-                Divider().background(Color.white).padding(.leading, 10)
-                //Align text properly
-                VStack(alignment: .leading, spacing: 0) {
-                    HStack(spacing: 30) {
-                        VStack(alignment: .leading, spacing: 0) {
-                            Text("Started").font(Font.system(size: 18, weight: .regular, design: .default)).kerning(0.05).foregroundColor(Color.white)
-                            (
-                                Text(String(self.goal.startDate!.mediumDate))
-                                    .font(Font.system(size: 25, weight: .regular, design: .rounded))
-                                    .kerning(0.25)
-                                    .foregroundColor(Color(goal.color!)).lineLimit(1)
-                                
-                            )
-                            .padding([.top], -3)
-                        }.padding(.leading, 3)
-                        Spacer()
-                        
-                        
-                        if(self.goal.endDate != nil){
-                            VStack(alignment: .leading, spacing: 0) {
-                                Text("End Date").font(Font.system(size: 18, weight: .regular, design: .default)).kerning(0.05).foregroundColor(Color.white)
-                                (
-                                    Text(String(self.goal.endDate!.mediumDate))
-                                        .font(Font.system(size: 25, weight: .regular, design: .rounded))
-                                        .kerning(0.25)
-                                        .foregroundColor(Color(goal.color!)).lineLimit(1)
-                                    
-                                )
-                                .padding([.top], -3)
-                            }
-                        }
-                        
-                        
-                    }.padding(.vertical, 10)
-                    
-                    Divider().background(Color.white)
-                    
-                    
-                }.padding([.leading], 15)
-            }
+        ScrollView(.vertical, showsIndicators: false){
+            
+            self.createProgressBox()
             
             RoundedRectangle(cornerRadius: 10)
                 .frame(height: 90).padding()
@@ -188,6 +147,61 @@ struct GoalDetailView: View {
             
             VStack{
                 
+
+                GroupBox(label: GroupBoxLabelButton(label: "Sessions", action: self.addCustomMinutes)){
+                    
+                    //list of all goal updates today
+                    ForEach(self.filteredGoalRecordsUpdatesToday.sorted(by: >), id: \.key){
+                        key, value in
+                        VStack{
+                            Divider()
+                            HStack{
+                                
+                                Text(key)
+                                Spacer()
+                                Text("\(self.getHoursFromSeconds(seconds: value)):\(self.getMinutesFromSeconds(seconds: value)):\(self.getSecondsFromSeconds(seconds: value))")
+                            }
+                        }
+
+                    }
+
+                }.padding()
+                .background(Color.blue)
+//                if $showCustomMinuteSheet.wrappedValue {
+//                          ZStack() {
+//                            Color.blue
+//                              VStack {
+//                                TextField("Test", text: self.$newSessionText)
+//                                HStack{
+//                                    //save and cancel button
+//                                    Button(action: {
+//                                        //Save and add to list
+//                                        self.showCustomMinuteSheet = false
+//
+//                                    }){
+//                                        Text("Save")
+//                                    }
+//
+//                                    Button(action: {
+//                                        self.showCustomMinuteSheet = false
+//                                    }){
+//                                        Text("Cancel")
+//                                    }
+//                                }
+//
+//                              }.padding()
+//                          }
+//                          .frame(width: 300, height: 80,alignment: .center)
+//                          .cornerRadius(20).shadow(radius: 20)
+//                      }
+                
+//                .popover(isPresented: self.$showCustomMinuteSheet) {
+//                    GroupBox{
+//                        Text("Testing")
+//                    }
+//                }
+//                .padding()
+ //               .background(Color.blue)
                 
                 
                 //TODO: Add ability to just log minutes directly and display it as a list
@@ -199,7 +213,8 @@ struct GoalDetailView: View {
                 //option to delete
                 
                 
-            }.navigationBarTitle(Text(goal.name!), displayMode: .automatic).navigationBarItems(
+            }
+            self.createDateInfoTile().padding([.leading], 15).navigationBarTitle(Text(goal.name!), displayMode: .automatic).navigationBarItems(
                 //                    leading: Button(action: {
                 //                    self.presentationMode.wrappedValue.dismiss()
                 //                }){
@@ -219,13 +234,112 @@ struct GoalDetailView: View {
                     
                 })
             
-        }.onAppear { self.updateProgress()}.toast(isShowing: self.$goalUpdatedSuccess, text: Text("Saved"))
+        }.onAppear { self.updateProgress()}.toast(isShowing: self.$goalUpdatedSuccess, text: Text("Saved")).textFieldAlert(isShowing: self.$showCustomMinuteSheet, text: self.$newSessionText, title: "Alert!")
         
         
     }
     
-    //MARK: - HELPER METHODS
+    //MARK: - SUB VIEWS
+    private func createDateInfoTile() -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 30) {
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("Started").font(Font.system(size: 18, weight: .regular, design: .default)).kerning(0.05).foregroundColor(Color.white)
+                    (
+                        Text(String(self.goal.startDate!.mediumDate))
+                            .font(Font.system(size: 25, weight: .regular, design: .rounded))
+                            .kerning(0.25)
+                            .foregroundColor(Color(goal.color!)).lineLimit(1)
+                        
+                    )
+                    .padding([.top], -3)
+                }.padding(.leading, 3)
+                Spacer()
+                
+                
+                if(self.goal.endDate != nil){
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text("End Date").font(Font.system(size: 18, weight: .regular, design: .default)).kerning(0.05).foregroundColor(Color.white)
+                        (
+                            Text(String(self.goal.endDate!.mediumDate))
+                                .font(Font.system(size: 25, weight: .regular, design: .rounded))
+                                .kerning(0.25)
+                                .foregroundColor(Color(goal.color!)).lineLimit(1)
+                            
+                        )
+                        .padding([.top], -3)
+                    }
+                }
+                
+                
+            }.padding(.vertical, 10)
+            
+            Divider().background(Color.white).padding(.horizontal, 2)
+            
+        }
+    }
     
+    private func createProgressBox() -> some View {
+        VStack{
+            GroupBox{
+                HStack{
+                    VStack(alignment: .leading, spacing: 2) {
+                        
+                        Text("Today").font(Font.system(size: 20, weight: .regular, design: .default)).kerning(0.05).foregroundColor(Color.white)
+                        (
+                            Text(self.filteredGoalRecordsToday.isEmpty ? "0/\(Int(self.goal.goalTime))":"\(Int(self.filteredGoalRecordsToday[0].dayTime/60))/\(Int(self.goal.goalTime))")
+                                .font(Font.system(size: 20, weight: .semibold, design: .rounded))
+                                .kerning(0.25)
+                                .foregroundColor(Color(goal.color!))
+                                + Text("MIN")
+                                .font(Font.system(size: 20, weight: .semibold, design: .rounded))
+                                .kerning(0.3).foregroundColor(Color(goal.color!))
+                        )
+                        .padding([.top], -3).padding(.bottom, 2)
+                        
+                        Text("Streak").font(Font.system(size: 20, weight: .regular, design: .default)).kerning(0.05).foregroundColor(Color.white)
+                        (
+                            Text(String(self.calculateCurrentStreak()))
+                                .font(Font.system(size: 20, weight: .semibold, design: .rounded))
+                                .kerning(0.3).foregroundColor(Color(goal.color!))
+                            
+                        )
+                        Text("Total Time")
+                            .font(Font.system(size: 18, weight: .regular, design: .default))
+                            .kerning(0.05)
+                            .foregroundColor(Color.white)
+                        (
+                            Text("\(self.getHoursFromSeconds(seconds: self.goal.totalTime)):\(self.getMinutesFromSeconds(seconds: self.goal.totalTime)):\(self.getSecondsFromSeconds(seconds: self.goal.totalTime))")
+                                .font(Font.system(size: 20, weight: .regular, design: .rounded))
+                                .kerning(0.25)
+                                .foregroundColor(Color(goal.color!))
+                        )
+                        .padding([.top], -3)
+                        
+                        
+                    }
+                    Spacer()
+                    
+                    ZStack(alignment: .center){
+                        ProgressRingView(progress: self.progress, thickness: 20, startColor: Color(self.goal.color!.darker(by: 10.0)!), endColor: Color(self.goal.color!.lighter(by: 15)!), backgroundColor: self.goal.color!).frame(width: 175, height: 175).aspectRatio(contentMode: .fit).animatableProgressText(progress: progress)
+                    }
+                    
+                    
+                }.padding(2)
+            }.cornerRadius(15).padding()
+            
+
+        }
+    }
+    
+    //create tile for total time
+    
+    //create tile for both streaks
+    
+    //MARK: - HELPER METHODS
+    private func addCustomMinutes() {
+        self.showCustomMinuteSheet = true
+    }
     //Calculates the current streak the user is on
     private func calculateCurrentStreak() -> Int {
         if(filteredGoalRecordsCurrentGoal.count == 0){
@@ -364,7 +478,7 @@ struct GoalDetailView: View {
             
             let keyExists = records[0].goalUpdates![hour] != nil
             if(keyExists){
-                records[0].goalUpdates![hour] = records[0].goalUpdates![hour]! + Double(minutes)
+                records[0].goalUpdates![hour] = (records[0].goalUpdates![hour]! + Double(minutes)).truncatingRemainder(dividingBy: 60)
             }
             else{
                 records[0].goalUpdates![hour] = Double(minutes)

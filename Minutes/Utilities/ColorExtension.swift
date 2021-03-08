@@ -90,3 +90,4 @@ extension Color {
     static let dividerBackground = Color(red: 46 / 255, green: 47 / 255, blue: 51 / 255)
     
 }
+
