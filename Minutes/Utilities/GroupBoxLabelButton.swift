@@ -9,23 +9,30 @@ import SwiftUI
 
 struct GroupBoxLabelButton: View {
     var label: String
-    var action: () -> Void
+    @Binding var isEditable: Bool
+    var action: () -> Bool
+
     var body: some View {
         HStack{
             Text(label).bold()
             Spacer()
             Button(action: {
-                self.action()
+                self.isEditable = self.action()
             }){
-                Image(systemName: "plus")
+                if(self.isEditable){
+                    Text("Done").foregroundColor(.white)
+                }
+                else {
+                    Text("Select").foregroundColor(.white)
+                }
             }
             
         }
     }
 }
 
-struct GroupBoxLabelButton_Previews: PreviewProvider {
-    static var previews: some View {
-        GroupBoxLabelButton(label: "Test", action: {})
-    }
-}
+//struct GroupBoxLabelButton_Previews: PreviewProvider {
+//    static var previews: some View {
+//        GroupBoxLabelButton(label: "Test", action: {return false})
+//    }
+//}

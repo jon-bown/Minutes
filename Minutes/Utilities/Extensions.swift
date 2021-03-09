@@ -77,6 +77,30 @@ extension Date {
         return dayOfMonth!
     }
     
+    
+    var minuteQuadrant: Int {
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.minute], from: self)
+        let minute = components.minute!
+        var quadrant = 0
+        if(minute == 0){
+            quadrant = 0
+        }
+        else if(minute > 0 && minute < 15) {
+            quadrant = 1
+        }
+        else if(minute >= 15 && minute < 30){
+            quadrant = 2
+        }
+        else if(minute >= 30 && minute < 45){
+            quadrant = 3
+        }
+        else {
+            quadrant = 4
+        }
+        return quadrant
+    }
+    
 }
 
 

@@ -2,7 +2,7 @@
 //  GoalRecord+CoreDataClass.swift
 //  Watch Minutes Extension
 //
-//  Created by Jonathan Bown on 2/6/21.
+//  Created by Jonathan Bown on 3/8/21.
 //
 //
 

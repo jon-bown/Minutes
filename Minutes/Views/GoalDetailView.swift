@@ -51,6 +51,8 @@ struct GoalDetailView: View {
     @State private var goalUpdatedSuccess: Bool = false
     @State private var showCustomMinuteSheet: Bool = false
     @State private var newSessionText: String = ""
+    @State private var isSessionsEditable: Bool = false
+    @State private var sessionsToRemove: [Date] = [Date]()
     //Just check the list view model if the goal record exists
     
     var filteredGoalRecordsToday: [GoalRecord] {
@@ -58,7 +60,7 @@ struct GoalDetailView: View {
     }
     
     //Extract dictionary used to display todays sessions
-    var filteredGoalRecordsUpdatesToday: [String: Double] {
+    var filteredGoalRecordsSavesToday: [Date: Double] {
         if(self.goalRecords.isEmpty){
             return [:]
         }
@@ -68,30 +70,10 @@ struct GoalDetailView: View {
         else {
             
             let firstItem = (self.goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs:$0.date!) && goal.name == $0.name}).first!)
-            if(!(firstItem.goalUpdates == nil)){
+            if(!(firstItem.goalSaves == nil)){
                 //it has goal updates
-                var finalDict = [String:Double]()
-                let intArray = Array(firstItem.goalUpdates!.keys)
-                for int in intArray {
-                    let timeDouble = Double(int)/4.0
-                    var timeString = "\(Int(floor(timeDouble))):"
-                    if(timeDouble.truncatingRemainder(dividingBy: 1) == 0){
-                        timeString += "00"
-                    }
-                    else if(timeDouble.truncatingRemainder(dividingBy: 1) == 0.25) {
-                        timeString += "15"
-                    }
-                    else if(timeDouble.truncatingRemainder(dividingBy: 1) == 0.5) {
-                        timeString += "30"
-                    }
-                    else {
-                        timeString += "45"
-                    }
-                    
-                    finalDict[timeString] = firstItem.goalUpdates![int]
-                    
-                }
-                return finalDict
+                
+                return firstItem.goalSaves!
             }
             else {
                 return [:]
@@ -118,13 +100,14 @@ struct GoalDetailView: View {
             
             HStack{
                 Spacer()
-                StopWatchButton(actions: [self.stopWatch.reset, self.stopWatch.reset, self.resetProgress],
+                StopWatchButton(actions: [self.stopWatch.reset, self.stopWatch.reset, self.resetTimer],
                                 labels: ["Reset", "Reset"],
                                 color: Color.red,
                                 isPaused: self.stopWatch.isPaused(), playPause: false)
                 Spacer()
                 Button(action: {
                     if(!self.stopWatch.isRunning){
+                        self.resetTimer()
                         self.updateGoalRecord()
                     }
                 }){
@@ -147,23 +130,63 @@ struct GoalDetailView: View {
             
             VStack{
                 
+                
 
-                GroupBox(label: GroupBoxLabelButton(label: "Sessions", action: self.addCustomMinutes)){
+                GroupBox(label: GroupBoxLabelButton(label: "Sessions", isEditable: self.$isSessionsEditable, action: self.makeListEditable)){
                     
                     //list of all goal updates today
-                    ForEach(self.filteredGoalRecordsUpdatesToday.sorted(by: >), id: \.key){
-                        key, value in
-                        VStack{
-                            Divider()
-                            HStack{
-                                
-                                Text(key)
-                                Spacer()
-                                Text("\(self.getHoursFromSeconds(seconds: value)):\(self.getMinutesFromSeconds(seconds: value)):\(self.getSecondsFromSeconds(seconds: value))")
-                            }
-                        }
+                    
+                        
+                        ForEach(self.filteredGoalRecordsSavesToday.sorted(by: >), id: \.key){
+                            key, value in
 
-                    }
+                                //Divider()
+                            GroupBox{
+                                HStack{
+                                    if(self.isSessionsEditable){
+                                        CheckListButton(dateKey: key, listOfSessions: self.$sessionsToRemove)
+                                    }
+                                    Text(key.shortTime)
+                                    Spacer()
+                                    Text("\(self.getHoursFromSeconds(seconds: value)):\(self.getMinutesFromSeconds(seconds: value)):\(self.getSecondsFromSeconds(seconds: value))")
+                                }
+                            }
+
+                            
+
+                        }
+                        
+                        Divider()
+                        
+                        HStack{
+                            Spacer()
+                            Button(action: {
+                                if self.isSessionsEditable {
+                                    //delete the sessions
+                                    
+                                    if(!self.sessionsToRemove.isEmpty){
+                                        self.deleteGoalRecordSessions()
+                                    }
+                                    
+                                    self.isSessionsEditable = false
+                                }
+                                else {
+                                    self.addCustomMinutes()
+                                }
+                                
+                            }){
+                                if(!self.isSessionsEditable){
+                                    Image(systemName: "plus").font(.system(size: 20))
+                                }
+                                else {
+                                    Image(systemName: "trash").font(.system(size: 20))
+                                }
+                                
+                            }
+                            Spacer()
+                            
+                        }.padding()
+
 
                 }.padding()
                 .background(Color.blue)
@@ -335,10 +358,42 @@ struct GoalDetailView: View {
     //create tile for total time
     
     //create tile for both streaks
+
     
     //MARK: - HELPER METHODS
     private func addCustomMinutes() {
         self.showCustomMinuteSheet = true
+    }
+    
+    private func makeListEditable() -> Bool {
+        self.isSessionsEditable.toggle()
+        return self.isSessionsEditable
+    }
+    
+    private func deleteGoalRecordSessions() {
+        // remove the goalrecord from goal saves
+        
+        //remove the goalrecord from goal updates
+        let record = self.goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs: $0.date!) && $0.name == goal.name}).first
+        print(self.sessionsToRemove)
+        for key in self.sessionsToRemove {
+            // the date
+            let timeToRemove = self.filteredGoalRecordsSavesToday[key]
+
+            
+            record!.dayTime -= timeToRemove!
+            self.goal.totalTime -= timeToRemove!
+            record!.goalSaves!.removeValue(forKey: key)
+            record!.goalUpdates!.removeValue(forKey: key.minuteQuadrant)
+
+        }
+        self.sessionsToRemove.removeAll()
+        print(self.sessionsToRemove)
+        self.recalculateDayTime()
+        self.recalculateProgress()
+        record!.progress = self.progress
+        
+        self.saveContext()
     }
     //Calculates the current streak the user is on
     private func calculateCurrentStreak() -> Int {
@@ -417,28 +472,16 @@ struct GoalDetailView: View {
             self.goal.totalTime += Double(self.stopWatch.seconds)
             //divide hours into four quadrants
             var hour = Calendar.current.component(.hour, from: Date())*4
-            let minute = Calendar.current.component(.minute, from: Date())
-            var quadrant = 0
-            if(minute == 0){
-                quadrant = 0
-            }
-            else if(minute > 0 && minute < 15) {
-                quadrant = 1
-            }
-            else if(minute >= 15 && minute < 30){
-                quadrant = 2
-            }
-            else if(minute >= 30 && minute < 45){
-                quadrant = 3
-            }
-            else {
-                quadrant = 4
-            }
             let minutes = (newGoalRecord.progress * 60).truncatingRemainder(dividingBy: 60)
             var entry = [Int:Double]()
-            hour = hour + quadrant
+            hour = hour + Date().minuteQuadrant
             entry[hour] = Double(minutes)
             newGoalRecord.goalUpdates = entry
+            
+            //SAVES
+            var save = [Date:Double]()
+            save[Date()] = Double(self.stopWatch.seconds)
+            newGoalRecord.goalSaves = save
             //add entry with hour: minutes
             //newGoal.color = UIColor(goalCol)
             //newGoal.cumTime = 0.0
@@ -456,25 +499,8 @@ struct GoalDetailView: View {
             
             
             var hour = Calendar.current.component(.hour, from: Date())*4
-            let minute = Calendar.current.component(.minute, from: Date())
-            var quadrant = 0
-            if(minute == 0){
-                quadrant = 0
-            }
-            else if(minute > 0 && minute < 15) {
-                quadrant = 1
-            }
-            else if(minute >= 15 && minute < 30){
-                quadrant = 2
-            }
-            else if(minute >= 30 && minute < 45){
-                quadrant = 3
-            }
-            else {
-                quadrant = 4
-            }
             let minutes = (records[0].progress * 60).truncatingRemainder(dividingBy: 60)
-            hour = hour + quadrant
+            hour = hour + Date().minuteQuadrant
             
             let keyExists = records[0].goalUpdates![hour] != nil
             if(keyExists){
@@ -483,6 +509,16 @@ struct GoalDetailView: View {
             else{
                 records[0].goalUpdates![hour] = Double(minutes)
             }
+            //Goal Saves
+            let dateKey = Date()
+            let saveKeyExists = records[0].goalSaves![dateKey] != nil
+            if(saveKeyExists){
+                records[0].goalSaves![dateKey] = (records[0].goalSaves![dateKey]! + Double(self.stopWatch.seconds))
+            }
+            else{
+                records[0].goalSaves![dateKey] = Double(self.stopWatch.seconds)
+            }
+            
             
         
             
@@ -508,10 +544,27 @@ struct GoalDetailView: View {
         
     }
     
+    func recalculateDayTime() {
+        let records = self.goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs: $0.date!) && $0.name == goal.name})
+        if(!records.isEmpty){
+            self.dayTime = records[0].dayTime
+        }
+        else{
+            self.dayTime = 0.0
+        }
+    }
+    
+    func recalculateProgress() {
+        self.progress = (Double(self.stopWatch.seconds) + self.dayTime)/(self.goal.goalTime*60)
+    }
+    
+    
+
+    
     func startLoading() {
         self.timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { timer in
             withAnimation() {
-                self.progress = (Double(self.stopWatch.seconds) + self.dayTime)/(self.goal.goalTime*60)
+                recalculateProgress()
                 //                if self.stopWatch.seconds >= Float(self.goal.goalTime*60) {
                 //                    timer.invalidate()
                 //                }
@@ -519,7 +572,7 @@ struct GoalDetailView: View {
         }
     }
     
-    func resetProgress() {
+    func resetTimer() {
         _ = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: false) { timer in
             withAnimation() {
                 self.timer?.invalidate()

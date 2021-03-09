@@ -2,7 +2,7 @@
 //  GoalRecord+CoreDataProperties.swift
 //  Watch Minutes Extension
 //
-//  Created by Jonathan Bown on 2/6/21.
+//  Created by Jonathan Bown on 3/8/21.
 //
 //
 
@@ -22,6 +22,7 @@ extension GoalRecord {
     @NSManaged public var id: UUID?
     @NSManaged public var name: String?
     @NSManaged public var progress: Double
+    @NSManaged public var goalSaves: [Date:Double]?
 
 }
 

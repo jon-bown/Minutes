@@ -120,6 +120,8 @@ struct BarChartView: View {
             .font(Font.system(size: 11, weight: .medium, design: .default))
             .foregroundColor(Color.chartLegendText)
     }
+    
+
 
 }
 
