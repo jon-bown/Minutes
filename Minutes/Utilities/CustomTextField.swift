@@ -17,11 +17,11 @@ extension View {
 
     func textFieldAlert(isShowing: Binding<Bool>,
                         text: Binding<String>,
-                        title: String) -> some View {
+                        title: String, saveAction: @escaping () -> Void) -> some View {
         TextFieldAlert(isShowing: isShowing,
                        text: text,
                        presenting: self,
-                       title: title)
+                       title: title, saveAction: saveAction)
     }
 
 }
@@ -32,6 +32,7 @@ struct TextFieldAlert<Presenting>: View where Presenting: View {
     @Binding var text: String
     let presenting: Presenting
     let title: String
+    let saveAction: () -> Void
 
     var body: some View {
         GeometryReader { (deviceSize: GeometryProxy) in
@@ -39,25 +40,41 @@ struct TextFieldAlert<Presenting>: View where Presenting: View {
                 self.presenting
                     .disabled(isShowing)
                 VStack {
-                    Text(self.title)
+                    Text(self.title).foregroundColor(.black).bold().font(.system(size: 20)).padding(.top, 12)
                     CustomTextField(text: self.$text, isFirstResponder: self.isShowing)                .multilineTextAlignment(.center)
                         .lineLimit(1)
-                        .id(self.isShowing).padding()
+                        .id(self.isShowing).padding().padding(.top, 5)
                     Divider()
                     HStack {
+                        
                         Button(action: {
                             withAnimation {
                                 self.isShowing.toggle()
                             }
                         }) {
-                            Text("Dismiss")
-                        }
-                    }
-                }.background(Color.black)
+                            Text("Dismiss").font(.system(size: 20)).bold().foregroundColor(.red).padding()
+                        }.frame(width: 110, height: 20, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/).padding()
+                        
+                        Divider()
+
+                        Button(action: {
+                            withAnimation {
+                                //add save action
+                            
+                                    self.saveAction()
+                                    self.isShowing.toggle()
+     
+
+                            }
+                        }) {
+                            Text("Save").font(.system(size: 20)).foregroundColor(.blue).padding()
+                        }.frame(width: 110, height: 20, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/).padding()
+                    }.padding(.horizontal, 4)
+                }.background(Color(UIColor.lightGray)).cornerRadius(15)
                 .padding()
                 .frame(
-                    width: 300,
-                    height: 200
+                    width: 280,
+                    height: 220
                 )
                 .shadow(radius: 1)
                 .opacity(self.isShowing ? 1 : 0)
@@ -93,6 +110,12 @@ struct CustomTextField: UIViewRepresentable {
     func makeUIView(context: UIViewRepresentableContext<CustomTextField>) -> UITextField {
         let textField = UITextField(frame: .zero)
         textField.delegate = context.coordinator
+        
+        let placeholder = NSAttributedString(string: "Minutes", attributes: [NSAttributedString.Key.foregroundColor : UIColor.darkGray])
+        textField.attributedPlaceholder = placeholder
+        textField.textColor = UIColor.black
+        textField.backgroundColor = UIColor.white
+        textField.keyboardType = UIKeyboardType.numberPad
         return textField
     }
 

@@ -156,7 +156,7 @@ struct GoalDetailView: View {
 
                         }
                         
-                        Divider()
+                    Divider().frame(height: 5).background(Color.red)
                         
                         HStack{
                             Spacer()
@@ -176,10 +176,10 @@ struct GoalDetailView: View {
                                 
                             }){
                                 if(!self.isSessionsEditable){
-                                    Image(systemName: "plus").font(.system(size: 20))
+                                    Image(systemName: "plus").font(.system(size: 25, weight: .bold)).frame(width: 100, height: 40).background(Color.gray).cornerRadius(15)
                                 }
                                 else {
-                                    Image(systemName: "trash").font(.system(size: 20))
+                                    Image(systemName: "trash").font(.system(size: 20)).foregroundColor(.red)
                                 }
                                 
                             }
@@ -257,7 +257,7 @@ struct GoalDetailView: View {
                     
                 })
             
-        }.onAppear { self.updateProgress()}.toast(isShowing: self.$goalUpdatedSuccess, text: Text("Saved")).textFieldAlert(isShowing: self.$showCustomMinuteSheet, text: self.$newSessionText, title: "Alert!")
+        }.onAppear { self.updateProgress()}.toast(isShowing: self.$goalUpdatedSuccess, text: Text("Saved")).textFieldAlert(isShowing: self.$showCustomMinuteSheet, text: self.$newSessionText, title: "Add Minutes", saveAction: self.saveCustomMinuteSession)
         
         
     }
@@ -375,7 +375,6 @@ struct GoalDetailView: View {
         
         //remove the goalrecord from goal updates
         let record = self.goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs: $0.date!) && $0.name == goal.name}).first
-        print(self.sessionsToRemove)
         for key in self.sessionsToRemove {
             // the date
             let timeToRemove = self.filteredGoalRecordsSavesToday[key]
@@ -388,12 +387,94 @@ struct GoalDetailView: View {
 
         }
         self.sessionsToRemove.removeAll()
-        print(self.sessionsToRemove)
         self.recalculateDayTime()
         self.recalculateProgress()
         record!.progress = self.progress
         
         self.saveContext()
+    }
+    
+    private func saveCustomMinuteSession(){
+        let records = self.goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs: $0.date!) && $0.name == goal.name})
+        guard let customMinutes = Int(self.newSessionText)
+        else {
+            return
+            //error
+        }
+        let customSeconds = Double(customMinutes) * 60.0
+        //Add date to array of records for the goal record
+        
+        if(records.isEmpty){
+            
+            let newGoalRecord = GoalRecord(context: managedObjectContext)
+            newGoalRecord.name = self.goal.name!
+            newGoalRecord.date = Date()
+            self.progress = customSeconds/(self.goal.goalTime*60)
+            newGoalRecord.progress = self.progress
+            newGoalRecord.id = self.goal.id!
+            
+            newGoalRecord.dayTime = customSeconds
+            self.goal.totalTime += customSeconds
+            //divide hours into four quadrants
+            var hour = Calendar.current.component(.hour, from: Date())*4
+            let minutes = (newGoalRecord.progress * 60).truncatingRemainder(dividingBy: 60)
+            var entry = [Int:Double]()
+            hour = hour + Date().minuteQuadrant
+            entry[hour] = Double(minutes)
+            newGoalRecord.goalUpdates = entry
+            
+            //SAVES
+            var save = [Date:Double]()
+            save[Date()] = customSeconds
+            newGoalRecord.goalSaves = save
+            //add entry with hour: minutes
+            //newGoal.color = UIColor(goalCol)
+            //newGoal.cumTime = 0.0
+            //newGoal.dayTime = 0.0
+            //newGoal.goalTime = Double(self.goalDailyTime)
+            //newGoal.frequency = ""
+            //newGoal.id = UUID()
+            saveContext()
+        }
+        
+        else {
+            //add entry with hour: minutes
+            records[0].dayTime += customSeconds
+            self.progress = records[0].dayTime/(self.goal.goalTime*60)
+            records[0].progress = self.progress
+            
+            
+            
+            var hour = Calendar.current.component(.hour, from: Date())*4
+            let minutes = (records[0].progress * 60).truncatingRemainder(dividingBy: 60)
+            hour = hour + Date().minuteQuadrant
+            
+            let keyExists = records[0].goalUpdates![hour] != nil
+            if(keyExists){
+                records[0].goalUpdates![hour] = (records[0].goalUpdates![hour]! + Double(minutes)).truncatingRemainder(dividingBy: 60)
+            }
+            else{
+                records[0].goalUpdates![hour] = Double(minutes)
+            }
+            //Goal Saves
+            let dateKey = Date()
+            let saveKeyExists = records[0].goalSaves![dateKey] != nil
+            if(saveKeyExists){
+                records[0].goalSaves![dateKey] = (records[0].goalSaves![dateKey]! + customSeconds)
+            }
+            else{
+                records[0].goalSaves![dateKey] = customSeconds
+            }
+            
+            
+        
+            
+            self.goal.totalTime += customSeconds
+            saveContext()
+            
+            
+        }
+        
     }
     //Calculates the current streak the user is on
     private func calculateCurrentStreak() -> Int {
@@ -425,7 +506,9 @@ struct GoalDetailView: View {
                         tempDate = record.date!
                     }
                     else{
+                        #if DEBUG
                         print("Error with counting hours between dates")
+                        #endif
                     }
                 }
                 return count
@@ -449,7 +532,9 @@ struct GoalDetailView: View {
             do {
                 try managedObjectContext.save()
             } catch {
+                #if DEBUG
                 print("Error saving managed object context: \(error)")
+                #endif
             }
         }
     }
