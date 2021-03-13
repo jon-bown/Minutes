@@ -1,97 +1,160 @@
 //
-//  StopWatch.swift
-//  StopWatch
+//  StopWatchTwo.swift
+//  Minutes
 //
-//  Created by ProgrammingWithSwift on 2020/05/24.
-//  Copyright © 2020 ProgrammingWithSwift. All rights reserved.
+//  Created by Jonathan Bown on 3/11/21.
 //
-import Combine
-import Foundation
-import SwiftUI
+
+import UIKit
+
+
+var kDisableTimerWhenAppIsNotActive = true
 
 class StopWatch: ObservableObject {
+    
+    
+    private enum TimerMode {
+        case stopped
+        case running
+        case suspended
+    }
+    
+    
+    // the heart of a timer object is a timer, if one is active
+    private weak var timer: Timer? = nil
+    
+    private var previouslyAccumulatedTime: TimeInterval = 0
+    private var startDate: Date? = nil
+    private var lastStopDate: Date? = nil
+    private var state: TimerMode = .stopped
+    
+    @Published var totalAccumulatedTime: TimeInterval = 0
+    
+    // now we let people ask us questions or tell us to do things
+    var isSuspended: Bool { return state == .suspended }
+    var isRunning: Bool { return state == .running }
+    var isStopped: Bool { return state == .stopped }
+    
     private var sourceTimer: DispatchSourceTimer?
     private let queue = DispatchQueue(label: "stopwatch.timer")
     private var counter: Int = 0
     var cumCounter: Int = 0
-    var isRunning: Bool = false
     
-    var stopWatchTime = "00:00:00" {
-        didSet {
-            self.update()
-        }
-    }
+    var stopWatchTime:String = "00:00:00"
 
-    var paused = true {
-        didSet {
-            self.update()
-        }
+
+    var minutes: Float = 0.0
+    
+    var seconds: Float = 0.0
+    
+    
+    
+    private func shutdownTimer() {
+        // how long we've been in the .running state
+        let accumulatedRunningTime = Date().timeIntervalSince(startDate!)
+        // total running time: however long we had been running before entering the
+        // current .running state, plus how long we've now been running now
+        previouslyAccumulatedTime += accumulatedRunningTime
+        totalAccumulatedTime = previouslyAccumulatedTime
+
+        // remember when we shut down
+        lastStopDate = Date()
+        // throw out the time
+        timer!.invalidate()
+        timer = nil  // should happen anyway with a weak variable
     }
     
-    var laps = [LapItem]() {
-        didSet {
-            self.update()
-        }
-    }
-    
-    var minutes = Float() {
-        didSet {
-            self.update()
-        }
-    }
-    
-    var seconds = Float() {
-        didSet {
-            self.update()
-        }
-    }
-    
-    private var currentLaps = [LapItem]() {
-        didSet {
-            self.laps = currentLaps.reversed()
+    func suspend() {
+        // it only makes sense to suspend if you are running
+        if state == .running {
+            shutdownTimer()
+            state = .suspended
         }
     }
     
     func start() {
-        self.paused = !self.paused
-        self.isRunning = true
-        guard let _ = self.sourceTimer else {
-            self.startTimer()
-            return
+        // we can only start if we are not running (either suspended or stopped)
+        if state != .running {
+            // set new start time beginning now
+            startDate = Date()
+            // except, if we are restarting the timer after the app was moved from inactive
+            // to active, use whatever we had as the lastStopDate when we suspended to be
+            // the new startDate (if so configured to do so)
+            if state == .suspended && !kDisableTimerWhenAppIsNotActive {
+                startDate = lastStopDate
+            }
+            // schedule a new timer
+            timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: (#selector(update)), userInfo: nil, repeats: true)
+            RunLoop.current.add(timer!, forMode:RunLoop.Mode.default)
+            state = .running
         }
+    }
+    
+    func stop() {
+        // it only makes sense to stop if you are running
+        if state == .running {
+            shutdownTimer()
+            state = .stopped
+        }
+    }
+    
+    @objc private func update() {
+        // how long we've been running in the current .running state
+        // and add in any previously accumulated time
+        totalAccumulatedTime = previouslyAccumulatedTime + Date().timeIntervalSince(startDate!)
         
-        self.resumeTimer()
-    }
-    
-    func pause() {
-        self.paused = !self.paused
-        self.isRunning = false
-        self.sourceTimer?.suspend()
-    }
-    
-    func lap() {
-        if let firstLap = self.laps.first {
-            let difference = self.counter - firstLap.count
-            self.currentLaps.append(LapItem(count: self.counter, diff: difference))
-        } else {
-            self.currentLaps.append(LapItem(count: self.counter))
+        DispatchQueue.main.async {
+            self.seconds = self.totalAccumulatedTime.seconds()
+            self.stopWatchTime = self.totalAccumulatedTime.stringFromTimeInterval()
         }
     }
     
     func reset() {
-        self.stopWatchTime = "00:00:00"
-        self.counter = 0
-        self.currentLaps = [LapItem]()
-        self.isRunning = false
-        self.seconds = 0
+        guard state == .stopped else { return }
+        previouslyAccumulatedTime = 0
+        totalAccumulatedTime = 0
+        
+                self.stopWatchTime = "00:00:00"
+                self.counter = 0
+                self.seconds = 0
     }
     
-    func update() {
-        objectWillChange.send()
-    }
+    //MARK: - OLD
+
+//    func start() {
+//
+//        self.paused = !self.paused
+//        self.isRunning = true
+//        guard let _ = self.sourceTimer else {
+//            self.startTimer()
+//            return
+//        }
+//
+//        self.resumeTimer()
+//    }
+    
+//    func pause() {
+//
+//        self.paused = !self.paused
+//        self.isRunning = false
+//        self.sourceTimer?.suspend()
+//    }
+    
+
+//    func reset() {
+//
+//        self.stopWatchTime = "00:00:00"
+//        self.counter = 0
+//        self.isRunning = false
+//        self.seconds = 0
+//    }
+//
+//    func update() {
+//        objectWillChange.send()
+//    }
     
     func isPaused() -> Bool {
-        return self.paused
+        return self.isStopped
     }
     
     private func startTimer() {
@@ -125,34 +188,55 @@ class StopWatch: ObservableObject {
     }
     
     func getSeconds() -> Float {
-        let seconds = counter / 100
-        return Float(seconds)
+        return self.totalAccumulatedTime.seconds()
     }
     
     func getMinutes() -> Float {
-        let seconds = counter / 100
-        let minutes = seconds / 60
-        return Float(minutes)
+        return self.totalAccumulatedTime.minutes()
     }
+    
+
 }
 
-extension StopWatch {
-    struct LapItem {
-        let uuid = UUID()
-        let count: Int
-        let stringTime: String
-        
-        init(count: Int, diff: Int = -1) {
-            self.count = count
+
+extension TimeInterval{
+
+        func stringFromTimeInterval() -> String {
+
+            let time = NSInteger(self)
+
+            let ms = Int((self.truncatingRemainder(dividingBy: 1)) * 1000)
+            let seconds = time % 60
+            let minutes = (time / 60) % 60
+            let hours = (time / 3600)
+
+            return String(format: "%0.2d:%0.2d:%0.2d",hours,minutes,seconds,ms)
             
-            if diff < 0 {
-                self.stringTime = StopWatch.convertCountToTimeString(counter: count)
-            } else {
-                self.stringTime = StopWatch.convertCountToTimeString(counter: diff)
-            }
+            //return String(format: "%0.2d:%0.2d:%0.2d.%0.3d",hours,minutes,seconds,ms)
+
         }
+    
+    
+    func seconds() -> Float {
+        let time = NSInteger(self)
+
+        let seconds = time
+        
+        return Float(seconds)
     }
-}
+    
+    
+    func minutes() -> Float {
+        let time = NSInteger(self)
+
+        let minutes = (time / 60) % 60
+        
+        return Float(minutes)
+    }
+    
+    
+    }
+
 
 extension StopWatch {
     static func convertCountToTimeString(counter: Int) -> String {

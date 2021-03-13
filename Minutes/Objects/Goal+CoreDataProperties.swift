@@ -23,7 +23,7 @@ extension Goal {
     @NSManaged public var id: UUID?
     @NSManaged public var monthDay: Int
     @NSManaged public var name: String?
-    @NSManaged public var priority: Int
+    @NSManaged public var priority: Int64
     @NSManaged public var startDate: Date?
     @NSManaged public var totalTime: Double
     @NSManaged public var weekDay: String?

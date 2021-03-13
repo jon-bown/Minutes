@@ -32,7 +32,7 @@ struct StopwatchButtonSubView: View {
                                 color: Color.red,
                                 isPaused: self.stopWatch.isPaused(), playPause: false, degreeRotation: -90).padding(.trailing, 8).padding(.leading, 5)
                 
-                WatchStopWatchButton(actions: [self.stopWatch.start, self.stopWatch.pause, self.startLoading],
+                WatchStopWatchButton(actions: [self.stopWatch.start, self.stopWatch.stop, self.startLoading],
                                 labels: ["Start", "Pause"],
                                 color: Color.red,
                                 isPaused: self.stopWatch.isPaused(), playPause: true, degreeRotation: 90).padding(.leading, 8).padding(.trailing,5)

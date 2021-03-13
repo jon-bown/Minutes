@@ -30,7 +30,7 @@ struct GoalForm: View {
     @State private var goalDay: String = ""
     @State private var goalCol: Color = Color(.sRGB, red: 0.98, green: 0.9, blue: 0.2)
     @State private var startDate: Date = Date()
-    @State private var priority: Int = 0
+    @State private var priority: Int64 = 0
     @State private var reminders: Bool = false
     @State private var setEndDate: Bool = false
     @State private var startTime: Date = Date()

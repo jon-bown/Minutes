@@ -86,7 +86,7 @@ struct GoalPriorityView: View {
                 else {
 
                     let destinationGoal = goals.first(where: {$0.priority == destination})
-                    sourceGoal?.priority = destination
+                    sourceGoal?.priority = Int64(destination)
                     destinationGoal?.priority -= 1
                     for goal in goals {
                         if(goal.priority < destination){
@@ -98,7 +98,7 @@ struct GoalPriorityView: View {
             case false:
 
                     let destinationGoal = goals.first(where: {$0.priority == destination})
-                    sourceGoal?.priority = destination
+                    sourceGoal?.priority = Int64(destination)
                     destinationGoal?.priority += 1
                     for goal in goals {
                         if(goal.priority > destination){

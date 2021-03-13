@@ -53,6 +53,7 @@ struct GoalDetailView: View {
     @State private var newSessionText: String = ""
     @State private var isSessionsEditable: Bool = false
     @State private var sessionsToRemove: [Date] = [Date]()
+    
     //Just check the list view model if the goal record exists
     
     var filteredGoalRecordsToday: [GoalRecord] {
@@ -120,7 +121,7 @@ struct GoalDetailView: View {
                     
                 }.buttonStyle(CircleStopWatchSaveStyle()).disabled(self.stopWatch.isRunning)
                 Spacer()
-                StopWatchButton(actions: [self.stopWatch.start, self.stopWatch.pause, self.startLoading],
+                StopWatchButton(actions: [self.stopWatch.start, self.stopWatch.stop, self.startLoading],
                                 labels: ["Start", "Pause"],
                                 color: Color.blue,
                                 isPaused: self.stopWatch.isPaused(), playPause: true)
@@ -361,6 +362,8 @@ struct GoalDetailView: View {
 
     
     //MARK: - HELPER METHODS
+    
+
     private func addCustomMinutes() {
         self.showCustomMinuteSheet = true
     }
@@ -553,8 +556,8 @@ struct GoalDetailView: View {
             newGoalRecord.progress = self.progress
             newGoalRecord.id = self.goal.id!
             
-            newGoalRecord.dayTime = Double(self.stopWatch.seconds)
-            self.goal.totalTime += Double(self.stopWatch.seconds)
+            newGoalRecord.dayTime = Double(self.stopWatch.totalAccumulatedTime.seconds())
+            self.goal.totalTime += Double(self.stopWatch.totalAccumulatedTime.seconds())
             //divide hours into four quadrants
             var hour = Calendar.current.component(.hour, from: Date())*4
             let minutes = (newGoalRecord.progress * 60).truncatingRemainder(dividingBy: 60)
@@ -565,7 +568,7 @@ struct GoalDetailView: View {
             
             //SAVES
             var save = [Date:Double]()
-            save[Date()] = Double(self.stopWatch.seconds)
+            save[Date()] = Double(self.stopWatch.totalAccumulatedTime.seconds())
             newGoalRecord.goalSaves = save
             //add entry with hour: minutes
             //newGoal.color = UIColor(goalCol)
@@ -580,7 +583,7 @@ struct GoalDetailView: View {
         else {
             //add entry with hour: minutes
             records[0].progress = self.progress
-            records[0].dayTime += Double(self.stopWatch.seconds)
+            records[0].dayTime += Double(self.stopWatch.totalAccumulatedTime.seconds())
             
             
             var hour = Calendar.current.component(.hour, from: Date())*4
@@ -598,16 +601,16 @@ struct GoalDetailView: View {
             let dateKey = Date()
             let saveKeyExists = records[0].goalSaves![dateKey] != nil
             if(saveKeyExists){
-                records[0].goalSaves![dateKey] = (records[0].goalSaves![dateKey]! + Double(self.stopWatch.seconds))
+                records[0].goalSaves![dateKey] = (records[0].goalSaves![dateKey]! + Double(self.stopWatch.totalAccumulatedTime.seconds()))
             }
             else{
-                records[0].goalSaves![dateKey] = Double(self.stopWatch.seconds)
+                records[0].goalSaves![dateKey] = Double(self.stopWatch.totalAccumulatedTime.seconds())
             }
             
             
         
             
-            self.goal.totalTime += Double(self.stopWatch.seconds)
+            self.goal.totalTime += Double(self.stopWatch.totalAccumulatedTime.seconds())
             saveContext()
             
             
@@ -640,15 +643,15 @@ struct GoalDetailView: View {
     }
     
     func recalculateProgress() {
-        self.progress = (Double(self.stopWatch.seconds) + self.dayTime)/(self.goal.goalTime*60)
+        self.progress = (Double(self.stopWatch.totalAccumulatedTime.seconds()) + self.dayTime)/(self.goal.goalTime*60)
     }
-    
     
 
     
     func startLoading() {
         self.timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { timer in
             withAnimation() {
+                
                 recalculateProgress()
                 //                if self.stopWatch.seconds >= Float(self.goal.goalTime*60) {
                 //                    timer.invalidate()
@@ -660,6 +663,7 @@ struct GoalDetailView: View {
     func resetTimer() {
         _ = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: false) { timer in
             withAnimation() {
+                recalculateDayTime()
                 self.timer?.invalidate()
             }
         }

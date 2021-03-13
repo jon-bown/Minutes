@@ -63,7 +63,9 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
         //self.scheduleBAR(first: false)
         //self.requestUpdate()
         //handler(entry)
+        #if DEBUG
         print("getCurrent")
+        #endif
 //        getTimelineEntries(for: complication, after: Date(), limit:
 //                            1) {
 //            handler($0?.last)
@@ -83,14 +85,16 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
     
     func getTimelineEntries(for complication: CLKComplication, after date: Date, limit: Int, withHandler handler: @escaping ([CLKComplicationTimelineEntry]?) -> Void) {
         // Call the handler with the timeline entries after the given date
-        let fifteenMinutes = 15.0 * 60.0
-        let twentyFourHours = 24.0 * 60.0 * 60.0
+//        let fifteenMinutes = 15.0 * 60.0
+//        let twentyFourHours = 24.0 * 60.0 * 60.0
 //        var current = date.addingTimeInterval(fifteenMinutes)
 //        let endDate = date.addingTimeInterval(twentyFourHours)
 //
         var entries = [CLKComplicationTimelineEntry]()
+        #if DEBUG
         print("getTimelineEntries")
         print(limit)
+        #endif
         for i in 0 ..< 1{
             let predictionDate = date.addingTimeInterval(Double(60 * 5 * i))
             let predictionTemplate = template(for: complication.family, date: predictionDate)
@@ -230,7 +234,9 @@ class ExtensionDelegate: NSObject, ObservableObject, WKExtensionDelegate {
         for task in backgroundTasks {
             
             task.setTaskCompletedWithSnapshot(false)
+            #if DEBUG
             print("reload complications")
+            #endif
             if(activeState){
                 self.updateActiveComplications()
             }
@@ -295,7 +301,9 @@ class ExtensionDelegate: NSObject, ObservableObject, WKExtensionDelegate {
         
         wkExt.scheduleBackgroundRefresh(withPreferredDate: scheduleDate, userInfo: info) {(error: Error?) in
             if (error != nil){
+                #if DEBUG
                 print("background could not be refreshed: \(error.debugDescription)")
+                #endif
             }
         }
     }
