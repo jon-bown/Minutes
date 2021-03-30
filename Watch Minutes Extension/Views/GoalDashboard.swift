@@ -29,7 +29,7 @@ struct GoalDashboard: View {
     
     
     var filteredGoalsToday: [Goal] {
-        let filteredArray = goals.filter({(Date() > $0.startDate! ||  cal.isDate(Date(), inSameDayAs:$0.startDate!)) && ((Date().dayOfTheWeek == $0.weekDay && $0.frequency == "Weekly") || ($0.frequency == "Monthly" && $0.monthDay == Date().dayOfTheMonth) || $0.frequency == "Daily")})
+        let filteredArray = goals.filter({(Date() > $0.startDate! ||  cal.isDate(Date(), inSameDayAs:$0.startDate!)) && (   $0.frequency == "Weekly" && ($0.weekDay!.contains(Date().dayOfTheWeek)) || ($0.frequency == "Monthly" && $0.monthDay == Date().dayOfTheMonth) || $0.frequency == "Daily")})
         if(!filteredArray.isEmpty){
             return filteredArray
         }

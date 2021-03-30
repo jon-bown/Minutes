@@ -46,6 +46,8 @@ struct GoalForm: View {
     //time interval dictionary
     let dOTW = ["Mon":2, "Tue":3, "Wed":4, "Thu":5, "Fri":6, "Sat":7, "Sun":1]
     
+    @StateObject var dayOTW = WeekDays()
+    
     var disableSave: Bool {
         if(editing){
             return false
@@ -76,13 +78,37 @@ struct GoalForm: View {
                         }
                     }
                     if(self.goalFrequency == "Weekly"){
-                        Picker("Day", selection: self.$goalDay) {
-                            ForEach(self.dOTW.sorted(by: >), id: \.key) { key,value in
-                                Text(key)
+ 
+                        ForEach(0..<self.dayOTW.weekDays.count) { index in
+                                //Text(key)
+                                
+                                HStack {
+                                        Button(action: {
+                                            self.dayOTW.selectDay(index: index)
+                                            print(self.dayOTW.weekDays[index].isSelected)
+                                        }) {
+                                                HStack{
+                                                    if self.dayOTW.weekDays[index].isSelected {
+                                                                Image(systemName: "checkmark.circle.fill")
+                                                                        .foregroundColor(.green)
+                                                                        .animation(.easeIn)
+                                                        } else {
+                                                                Image(systemName: "circle")
+                                                                        .foregroundColor(.primary)
+                                                                        .animation(.easeOut)
+                                                        }
+                                                    Text(self.dayOTW.weekDays[index].weekDayString)
+                                                    
+                                                }.accentColor(.red)
+                                        }.buttonStyle(BorderlessButtonStyle())
+
+                                }
+                                
+                                
+                                
                             }
                         }
                         
-                    }
                     
                     DatePicker("Start on:", selection: self.$startDate, displayedComponents: .date)
                     
@@ -224,7 +250,7 @@ struct GoalForm: View {
     
     private func submitUserNotificationTrigger(id: UUID) {
         
-        let center = UNUserNotificationCenter.current()
+        
         
         let content = UNMutableNotificationContent()
         content.title = self.goalName
@@ -240,12 +266,23 @@ struct GoalForm: View {
         dateComponents.minute = componentsTime.minute
         switch self.goalFrequency {
         case "Daily":
+            submitNotificationTrigger(components: dateComponents, repeats: true, identifier: id.uuidString, content: content)
             break
         case "Weekly":
-            dateComponents.weekday = self.dOTW[self.goalDay]
+            //loop through and create one for each
+            for weekday in self.dayOTW.weekDays {
+                if(weekday.isSelected) {
+                    dateComponents.weekday = weekday.id
+                    submitNotificationTrigger(components: dateComponents, repeats: true, identifier: id.uuidString, content: content)
+                }
+            }
+            
+            
             break
         case "Monthly":
             dateComponents.day = componentsDay.day
+            
+            submitNotificationTrigger(components: dateComponents, repeats: true, identifier: id.uuidString, content: content)
             //dateComponents.weekday
             break
         //        case "Biweekly":
@@ -272,12 +309,17 @@ struct GoalForm: View {
         }
         
         //if(dateComponents.isValidDate){
-            let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
-            let request = UNNotificationRequest(identifier: id.uuidString, content: content, trigger: trigger)
-            center.add(request)
-            
         //}
 
+        
+    }
+    
+    private func submitNotificationTrigger(components: DateComponents, repeats: Bool, identifier: String, content: UNNotificationContent) {
+        let center = UNUserNotificationCenter.current()
+        
+        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: repeats)
+        let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
+        center.add(request)
         
     }
     
@@ -305,14 +347,20 @@ struct GoalForm: View {
         switch self.goalFrequency {
         case "Daily":
             newGoal.monthDay = 0
-            newGoal.weekDay = ""
+            newGoal.weekDay = [String]()
             break
         case "Weekly":
-            newGoal.weekDay = self.goalDay
+            newGoal.weekDay = [String]()
+            for weekday in self.dayOTW.weekDays {
+                if(weekday.isSelected) {
+                    
+                    newGoal.weekDay!.append(weekday.weekDayString)
+                }
+            }
             newGoal.monthDay = 0
             break
         case "Monthly":
-            newGoal.weekDay = ""
+            newGoal.weekDay = [String]()
             newGoal.monthDay = self.startDate.dayOfTheMonth
             break
         default:
@@ -348,14 +396,20 @@ struct GoalForm: View {
                 switch self.goalFrequency {
                 case "Daily":
                     goal.monthDay = 0
-                    goal.weekDay = ""
+                    goal.weekDay = [String]()
                     break
                 case "Weekly":
-                    goal.weekDay = self.goalDay
+                    goal.weekDay = [String]()
+                    for weekday in self.dayOTW.weekDays {
+                        if(weekday.isSelected) {
+                            
+                            goal.weekDay!.append(weekday.weekDayString)
+                        }
+                    }
                     goal.monthDay = 0
                     break
                 case "Monthly":
-                    goal.weekDay = ""
+                    goal.weekDay = [String]()
                     goal.monthDay = self.startDate.dayOfTheMonth
                     break
                 default:

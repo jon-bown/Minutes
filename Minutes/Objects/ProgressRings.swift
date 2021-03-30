@@ -38,7 +38,7 @@ struct ProgressRings: View {
     //var goalList: FetchedResults<Goal>
     var filteredGoals: [Goal] {
         if(!goals.isEmpty){
-            return self.goals.filter({(dateProvided > $0.startDate! ||  cal.isDate(dateProvided, inSameDayAs:$0.startDate!)) && ($0.endDate == nil || dateProvided <= $0.endDate!) && ((dateProvided.dayOfTheWeek == $0.weekDay && $0.frequency == "Weekly") || ($0.frequency == "Monthly" && $0.monthDay == dateProvided.dayOfTheMonth) || $0.frequency == "Daily")}).sorted(by: {$0.priority < $1.priority})
+            return self.goals.filter({(dateProvided > $0.startDate! ||  cal.isDate(dateProvided, inSameDayAs:$0.startDate!)) && ($0.endDate == nil || dateProvided <= $0.endDate!) && (($0.frequency == "Weekly" && $0.weekDay!.contains(Date().dayOfTheWeek)) || ($0.frequency == "Monthly" && $0.monthDay == dateProvided.dayOfTheMonth) || $0.frequency == "Daily")}).sorted(by: {$0.priority < $1.priority})
         }
         else{
             return []
@@ -143,7 +143,7 @@ struct ProgressRingsStatic: View {
     //var goalList: FetchedResults<Goal>
     var filteredGoals: [Goal] {
         if(!goals.isEmpty){
-            return self.goals.filter({(dateProvided > $0.startDate! ||  cal.isDate(dateProvided, inSameDayAs:$0.startDate!)) && ($0.endDate == nil || dateProvided <= $0.endDate!) && ((dateProvided.dayOfTheWeek == $0.weekDay && $0.frequency == "Weekly") || ($0.frequency == "Monthly" && $0.monthDay == dateProvided.dayOfTheMonth) || $0.frequency == "Daily")}).sorted(by: {$0.priority < $1.priority})
+            return self.goals.filter({(dateProvided > $0.startDate! ||  cal.isDate(dateProvided, inSameDayAs:$0.startDate!)) && ($0.endDate == nil || dateProvided <= $0.endDate!) && (($0.frequency == "Weekly" && $0.weekDay!.contains(Date().dayOfTheWeek)) || ($0.frequency == "Monthly" && $0.monthDay == dateProvided.dayOfTheMonth) || $0.frequency == "Daily")}).sorted(by: {$0.priority < $1.priority})
         }
         else{
             return []

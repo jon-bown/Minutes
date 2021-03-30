@@ -27,7 +27,7 @@ struct MainProgressView: View {
     ) var goalRecords: FetchedResults<GoalRecord>
     
     var filteredGoals: [Goal] {
-        return goals.filter({(Date() > $0.startDate! ||  cal.isDate(Date(), inSameDayAs:$0.startDate!)) && ((Date().dayOfTheWeek == $0.weekDay && $0.frequency == "Weekly") || ($0.frequency == "Monthly" && $0.monthDay == Date().dayOfTheMonth) || $0.frequency == "Daily")}).sorted(by: {$0.priority < $1.priority})
+        return goals.filter({(Date() > $0.startDate! ||  cal.isDate(Date(), inSameDayAs:$0.startDate!)) && (($0.frequency == "Weekly" && $0.weekDay!.contains(Date().dayOfTheWeek)) || ($0.frequency == "Monthly" && $0.monthDay == Date().dayOfTheMonth) || $0.frequency == "Daily")}).sorted(by: {$0.priority < $1.priority})
     }
     
     @State private var showNewGoalForm: Bool = false

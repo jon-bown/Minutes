@@ -26,7 +26,7 @@ struct DailyStatsView: View {
     private var maxStatLimit: Int = 3
     
     var filteredGoals: [Goal] {
-        return self.goalList.filter({(dateProvided > $0.startDate! ||  cal.isDate(dateProvided, inSameDayAs:$0.startDate!)) && ((dateProvided.dayOfTheWeek == $0.weekDay && $0.frequency == "Weekly") || ($0.frequency == "Monthly" && $0.monthDay == dateProvided.dayOfTheMonth) || $0.frequency == "Daily")}).sorted(by: {$0.priority < $1.priority})
+        return self.goalList.filter({(dateProvided > $0.startDate! ||  cal.isDate(dateProvided, inSameDayAs:$0.startDate!)) && (($0.frequency == "Weekly" && $0.weekDay!.contains(Date().dayOfTheWeek)) || ($0.frequency == "Monthly" && $0.monthDay == dateProvided.dayOfTheMonth) || $0.frequency == "Daily")}).sorted(by: {$0.priority < $1.priority})
     }
     
     var filteredGoalRecords: [GoalRecord] {

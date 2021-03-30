@@ -26,7 +26,7 @@ struct OverallProgressView: View {
     ) var goalRecords: FetchedResults<GoalRecord>
     
     var filteredGoals: [Goal] {
-        return goals.filter({(self.selectedDate > $0.startDate! ||  calendar.isDate(self.selectedDate, inSameDayAs:$0.startDate!)) && ((self.selectedDate.dayOfTheWeek == $0.weekDay && $0.frequency == "Weekly") || ($0.frequency == "Monthly" && $0.monthDay == self.selectedDate.dayOfTheMonth) || $0.frequency == "Daily")}).sorted(by: {$0.priority < $1.priority})
+        return goals.filter({(self.selectedDate > $0.startDate! ||  calendar.isDate(self.selectedDate, inSameDayAs:$0.startDate!)) && ($0.weekDay!.contains(Date().dayOfTheWeek) || ($0.frequency == "Monthly" && $0.monthDay == self.selectedDate.dayOfTheMonth) || $0.frequency == "Daily")}).sorted(by: {$0.priority < $1.priority})
     }
     
     //goalRecords created today

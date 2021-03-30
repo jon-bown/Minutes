@@ -2,7 +2,7 @@
 //  Goal+CoreDataProperties.swift
 //  Minutes
 //
-//  Created by Jonathan Bown on 2/6/21.
+//  Created by Jonathan Bown on 3/24/21.
 //
 //
 
@@ -18,6 +18,7 @@ extension Goal {
     }
 
     @NSManaged public var color: UIColor?
+    @NSManaged public var endDate: Date?
     @NSManaged public var frequency: String?
     @NSManaged public var goalTime: Double
     @NSManaged public var id: UUID?
@@ -26,8 +27,7 @@ extension Goal {
     @NSManaged public var priority: Int64
     @NSManaged public var startDate: Date?
     @NSManaged public var totalTime: Double
-    @NSManaged public var weekDay: String?
-    @NSManaged public var endDate: Date?
+    @NSManaged public var weekDay: [String]?
 
 }
 
