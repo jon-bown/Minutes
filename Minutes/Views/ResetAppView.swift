@@ -12,49 +12,39 @@ struct ResetAppView: View {
     @Environment(\.managedObjectContext) var managedObjectContext
     @Environment(\.presentationMode) var presentationMode
     
-    @FetchRequest(
-      // 2
-      entity: Goal.entity(),
-      // 3
-      sortDescriptors: [
-        NSSortDescriptor(keyPath: \Goal.priority, ascending: true)
-      ]
-    // 4
-    ) var goals: FetchedResults<Goal>
-    
-    @FetchRequest(
-        entity: GoalRecord.entity(),
-        sortDescriptors: [
-            NSSortDescriptor(keyPath: \GoalRecord.name, ascending: true)
-        ]
-    ) var goalRecords: FetchedResults<GoalRecord>
-    
     @State var simpleAlertMessageWithButtons = false
     
     var body: some View {
         //Reset all app data
         VStack{
-            GroupBox{
+            
                 
                 Button(action: {
                     //do an are you sure alert box
                     simpleAlertMessageWithButtons.toggle()
 
                 }){
-                    Text("Erase All Data").foregroundColor(Color.red).font(.system(size: 18, design: .rounded)).padding(4).cornerRadius(8).multilineTextAlignment(.leading)
+                    GroupBox{
+                        HStack{
+                            Text("Erase All Data").foregroundColor( Color.red).font(.system(size: 18, design: .rounded)).padding(4).cornerRadius(8).multilineTextAlignment(.leading)
+                            Spacer()
+                        }
+
+                        
+                    }.cornerRadius(15).padding()
                 }.alert(isPresented: $simpleAlertMessageWithButtons, content: {
                     
                     let firstButton = Alert.Button.default(Text("Erase")){
-                                        self.deleteAllGoals()
-                                        self.deleteAllGoalRecords()
+                        self.deleteAllGoals()
+                        self.deleteAllGoalRecords()
                         self.deleteAllNotifications()
                         self.presentationMode.wrappedValue.dismiss()
                     }
-                     let secondButton = Alert.Button.destructive(Text("cancel"))
+                     let secondButton = Alert.Button.destructive(Text("Cancel"))
                      
                     return Alert(title: Text("Are you sure you want to erase goal data?"), primaryButton: firstButton, secondaryButton: secondButton)
                 }).frame(width: UIScreen.main.bounds.width - 60)
-            }.cornerRadius(15).padding()
+            
             Spacer()
         }
        
@@ -101,7 +91,13 @@ struct ResetAppView: View {
     }
     
     func deleteAllNotifications() {
-        
+        UNUserNotificationCenter.current().getPendingNotificationRequests { (notificationRequests) in
+           var identifiers: [String] = []
+           for notification:UNNotificationRequest in notificationRequests {
+                  identifiers.append(notification.identifier)
+           }
+           UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
+        }
     }
     
 }

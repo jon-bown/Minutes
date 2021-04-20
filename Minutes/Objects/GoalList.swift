@@ -13,27 +13,18 @@ struct GoalList: View {
     
     @Environment(\.managedObjectContext) var managedObjectContext
     
-    // 1
     @FetchRequest(
-      // 2
-      entity: Goal.entity(),
-      // 3
-      sortDescriptors: [
-        NSSortDescriptor(keyPath: \Goal.priority, ascending: true)
-      ]
-    // 4
+        entity: Goal.entity(),
+        sortDescriptors: [
+            NSSortDescriptor(keyPath: \Goal.priority, ascending: true)
+        ]
     ) var goals: FetchedResults<Goal>
     
-    
-    // 1
     @FetchRequest(
-      // 2
-      entity: GoalRecord.entity(),
-      // 3
-      sortDescriptors: [
-        NSSortDescriptor(keyPath: \GoalRecord.name, ascending: true)
-      ]
-    // 4
+        entity: GoalRecord.entity(),
+        sortDescriptors: [
+            NSSortDescriptor(keyPath: \GoalRecord.name, ascending: true)
+        ]
     ) var records: FetchedResults<GoalRecord>
     
     
@@ -43,51 +34,46 @@ struct GoalList: View {
         if(goals.isEmpty){
             Text("Tap '+' to create a new minute goal!")
         }else {
-
-                List{ ForEach(goals, id: \.id) { goal in
-                    //NavigationLink(destination: GoalDetailView(goal: goal)) {
-                        
-                        GoalRow(goal: goal)
-                    //}
-                    
-                }.onDelete(perform: deleteGoal)
+            
+            List{ ForEach(goals, id: \.id) { goal in
+                //NavigationLink(destination: GoalDetailView(goal: goal)) {
+                
+                GoalRow(goal: goal)
+                //}
+                
+            }.onDelete(perform: deleteGoal)
             }
             
-
-            
-            
-
-
-    }
+        }
     }
     
     
     private func saveContext() {
-      do {
-        try managedObjectContext.save()
-      } catch {
-        print("Error saving managed object context: \(error)")
-      }
+        do {
+            try managedObjectContext.save()
+        } catch {
+            print("Error saving managed object context: \(error)")
+        }
     }
     
-
+    
     // remove a goal from the list
     func deleteGoal(at offsets: IndexSet){
         for index in offsets {
-//            let recordSubset = records.filter({$0.name == goals[index].name})
-//            for record in recordSubset {
-//                managedObjectContext.delete(records[records.firstIndex(of: record)!])
-//            }
-
-                managedObjectContext.delete(goals[index])
-
-                    }
+            //            let recordSubset = records.filter({$0.name == goals[index].name})
+            //            for record in recordSubset {
+            //                managedObjectContext.delete(records[records.firstIndex(of: record)!])
+            //            }
+            
+            managedObjectContext.delete(goals[index])
+            
+        }
         DispatchQueue.main.async {
             saveContext()
         }
-            
+        
     }
-
+    
 }
 
 struct GoalList_Previews: PreviewProvider {

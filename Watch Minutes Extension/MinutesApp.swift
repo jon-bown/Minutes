@@ -22,8 +22,6 @@ struct MinutesApp: App {
         WKNotificationScene(controller: NotificationController.self, category: "myCategory")
     }
     
-    
-    
 }
 
 

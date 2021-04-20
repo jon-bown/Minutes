@@ -180,13 +180,69 @@ struct RootView: View {
 //                .overlay(
 //                    Text(String(self.calendar.component(.day, from: date)))
 //                )
+            
             NavigationLink(destination: OverallProgressView(dateProvided: date)){
             VStack {
                 Text(String(self.calendar.component(.day, from: date))).foregroundColor(.white)
+                //Text(date.dayOfTheWeek)
                 ProgressRings(dateProvided: date, maxWidth: 30, maxLineWidth: Int(Constants.weekdayRingThickness), maxRingLimit: 3).padding(2).clipShape(Circle()).padding(.vertical, 4)
                 
             }
             }
+            
+        }.frame(width: screenSize.width-80)
+            
+    }
+    }
+}
+
+struct SmallCalendarView: View {
+    @Environment(\.calendar) var calendar
+    @Environment(\.managedObjectContext) var managedObjectContext
+    
+    @FetchRequest(
+      entity: Goal.entity(),
+      sortDescriptors: [
+        NSSortDescriptor(keyPath: \Goal.priority, ascending: true)
+      ]
+    ) var goals: FetchedResults<Goal>
+    
+    @FetchRequest(
+        entity: GoalRecord.entity(),
+        sortDescriptors: [
+            NSSortDescriptor(keyPath: \GoalRecord.name, ascending: true)
+        ]
+    ) var goalRecords: FetchedResults<GoalRecord>
+
+    private var year: DateInterval {
+ 
+            return calendar.dateInterval(of: .weekOfMonth, for: Date())!
+
+      ///create custom intervals
+    }
+    
+    let screenSize = UIScreen.main.bounds.size
+
+    var body: some View {
+        NavigationView{
+        CalendarView(interval: year) { date in
+//            Text("50")
+//                .hidden()
+//                .padding(8)
+//                .background(Color.blue)
+//                .clipShape(Circle())
+//                .padding(.vertical, 4)
+//                .overlay(
+//                    Text(String(self.calendar.component(.day, from: date)))
+//                )
+
+            VStack {
+                Text(String(self.calendar.component(.day, from: date))).foregroundColor(.white)
+                //Text(date.dayOfTheWeek)
+                ProgressRings(dateProvided: date, maxWidth: 30, maxLineWidth: Int(Constants.weekdayRingThickness), maxRingLimit: 3).padding(2).clipShape(Circle()).padding(.vertical, 4)
+                
+            }
+
             
         }.frame(width: screenSize.width-80)
             

@@ -73,7 +73,7 @@ struct WatchStopWatchButton : View {
                 Text(self.labels[1])
                     .foregroundColor(self.playPause ? .red:.white).clipped()
             }
-        }.background(Capsule().foregroundColor(self.playPause ? (self.isPaused ? Color.green: Color.red) : .gray).opacity(0.3))
+        }.background(Capsule().foregroundColor(self.playPause ? (self.isPaused ? Color.green: Color.red) : .gray).opacity(0.3)).buttonStyle(WatchStopWatchSaveStyle())
         
         
         //        .background(HalfCapsuleShape().foregroundColor(self.playPause ? (self.isPaused ? Color.green: Color.red) : .gray).frame(width: 50, height: 80).rotationEffect(.degrees(degreeRotation)))

@@ -21,6 +21,7 @@ struct StopwatchButtonSubView: View {
     @Binding var progress: Double
     @Binding var dayTime: Double
     @Binding var selectedTab: Int
+    @State private var showEditView: Bool = false
     
     
     var body: some View {
@@ -54,6 +55,26 @@ struct StopwatchButtonSubView: View {
                     }
                     
                 }.background(Capsule().foregroundColor(Color.blue).opacity(0.7)).buttonStyle(WatchStopWatchSaveStyle()).disabled(self.stopWatch.isRunning)
+                
+                //TODO: ADD EDIT BUTTON
+                
+                Button(action: {
+                    if(!self.stopWatch.isRunning){
+                        self.showEditView = true
+                        //self.delegate?.scheduleBAR(first: false)
+                    }
+                }){
+                    if(!self.stopWatch.isRunning){
+                        Text("Edit").foregroundColor(.white)
+                    }
+                    else {
+                        Text("Edit").foregroundColor(.gray)
+                    }
+                    
+                }.background(Capsule().foregroundColor(Color.yellow).opacity(0.7)).buttonStyle(WatchStopWatchSaveStyle()).disabled(self.stopWatch.isRunning).sheet(isPresented: self.$showEditView) {
+                    //Show edit view
+                    ChangeGoalsView()
+                }
             }.padding(.top, 20)
             
         }.navigationTitle("Goals")

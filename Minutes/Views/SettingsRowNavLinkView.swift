@@ -11,11 +11,12 @@ struct SettingsRowNavLinkView: View {
     
     var navView: AnyView
     var label: String
+    var enabled: Bool
     
     var body: some View {
         Divider().padding(.vertical,4)
         NavigationLink(destination: navView){
-            Text(label)
+            Text(label).foregroundColor(enabled ? Color.gray:Color.white)
             Spacer()
             Image(systemName: "chevron.right")
         }

@@ -27,7 +27,11 @@ struct MainProgressView: View {
     ) var goalRecords: FetchedResults<GoalRecord>
     
     var filteredGoals: [Goal] {
-        return goals.filter({(Date() > $0.startDate! ||  cal.isDate(Date(), inSameDayAs:$0.startDate!)) && (($0.frequency == "Weekly" && $0.weekDay!.contains(Date().dayOfTheWeek)) || ($0.frequency == "Monthly" && $0.monthDay == Date().dayOfTheMonth) || $0.frequency == "Daily")}).sorted(by: {$0.priority < $1.priority})
+        return AppUtil.filterCurrentGoals(goals: self.goalsArray, date: Date())
+    }
+    
+    var goalsArray: [Goal] {
+        return goals.sorted(by: {$0.priority > $1.priority})
     }
     
     @State private var showNewGoalForm: Bool = false
@@ -85,7 +89,7 @@ struct MainProgressView: View {
                                 }
                             }
                             else {
-                                ForEach(goals, id: \.self) { goal in
+                                ForEach(goalsArray, id: \.self) { goal in
                                     NavigationLink(destination: GoalDetailView(goal: goal)){
                                         GroupBox{
                                             HStack{
@@ -122,7 +126,7 @@ struct MainProgressView: View {
                     HStack(alignment: .firstTextBaseline) {
                         
                         VStack(alignment: .leading) {
-                            Text(getCurrentDate().uppercased())
+                            Text(AppUtil.getCurrentDate().uppercased())
                                 .font(.headline)
                                 .foregroundColor(.secondary)
                             Text("Summary")
@@ -138,7 +142,7 @@ struct MainProgressView: View {
                             isPresented: self.$showNewGoalForm
                         ) {
                             
-                            GoalForm(editing: false, goal: Goal(), isPresented: self.$showNewGoalForm, success: self.$goalAddSuccess).environment(\.managedObjectContext, self.managedObjectContext)
+                            GoalForm(editing: false, isPresented: self.$showNewGoalForm, success: self.$goalAddSuccess ).environment(\.managedObjectContext, self.managedObjectContext)
                             
                         }.padding()
 
@@ -149,11 +153,7 @@ struct MainProgressView: View {
     }
     
     
-   
-    func getCurrentDate(with format: String = "EEEE, MMM d") -> String { let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = format
-        return dateFormatter.string(from: Date())
-    }
+
 }
 
 #if DEBUG

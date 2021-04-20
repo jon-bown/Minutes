@@ -19,7 +19,7 @@ struct GoalForm: View {
     ) var goals: FetchedResults<Goal>
     
     var editing: Bool
-    @ObservedObject var goal: Goal
+    var passedGoal: Goal?
     @Binding var isPresented: Bool
     @Binding var success: Bool
     
@@ -39,13 +39,8 @@ struct GoalForm: View {
     @State private var endDate: Date = Date()
     
     
-    //End date
-    
-    
     let freq = ["Daily", "Weekly", "Monthly"] //add custom
     //time interval dictionary
-    let dOTW = ["Mon":2, "Tue":3, "Wed":4, "Thu":5, "Fri":6, "Sat":7, "Sun":1]
-    
     @StateObject var dayOTW = WeekDays()
     
     var disableSave: Bool {
@@ -57,51 +52,49 @@ struct GoalForm: View {
         }
         
     }
-
+    
     //MARK: - BODY
     var body: some View {
         NavigationView{
             VStack{
                 Form{
                     Section{
-                    TextField("Name", text: self.$goalName)
-                    ColorPicker("Color Theme", selection: self.$goalCol, supportsOpacity: true)
-                    HStack{
-                        Text("Minutes").bold()
-                        NumberTextField(value: self.$goalDailyTime, formatter: NumberFormatter(), keyType: UIKeyboardType.numberPad)
-
-                    }
-                    
-                    Picker("Frequency", selection: self.$goalFrequency) {
-                        ForEach(self.freq, id: \.self) { freq in
-                            Text(freq)
+                        TextField("Name", text: self.$goalName)
+                        ColorPicker("Color Theme", selection: self.$goalCol, supportsOpacity: true)
+                        HStack{
+                            Text("Minutes:")
+                            NumberTextField(value: self.$goalDailyTime, formatter: NumberFormatter(), keyType: UIKeyboardType.numberPad)
+                            
                         }
-                    }
-                    if(self.goalFrequency == "Weekly"){
- 
-                        ForEach(0..<self.dayOTW.weekDays.count) { index in
-                                //Text(key)
+                        
+                        Picker("Frequency", selection: self.$goalFrequency) {
+                            ForEach(self.freq, id: \.self) { freq in
+                                Text(freq)
+                            }
+                        }
+                        if(self.goalFrequency == "Weekly"){
+                            
+                            ForEach(0..<self.dayOTW.weekDays.count) { index in
                                 
                                 HStack {
-                                        Button(action: {
-                                            self.dayOTW.selectDay(index: index)
-                                            print(self.dayOTW.weekDays[index].isSelected)
-                                        }) {
-                                                HStack{
-                                                    if self.dayOTW.weekDays[index].isSelected {
-                                                                Image(systemName: "checkmark.circle.fill")
-                                                                        .foregroundColor(.green)
-                                                                        .animation(.easeIn)
-                                                        } else {
-                                                                Image(systemName: "circle")
-                                                                        .foregroundColor(.primary)
-                                                                        .animation(.easeOut)
-                                                        }
-                                                    Text(self.dayOTW.weekDays[index].weekDayString)
-                                                    
-                                                }.accentColor(.red)
-                                        }.buttonStyle(BorderlessButtonStyle())
-
+                                    Button(action: {
+                                        self.dayOTW.selectDay(index: index)
+                                    }) {
+                                        HStack{
+                                            if self.dayOTW.weekDays[index].isSelected {
+                                                Image(systemName: "checkmark.circle.fill")
+                                                    .foregroundColor(.green)
+                                                    .animation(.easeIn)
+                                            } else {
+                                                Image(systemName: "circle")
+                                                    .foregroundColor(.primary)
+                                                    .animation(.easeOut)
+                                            }
+                                            Text(self.dayOTW.weekDays[index].weekDayString).foregroundColor(.white).font(Font.body.bold())
+                                            
+                                        }.accentColor(.red)
+                                    }.buttonStyle(BorderlessButtonStyle())
+                                    
                                 }
                                 
                                 
@@ -109,30 +102,33 @@ struct GoalForm: View {
                             }
                         }
                         
-                    
-                    DatePicker("Start on:", selection: self.$startDate, displayedComponents: .date)
-                    
-                    Toggle(isOn: self.$setEndDate){
-                        Text("End Date")
-                    }
-                    if(self.setEndDate){
-                        DatePicker("End On:", selection: self.$endDate, displayedComponents: .date)
                         
-                    }
-                    
-                    Toggle(isOn: self.$reminders){
-                        Text("Reminders")
-                    }.onTapGesture {
-                        self.checkNotificationPermission()
-                    }.alert(isPresented: self.$showPermissionAlert) {
-                        Alert(title: Text("Error"), message: Text("You must enable notifications"), dismissButton: .default(Text("Go to Settings")))
-                    }
-                    
-                    if(self.reminders && self.notificationPermission){
+                        DatePicker("Start on:", selection: self.$startDate, displayedComponents: .date)
                         
-                        DatePicker("Alert at:", selection: self.$startTime, displayedComponents: .hourAndMinute)
-                    }
-                }.padding(5)
+                        Toggle(isOn: self.$setEndDate){
+                            Text("End Date")
+                        }
+                        if(self.setEndDate){
+                            DatePicker("End On:", selection: self.$endDate, displayedComponents: .date)
+                            
+                        }
+                        
+                        Toggle(isOn: self.$reminders){
+                            Text("Reminders")
+                        }.onTapGesture {
+                            if(!self.notificationPermission){
+                                self.checkNotificationPermission()
+                            }
+                            
+                        }.alert(isPresented: self.$showPermissionAlert) {
+                            Alert(title: Text("Error"), message: Text("You must enable notifications in Settings"), dismissButton: .default(Text("Go to Settings")))
+                        }
+                        
+                        if(self.reminders){
+                            
+                            DatePicker("Alert at:", selection: self.$startTime, displayedComponents: .hourAndMinute)
+                        }
+                    }.padding(5)
                 }
                 Section{
                     Button(action: {
@@ -142,7 +138,7 @@ struct GoalForm: View {
                         else {
                             self.addGoal()
                         }
-
+                        
                     }) {
                         HStack(alignment: .center) {
                             Spacer()
@@ -156,31 +152,49 @@ struct GoalForm: View {
                     .background(disableSave ? Color.gray: Color.red)
                     .cornerRadius(15)
                     .padding(.horizontal, 50)
+                    
+                    Button(action: {
+                        self.dismissView()
+                        
+                    }) {
+                        HStack(alignment: .center) {
+                            Spacer()
+                            Text("Cancel")
+                                .font(.headline)
+                                .foregroundColor(Color.white)
+                            Spacer()
+                        }
+                    }
+                    .padding(.vertical, 10.0)
+                    .background(Color.blue)
+                    .cornerRadius(15)
+                    .padding(.horizontal, 50)
+                    
                 }
-
-                    //Spacer()
+                
+                //Spacer()
                 
                 
-            }.navigationBarTitle(editing ? self.goalName:"New Goal", displayMode: .inline).navigationBarItems(leading: Button(action: {
-                self.isPresented = false
-            }){
-                Image(systemName: "x.circle").font(Font.system(size: 30, weight: .regular)).foregroundColor(.white)
-            })
-        }.onAppear(){
+            }.navigationTitle(editing ? self.goalName:"New Goal")
+            .navigationBarTitleDisplayMode(.large)
+        }.navigationViewStyle(StackNavigationViewStyle()).onAppear(){
             if(editing){
                 //assign goal properties
+                guard let goal = self.passedGoal else {
+                    return
+                }
                 self.goalName = goal.name!
                 self.goalCol = Color(goal.color!)
                 self.goalDailyTime = Int(goal.goalTime)
                 self.startDate = goal.startDate!
                 self.priority = goal.priority
                 self.goalFrequency = goal.frequency!
-                
+                if(self.goalFrequency == "Weekly"){
+                    self.dayOTW.populateSelections(currentDays: goal.weekDay!)
+                }
                 self.checkNotificationPermission()
                 self.checkNotificationsExist(id: goal.id!)
-                if(self.reminders){
-                    self.updateNotificationFields(id: goal.id!)
-                }
+
                 //check individual notifications
                 
             }
@@ -191,65 +205,150 @@ struct GoalForm: View {
                 if let date = dateFormatter.date(from: "12:00") {
                     self.startTime = date
                 }
+                self.dayOTW.populateSelections(currentDays: [])
             }
-
+            
         }
     }
     
     //MARK: - FUNCTIONS
-    private func updateNotificationFields(id: UUID) {
-        UNUserNotificationCenter.current().getPendingNotificationRequests { (notificationRequests) in
-           for notification:UNNotificationRequest in notificationRequests {
-            if notification.identifier == id.uuidString {
-                guard let trigger = notification.trigger as? UNCalendarNotificationTrigger else {
-                    return
-                }
-                self.startTime = trigger.nextTriggerDate()!
-                  
-               }
-           }
 
+    
+    private func requestNotificationAuthorization() {
+        
+        let queue = DispatchQueue.main
+        let group = DispatchGroup()
+        
+        group.enter()
+        
+        queue.async {
+        
+            self.isNotificationAuthorizationRequesting { permission in
+                
+                self.reminders = permission
+                self.notificationPermission = permission
+                self.showPermissionAlert = !permission
+                
+            }
+            group.leave()
+        }
+        
+        
+    }
+    
+    func isNotificationAuthorizationRequesting(completion:@escaping (Bool)->Void) {
+        let center = UNUserNotificationCenter.current()
+        //var grant = false
+        center.requestAuthorization(options: [.alert, .badge, .sound]) { (granted, error) in
+            if granted {
+                DispatchQueue.main.async {
+                    UIApplication.shared.registerForRemoteNotifications()
+                }
+                  completion(true)
+
+            } else {
+                completion(false)
+            }
         }
     }
     
     private func checkNotificationPermission() {
-        let center = UNUserNotificationCenter.current()
+        var permissionResult: UNAuthorizationStatus = .notDetermined
+        let queue = DispatchQueue.main
+        let group = DispatchGroup()
         
-        center.requestAuthorization(options: [.alert, .badge, .sound]) { (granted, error) in
-            if granted {
-                self.notificationPermission = true
-            } else {
-                self.showPermissionAlert = true
-                self.reminders = false
+        group.enter()
+        
+        queue.async {
+            AppUtil.isNotificationsEnabled { result in
+                permissionResult = result
+                //print("Permission result Async: \(permissionResult.rawValue)")
+                switch permissionResult  {
+                case .authorized:
+                    //print(permissionResult.rawValue)
+                    self.notificationPermission = true
+                case .denied:
+                    self.reminders = false
+                    self.notificationPermission = false
+                    self.showPermissionAlert = true
+                case .notDetermined:
+                    self.requestNotificationAuthorization()
+                case .provisional:
+                    // @available(iOS 12.0, *)
+                    print("The application is authorized to post non-interruptive user notifications.")
+                case .ephemeral:
+                    // @available(iOS 14.0, *)
+                    print("The application is temporarily authorized to post notifications. Only available to app clips.")
+                @unknown default:
+                    print("Unknow Status")
+                }
+                print(result.rawValue)
             }
+            //group.wait()
+            group.leave()
         }
+        
+
+
     }
     
+    
     private func checkNotificationsExist(id: UUID) {
-            //Check if any notifications exist, if they do set reminders to true
+        
+        var remind = false
+        var hour: Int = 0
+        var minute: Int = 0
+        
+        let queue = DispatchQueue.main
+        let group = DispatchGroup()
+        
+       
+        
+        queue.async(group: group) {
+            group.enter()
             UNUserNotificationCenter.current().getPendingNotificationRequests { (notificationRequests) in
-               for notification:UNNotificationRequest in notificationRequests {
-                if notification.identifier == id.uuidString {
-                    self.reminders = true
-                   }
-               }
+                for notification:UNNotificationRequest in notificationRequests {
+                    if notification.identifier == id.uuidString {
+                        remind = true
+                        guard let trigger = notification.trigger as? UNCalendarNotificationTrigger else {
+                            return
+                        }
+                        let nextTriggerDate = trigger.nextTriggerDate()!
+                        //get date components
+                        let components = Calendar.current.dateComponents([.hour, .minute], from: nextTriggerDate)
+                        hour = components.hour!
+                        minute = components.minute!
+                        print(hour)
+                        print(minute)
+                        return
+                    }
+                }
             }
-        }
+             group.leave()
+         }
+        
+
+        group.notify(queue: queue) {
+            self.reminders = remind
+            self.startTime = Calendar.current.date(bySettingHour: hour, minute: minute, second: 0, of: self.startTime)!
+           }
+    }
+    
+    
     
     private func removeNotificationsForGoal(id: UUID){
-        UNUserNotificationCenter.current().getPendingNotificationRequests { (notificationRequests) in
-           var identifiers: [String] = []
-           for notification:UNNotificationRequest in notificationRequests {
-            if notification.identifier == id.uuidString {
-                  identifiers.append(notification.identifier)
-               }
-           }
-           UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
-        }
+        
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [id.uuidString])
+        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [id.uuidString])
+        
+        
+//            AppUtil.removePendingRequests(id: id) { result in
+//                self.reminders = !result
+//                print("Reminders:\(self.reminders)")
+//            }
     }
     
     private func submitUserNotificationTrigger(id: UUID) {
-        
         
         
         let content = UNMutableNotificationContent()
@@ -310,7 +409,7 @@ struct GoalForm: View {
         
         //if(dateComponents.isValidDate){
         //}
-
+        
         
     }
     
@@ -321,6 +420,11 @@ struct GoalForm: View {
         let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
         center.add(request)
         
+    }
+    
+    private func dismissView() {
+        
+        self.isPresented = false
     }
     
     private func saveContext() {
@@ -351,10 +455,11 @@ struct GoalForm: View {
             break
         case "Weekly":
             newGoal.weekDay = [String]()
-            for weekday in self.dayOTW.weekDays {
-                if(weekday.isSelected) {
+            for index in 0...6 {
+                if(self.dayOTW.weekDays[index].isSelected) {
                     
-                    newGoal.weekDay!.append(weekday.weekDayString)
+                    newGoal.weekDay!.append(self.dayOTW.weekDays[index].weekDayString)
+                    //print(self.dayOTW.weekDays[index].weekDayString)
                 }
             }
             newGoal.monthDay = 0
@@ -380,7 +485,7 @@ struct GoalForm: View {
         if(self.reminders){
             self.submitUserNotificationTrigger(id: newGoal.id!)
         }
-
+        
         self.saveContext()
         
         self.success = true
@@ -388,47 +493,51 @@ struct GoalForm: View {
     }
     
     func updateGoal() {
-                goal.color = UIColor(self.goalCol)
-                goal.name = self.goalName
-                goal.goalTime = Double(self.goalDailyTime)
-                goal.startDate = self.startDate
-                goal.frequency = self.goalFrequency
-                switch self.goalFrequency {
-                case "Daily":
-                    goal.monthDay = 0
-                    goal.weekDay = [String]()
-                    break
-                case "Weekly":
-                    goal.weekDay = [String]()
-                    for weekday in self.dayOTW.weekDays {
-                        if(weekday.isSelected) {
-                            
-                            goal.weekDay!.append(weekday.weekDayString)
-                        }
-                    }
-                    goal.monthDay = 0
-                    break
-                case "Monthly":
-                    goal.weekDay = [String]()
-                    goal.monthDay = self.startDate.dayOfTheMonth
-                    break
-                default:
-                    break
+        guard let goal = self.passedGoal else {
+            return
+        }
+        goal.color = UIColor(self.goalCol)
+        goal.name = self.goalName
+        goal.goalTime = Double(self.goalDailyTime)
+        goal.startDate = self.startDate
+        goal.frequency = self.goalFrequency
+        switch self.goalFrequency {
+        case "Daily":
+            goal.monthDay = 0
+            goal.weekDay = [String]()
+            break
+        case "Weekly":
+            goal.weekDay = [String]()
+            for weekday in self.dayOTW.weekDays {
+                if(weekday.isSelected) {
+                    
+                    goal.weekDay!.append(weekday.weekDayString)
                 }
-                if managedObjectContext.hasChanges {
-                    try? self.managedObjectContext.save()
+            }
+            goal.monthDay = 0
+            break
+        case "Monthly":
+            goal.weekDay = [String]()
+            goal.monthDay = self.startDate.dayOfTheMonth
+            break
+        default:
+            break
+        }
+        if managedObjectContext.hasChanges {
+            try? self.managedObjectContext.save()
         }
         
         if(self.reminders){
-            print("submit")
+            //print("submit")
             self.submitUserNotificationTrigger(id: goal.id!)
         }
         else {
+            print("removing")
             self.removeNotificationsForGoal(id: goal.id!)
         }
         self.success = true
         self.isPresented = false
-        }
+    }
 }
 
 

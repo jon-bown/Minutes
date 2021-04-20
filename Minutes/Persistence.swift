@@ -31,9 +31,15 @@ struct PersistenceController {
     let container: NSPersistentContainer
 
     init(inMemory: Bool = false) {
-        container = NSPersistentCloudKitContainer(name: "Minutes")
+        //container = NSPersistentCloudKitContainer(name: "Minutes")
+        let storeURL = AppGroup.facts.containerURL.appendingPathComponent("Minutes.sqlite")
+        let description = NSPersistentStoreDescription(url: storeURL)
+
+        container = NSPersistentContainer(name: "Minutes")
+        container.persistentStoreDescriptions = [description]
         if inMemory {
-            container.persistentStoreDescriptions.first!.url = URL(fileURLWithPath: "/dev/null")
+
+            //container.persistentStoreDescriptions.first!.url = URL(fileURLWithPath: "/dev/null")
         }
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {

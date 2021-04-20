@@ -6,9 +6,11 @@
 //
 
 import SwiftUI
+import CoreData
 
 struct GoalDashboard: View {
     @Environment(\.managedObjectContext) var managedObjectContext
+    @Environment(\.scenePhase) var scenePhase
     
     private var cal = Calendar.current
     
@@ -52,15 +54,24 @@ struct GoalDashboard: View {
 
     }
     
+    @State private var goalsEmpty: Bool = true
+    
     var body: some View {
         //NavigationView{
+
         ScrollView{
-            
+                    if(goalsEmpty){
+                        VStack{
+                            Text("No Goals Set").padding()
+                            Text("Use your phone to set a goal!").padding()
+                        }
+                    }
+                    else {
             VStack{
                 //parameterize this to fit any watch screen
                 ProgressRings(dateProvided: Date(), maxWidth: 150, maxLineWidth: 15, maxRingLimit: 3).padding(10)
                 Divider()
-                Section(header: Text("Today")){
+                Section(header: Text("Today").bold()){
                     ForEach(filteredGoalsToday, id: \.self) { goal in
                         //NavigationLink(destination: GoalDetailView(goal: goal)) {
                         //For all goals of today, show a individual progress
@@ -75,7 +86,7 @@ struct GoalDashboard: View {
                     }
                 }
                 
-                Section(header: Text("Other")){
+                Section(header: Text("Other").bold()){
                     ForEach(filteredGoalsNotToday, id: \.self) { goal in
                         HStack{
                             NavigationLink(destination: WKGoalDetailView(goal: goal).environment(\.managedObjectContext, managedObjectContext)){
@@ -87,11 +98,90 @@ struct GoalDashboard: View {
                         
                     }
                 }
+                
+                
 
                 
             }.navigationTitle("Today").aspectRatio(contentMode: .fit)
             
         }
+        }.onChange(of: scenePhase) { newPhase in
+            if newPhase == .inactive {
+                #if DEBUG
+                print("Inactive")
+                #endif
+                let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Goal")
+                
+                fetchRequest.includesPropertyValues = false
+                
+                do {
+                    let items = try managedObjectContext.fetch(fetchRequest) as! [Goal]
+                    
+                    if(!items.isEmpty){
+                        goalsEmpty = false
+                    }
+                    else {
+                        goalsEmpty = true
+                    }
+                    
+                } catch {
+                    // Error Handling
+                    // ...
+                    #if DEBUG
+                    print("error")
+                    #endif
+                }
+            } else if newPhase == .active {
+                #if DEBUG
+                print("Active")
+                #endif
+                let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Goal")
+                
+                fetchRequest.includesPropertyValues = false
+                
+                do {
+                    let items = try managedObjectContext.fetch(fetchRequest) as! [Goal]
+                    
+                    if(!items.isEmpty){
+                        goalsEmpty = false
+                    }
+                    else {
+                        goalsEmpty = true
+                    }
+                    
+                } catch {
+                    // Error Handling
+                    // ...
+                    #if DEBUG
+                    print("error")
+                    #endif
+                }
+            } else if newPhase == .background {
+                print("Background")
+                let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Goal")
+                
+                fetchRequest.includesPropertyValues = false
+                
+                do {
+                    let items = try managedObjectContext.fetch(fetchRequest) as! [Goal]
+                    
+                    if(!items.isEmpty){
+                        goalsEmpty = false
+                    }
+                    else {
+                        goalsEmpty = true
+                    }
+                    
+                } catch {
+                    // Error Handling
+                    // ...
+                    #if DEBUG
+                    print("error")
+                    #endif
+                }
+            }
+        }
+      //}
     }
 }
 

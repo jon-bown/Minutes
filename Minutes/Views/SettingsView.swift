@@ -8,14 +8,27 @@
 import SwiftUI
 
 struct SettingsView: View {
+    @Environment(\.managedObjectContext) var managedObjectContext
+    @Environment(\.presentationMode) var presentationMode
+    @FetchRequest(
+      entity: Goal.entity(),
+      sortDescriptors: [
+        NSSortDescriptor(keyPath: \Goal.priority, ascending: true)
+      ]
+    ) var goals: FetchedResults<Goal>
+    
+    var buttonDisabled: Bool {
+        return goals.count == 0
+    }
+    
     var body: some View {
         NavigationView {
             ScrollView(.vertical, showsIndicators: false){
                 VStack(spacing: 20){
                     // MARK: - SECTION 1
                     GroupBox(label: Text("GOAL SETTINGS").bold()){
-                        SettingsRowNavLinkView(navView: AnyView(GoalPriorityView()), label: "Goal Priorities")
-                        SettingsRowNavLinkView(navView: AnyView(ResetAppView()), label: "Reset")
+                        SettingsRowNavLinkView(navView: AnyView(GoalPriorityView()), label: "Edit Goals", enabled: buttonDisabled).disabled(buttonDisabled)
+                        SettingsRowNavLinkView(navView: AnyView(ResetAppView()), label: "Reset", enabled: buttonDisabled).disabled(buttonDisabled)
                     }
                     // MARK: - SECTION 2
                     
@@ -33,9 +46,9 @@ struct SettingsView: View {
 //                Section(header: Text("NOTIFICATIONS")){
 //                    
 //                }
-            }.navigationBarTitle(Text("Settings"), displayMode: .large).padding()   
+            }.navigationTitle(Text("Settings")).navigationBarTitleDisplayMode(.large).padding()
 
-        }
+        }.navigationViewStyle(StackNavigationViewStyle())
     }
 }
 

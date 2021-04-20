@@ -13,7 +13,7 @@ struct ProgressRings: View {
     
     @Environment(\.managedObjectContext) var managedObjectContext
     
-
+    
     
     @FetchRequest(
         entity: GoalRecord.entity(),
@@ -37,28 +37,26 @@ struct ProgressRings: View {
     var animate: Bool = true
     //var goalList: FetchedResults<Goal>
     var filteredGoals: [Goal] {
-        if(!goals.isEmpty){
-            return self.goals.filter({(dateProvided > $0.startDate! ||  cal.isDate(dateProvided, inSameDayAs:$0.startDate!)) && ($0.endDate == nil || dateProvided <= $0.endDate!) && (($0.frequency == "Weekly" && $0.weekDay!.contains(Date().dayOfTheWeek)) || ($0.frequency == "Monthly" && $0.monthDay == dateProvided.dayOfTheMonth) || $0.frequency == "Daily")}).sorted(by: {$0.priority < $1.priority})
-        }
-        else{
-            return []
-        }
-
+        return AppUtil.filterCurrentGoals(goals: self.goalsArray, date: dateProvided)
     }
-//
+    
+    var goalRecordsArray: [GoalRecord] {
+        return goalRecords.sorted(by: {$0.date! > $1.date!})
+    }
     
     
-//    var filteredGoals: [Goal] {
-//        return goals.filter({(dateProvided > $0.startDate! ||  cal.isDate(dateProvided, inSameDayAs:$0.startDate!)) && ((dateProvided.dayOfTheWeek == $0.weekDay && $0.frequency == "Weekly") || ($0.frequency == "Monthly" && $0.monthDay == dateProvided.dayOfTheMonth) || $0.frequency == "Daily")}).sorted(by: {$0.priority < $1.priority})
-//    }
+    var goalsArray: [Goal] {
+        return goals.sorted(by: {$0.priority < $1.priority})
+    }
+    //
+    
+    
+    //    var filteredGoals: [Goal] {
+    //        return goals.filter({(dateProvided > $0.startDate! ||  cal.isDate(dateProvided, inSameDayAs:$0.startDate!)) && ((dateProvided.dayOfTheWeek == $0.weekDay && $0.frequency == "Weekly") || ($0.frequency == "Monthly" && $0.monthDay == dateProvided.dayOfTheMonth) || $0.frequency == "Daily")}).sorted(by: {$0.priority < $1.priority})
+    //    }
     
     var filteredGoalRecords: [GoalRecord] {
-        if(goalRecords.isEmpty){
-            return []
-        }
-        else{
-            return self.goalRecords.filter({cal.isDate(self.dateProvided, inSameDayAs:$0.date!)})
-        }
+        return AppUtil.filterGoalRecordsByDate(goalRecords: self.goalRecordsArray, date: self.dateProvided)
         
     }
     
@@ -77,7 +75,7 @@ struct ProgressRings: View {
         
         ZStack {
             if(filteredGoals.isEmpty){
-                ProgressRingView(progress: 0.0, startColor: Color.clear, endColor: Color.clear, backgroundColor: UIColor.black)
+                ProgressRingView(progress: 0.0, thickness: CGFloat(self.maxLineWidth), startColor: Color.clear, endColor: Color.clear, backgroundColor: UIColor.clear).frame(width: calculateDim(index: 0), height: calculateDim(index: 0)).aspectRatio(contentMode: .fit)
             }
             else {
                 ForEach(filteredGoals, id: \.self){ goal in
@@ -92,7 +90,7 @@ struct ProgressRings: View {
                             else {
                                 ProgressRingView(progress: filteredGoalRecords.first(where: { goal.id == $0.id }) == nil ? 0.0: filteredGoalRecords.first(where: { goal.id == $0.id})!.progress, thickness: CGFloat(self.maxLineWidth), startColor: Color(goal.color!.darker(by: 10.0)!), endColor: Color(goal.color!.lighter(by: 15)!), backgroundColor: goal.color!, animate: animate).frame(width: calculateDim(index: index), height: calculateDim(index: index)).aspectRatio(contentMode: .fit)
                             }
-
+                            
                         }
                     }
                     
@@ -118,7 +116,7 @@ struct ProgressRingsStatic: View {
     
     @Environment(\.managedObjectContext) var managedObjectContext
     
-
+    
     
     @FetchRequest(
         entity: GoalRecord.entity(),
@@ -141,21 +139,26 @@ struct ProgressRingsStatic: View {
     var maxRingLimit: Int = 4
     var animate: Bool = true
     //var goalList: FetchedResults<Goal>
+    
+    var goalsArray: [Goal] {
+        return goals.sorted(by: {$0.priority > $1.priority})
+    }
+    
     var filteredGoals: [Goal] {
-        if(!goals.isEmpty){
-            return self.goals.filter({(dateProvided > $0.startDate! ||  cal.isDate(dateProvided, inSameDayAs:$0.startDate!)) && ($0.endDate == nil || dateProvided <= $0.endDate!) && (($0.frequency == "Weekly" && $0.weekDay!.contains(Date().dayOfTheWeek)) || ($0.frequency == "Monthly" && $0.monthDay == dateProvided.dayOfTheMonth) || $0.frequency == "Daily")}).sorted(by: {$0.priority < $1.priority})
+        if(!goalsArray.isEmpty){
+            return AppUtil.filterCurrentGoals(goals: self.goalsArray, date: dateProvided)
         }
         else{
             return []
         }
-
+        
     }
-//
+    //
     
     
-//    var filteredGoals: [Goal] {
-//        return goals.filter({(dateProvided > $0.startDate! ||  cal.isDate(dateProvided, inSameDayAs:$0.startDate!)) && ((dateProvided.dayOfTheWeek == $0.weekDay && $0.frequency == "Weekly") || ($0.frequency == "Monthly" && $0.monthDay == dateProvided.dayOfTheMonth) || $0.frequency == "Daily")}).sorted(by: {$0.priority < $1.priority})
-//    }
+    //    var filteredGoals: [Goal] {
+    //        return goals.filter({(dateProvided > $0.startDate! ||  cal.isDate(dateProvided, inSameDayAs:$0.startDate!)) && ((dateProvided.dayOfTheWeek == $0.weekDay && $0.frequency == "Weekly") || ($0.frequency == "Monthly" && $0.monthDay == dateProvided.dayOfTheMonth) || $0.frequency == "Daily")}).sorted(by: {$0.priority < $1.priority})
+    //    }
     
     var filteredGoalRecords: [GoalRecord] {
         if(goalRecords.isEmpty){
@@ -197,7 +200,7 @@ struct ProgressRingsStatic: View {
                             else {
                                 ProgressRingViewStatic(progress: filteredGoalRecords.first(where: { goal.id == $0.id }) == nil ? 0.0: filteredGoalRecords.first(where: { goal.id == $0.id})!.progress, thickness: CGFloat(self.maxLineWidth), startColor: Color(goal.color!.darker(by: 10.0)!), endColor: Color(goal.color!.lighter(by: 15)!), backgroundColor: goal.color!, animate: animate).frame(width: calculateDim(index: index), height: calculateDim(index: index)).aspectRatio(contentMode: .fit)
                             }
-
+                            
                         }
                     }
                     

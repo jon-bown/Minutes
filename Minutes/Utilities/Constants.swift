@@ -9,7 +9,7 @@ import CoreGraphics
 
 struct Constants {
     
-    static let navigationBarHeight: CGFloat = 62
+    static let navigationBarHeight: CGFloat = 65
     static let mainRingThickness: CGFloat = 30
     static let weekdayRingThickness: CGFloat = 4
     static let barChartColumns: Int = 96
@@ -22,5 +22,9 @@ struct Constants {
     static let standChartColumnWidth: CGFloat = 13.8
     static let standChartColumnSpacing: CGFloat = 1
     static let standChartGridColumnSpacing: CGFloat = 2.5
+    
+    static let miniBarChartColumns: Int = 96
+    static let miniBarChartColumnWidth: CGFloat = 2.6
+    static let miniBarChartColumnSpacing: CGFloat = 1
     
 }

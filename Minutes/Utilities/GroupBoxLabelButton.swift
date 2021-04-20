@@ -23,7 +23,7 @@ struct GroupBoxLabelButton: View {
                     Text("Done").foregroundColor(.white)
                 }
                 else {
-                    Text("Select").foregroundColor(.white)
+                    Text("Edit").font(.system(size: 15)).foregroundColor(.white)
                 }
             }
             

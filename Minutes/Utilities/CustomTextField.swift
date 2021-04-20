@@ -11,8 +11,6 @@ import UIKit
 
 
 
-
-
 extension View {
 
     func textFieldAlert(isShowing: Binding<Bool>,
@@ -49,28 +47,28 @@ struct TextFieldAlert<Presenting>: View where Presenting: View {
                         
                         Button(action: {
                             withAnimation {
+                                //add save action
+                                    self.saveAction()
+                                    self.isShowing.toggle()
+                            }
+                        }) {
+                            Text("Save").font(.system(size: 20)).bold().foregroundColor(.blue).padding()
+                        }.frame(width: 110, height: 20, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/).padding()
+
+                        
+                        Divider()
+                        
+                        Button(action: {
+                            withAnimation {
                                 self.isShowing.toggle()
                             }
                         }) {
                             Text("Dismiss").font(.system(size: 20)).bold().foregroundColor(.red).padding()
                         }.frame(width: 110, height: 20, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/).padding()
-                        
-                        Divider()
 
-                        Button(action: {
-                            withAnimation {
-                                //add save action
-                            
-                                    self.saveAction()
-                                    self.isShowing.toggle()
-     
 
-                            }
-                        }) {
-                            Text("Save").font(.system(size: 20)).foregroundColor(.blue).padding()
-                        }.frame(width: 110, height: 20, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/).padding()
                     }.padding(.horizontal, 4)
-                }.background(Color(UIColor.lightGray)).cornerRadius(15)
+                }.background(Color(UIColor.white)).cornerRadius(15)
                 .padding()
                 .frame(
                     width: 280,
@@ -114,7 +112,7 @@ struct CustomTextField: UIViewRepresentable {
         let placeholder = NSAttributedString(string: "Minutes", attributes: [NSAttributedString.Key.foregroundColor : UIColor.darkGray])
         textField.attributedPlaceholder = placeholder
         textField.textColor = UIColor.black
-        textField.backgroundColor = UIColor.white
+        textField.backgroundColor = UIColor.lightGray
         textField.keyboardType = UIKeyboardType.numberPad
         return textField
     }

@@ -242,7 +242,7 @@ class ExtensionDelegate: NSObject, ObservableObject, WKExtensionDelegate {
             }
             else {
                 self.updateActiveComplications()
-                self.scheduleBAR(first: false)
+                //self.scheduleBAR(first: false)
             }
 //            switch task {
 //            case let backgroundTask as WKApplicationRefreshBackgroundTask:

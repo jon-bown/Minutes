@@ -163,6 +163,7 @@ struct BarChartBarView: View {
             .onAppear() {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                     withAnimation(self.animation) {
+                       
                         self.currentHeight = self.height
                     }
                 }

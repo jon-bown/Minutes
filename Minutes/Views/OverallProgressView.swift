@@ -25,8 +25,14 @@ struct OverallProgressView: View {
         ]
     ) var goalRecords: FetchedResults<GoalRecord>
     
+    private var cal = Calendar.current
+    
     var filteredGoals: [Goal] {
-        return goals.filter({(self.selectedDate > $0.startDate! ||  calendar.isDate(self.selectedDate, inSameDayAs:$0.startDate!)) && ($0.weekDay!.contains(Date().dayOfTheWeek) || ($0.frequency == "Monthly" && $0.monthDay == self.selectedDate.dayOfTheMonth) || $0.frequency == "Daily")}).sorted(by: {$0.priority < $1.priority})
+        return AppUtil.filterCurrentGoals(goals: self.goalsArray, date: dateProvided)
+    }
+    
+    var goalsArray: [Goal] {
+        return goals.sorted(by: {$0.priority > $1.priority})
     }
     
     //goalRecords created today
@@ -199,10 +205,10 @@ struct OverallProgressView: View {
                         
                         //Use weekdays here
                         ForEach(days, id:\.self) { item in
-                            VStack(spacing: 1) {
+                            VStack(spacing: 2) {
                                 if(item.dayOfTheWeek == self.selectedDate.dayOfTheWeek){
                                     ZStack{
-                                        Circle().fill(Color.pink).clipped().opacity(0.9).frame(width: 15, height: 15)
+                                        Circle().fill(Color.pink).clipped().opacity(0.9).frame(width: 12, height: 12)
                                         Text(String(item.dayOfTheWeek[item.dayOfTheWeek.startIndex]))
                                             .font(Font.system(size: 10, weight: .regular, design: .default))
                                             .foregroundColor(Color.white)
@@ -216,7 +222,7 @@ struct OverallProgressView: View {
                                 }
                                 ZStack {
                                     ProgressRings(dateProvided: item, maxWidth: 30, maxLineWidth: Int(Constants.weekdayRingThickness), maxRingLimit: 3).clipShape(Circle())
-                                        .frame(width: 45, height: 45)
+                                        .frame(width: 45, height: 40)
                                         .aspectRatio(contentMode: .fit)
                                 }
                             }.contentShape(Rectangle()).onTapGesture {

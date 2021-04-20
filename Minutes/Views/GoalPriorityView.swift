@@ -68,45 +68,37 @@ struct GoalPriorityView: View {
     
     //Moves the priorities and the goal items
     func onMove(from source: IndexSet, to destination: Int) {
-        guard let maxPriority = goals.map({$0.priority}).max() else { return }
-        for index in source {
-            let sourceGoal = goals.first(where: {$0.priority == index})
-            //Upward swap or downward swap
-            switch index <= destination {
-            case true:
-                if(destination > maxPriority){
 
-                    sourceGoal?.priority = maxPriority
-                    for goal in goals {
-                        if(goal.priority < maxPriority){
-                            goal.priority -= 1
-                        }
-                    }
+        for index in source {
+            if(index == destination){
+                return
+            }
+            print("Index: \(index)")
+            print("Destination: \(destination)")
+            let sourceGoal = goals.first(where: {$0.priority == (index+1)})!
+            
+            
+            var goalsArray = filteredGoals
+            goalsArray.remove(at: index)
+            if(goalsArray.count == (destination-1)){
+                goalsArray.append(sourceGoal)
+            }
+            else {
+                if(index < destination){
+                    goalsArray.insert(sourceGoal, at: (destination-1))
                 }
                 else {
-
-                    let destinationGoal = goals.first(where: {$0.priority == destination})
-                    sourceGoal?.priority = Int64(destination)
-                    destinationGoal?.priority -= 1
-                    for goal in goals {
-                        if(goal.priority < destination){
-                            goal.priority -= 1
-                        }
-                    }
+                    goalsArray.insert(sourceGoal, at: (destination))
                 }
-                break
-            case false:
-
-                    let destinationGoal = goals.first(where: {$0.priority == destination})
-                    sourceGoal?.priority = Int64(destination)
-                    destinationGoal?.priority += 1
-                    for goal in goals {
-                        if(goal.priority > destination){
-                            goal.priority += 1
-                        }
-                    }
-                break
+                
             }
+            
+            for goal in filteredGoals {
+                let marker = goalsArray.firstIndex(of: goalsArray.first(where: {$0.id == goal.id!})!)
+                goal.priority = Int64(Int(marker!)+1)
+            }
+            
+      
         }
     
         DispatchQueue.main.async {
@@ -119,13 +111,7 @@ struct GoalPriorityView: View {
     }
     
     func onDelete(at offsets: IndexSet) {
-        //order.items.remove(atOffsets: offsets)
-        //let items = try managedObjectContext.fetch(fetchRequest) as! [Goal]
-        
-//        for index in offsets {
-//            managedObjectContext.delete(items[index])
-//        }
-        do {
+
             for index in offsets {
                 let goal = self.goals.first(where: {$0.id == goals[index].id})!
                 
@@ -146,11 +132,8 @@ struct GoalPriorityView: View {
                 
 
             }
-            try managedObjectContext.save()
-        }
-        catch {
-            
-        }
+            saveContext()
+        
         
 
     }

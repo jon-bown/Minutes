@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import WidgetKit
 
 struct ProgressBar: View {
     var color: UIColor
@@ -53,41 +54,30 @@ struct GoalDetailView: View {
     @State private var newSessionText: String = ""
     @State private var isSessionsEditable: Bool = false
     @State private var sessionsToRemove: [Date] = [Date]()
+    @State private var remindersOnText: String = "Off"
+    @State private var reminderTimeText: String = ""
     
     //Just check the list view model if the goal record exists
+    var goalRecordsArray: [GoalRecord] {
+        return goalRecords.sorted(by: {$0.date! > $1.date!})
+    }
     
-    var filteredGoalRecordsToday: [GoalRecord] {
-        return self.goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs:$0.date!) && goal.name == $0.name})
+    
+    var filteredCurrentGoalRecordsToday: [GoalRecord] {
+        return AppUtil.filterGoalRecordsTodayByName(goalRecords: self.goalRecordsArray, goalName: self.goal.name!)
+    }
+    
+    var filteredGoalRecordsCurrentGoal: [GoalRecord] {
+        return AppUtil.filterGoalRecordsByGoal(goalRecords: self.goalRecordsArray, goalName: self.goal.name!)
     }
     
     //Extract dictionary used to display todays sessions
     var filteredGoalRecordsSavesToday: [Date: Double] {
-        if(self.goalRecords.isEmpty){
-            return [:]
-        }
-        else if(self.goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs:$0.date!) && goal.name == $0.name}).isEmpty){
-            return [:]
-        }
-        else {
-            
-            let firstItem = (self.goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs:$0.date!) && goal.name == $0.name}).first!)
-            if(!(firstItem.goalSaves == nil)){
-                //it has goal updates
-                
-                return firstItem.goalSaves!
-            }
-            else {
-                return [:]
-            }
-            
-            
-        }
+        return AppUtil.filterGoalRecordSavesTodayByName(goalRecords: self.goalRecordsArray, goalName: self.goal.name!)
         
     }
     
-    var filteredGoalRecordsCurrentGoal: [GoalRecord] {
-        return self.goalRecords.filter({goal.name == $0.name})
-    }
+
     
     var body: some View {
         ScrollView(.vertical, showsIndicators: false){
@@ -149,7 +139,7 @@ struct GoalDetailView: View {
                                     }
                                     Text(key.shortTime)
                                     Spacer()
-                                    Text("\(self.getHoursFromSeconds(seconds: value)):\(self.getMinutesFromSeconds(seconds: value)):\(self.getSecondsFromSeconds(seconds: value))")
+                                    Text(AppUtil.getTotalTimeString(seconds: value))
                                 }
                             }
 
@@ -157,7 +147,7 @@ struct GoalDetailView: View {
 
                         }
                         
-                    Divider().frame(height: 5).background(Color.red)
+                    Divider().frame(height: 2).background(Color.white)
                         
                         HStack{
                             Spacer()
@@ -177,13 +167,14 @@ struct GoalDetailView: View {
                                 
                             }){
                                 if(!self.isSessionsEditable){
-                                    Image(systemName: "plus").font(.system(size: 25, weight: .bold)).frame(width: 100, height: 40).background(Color.gray).cornerRadius(15)
+                                    Image(systemName: "plus").font(.system(size: 25, weight: .bold))
+                                        //.frame(width: 100, height: 40).background(Color.gray).cornerRadius(15)
                                 }
                                 else {
                                     Image(systemName: "trash").font(.system(size: 20)).foregroundColor(.red)
                                 }
                                 
-                            }
+                            }.buttonStyle(CircleStopWatchSaveStyle())
                             Spacer()
                             
                         }.padding()
@@ -238,6 +229,12 @@ struct GoalDetailView: View {
                 
                 
             }
+            self.createStreakInfoTile().padding([.leading, .trailing], 15)
+            self.createTotalTimeInfoTile().padding([.leading, .trailing], 15)
+            self.createFrequencyInfoTile().padding([.leading, .trailing], 15)
+            //if(checkNotificationsExist(id: self.goal.id!)){
+            self.createReminderInfoTile().padding([.leading, .trailing], 15)
+            //}
             self.createDateInfoTile().padding([.leading], 15).navigationBarTitle(Text(goal.name!), displayMode: .automatic).navigationBarItems(
                 //                    leading: Button(action: {
                 //                    self.presentationMode.wrappedValue.dismiss()
@@ -253,12 +250,26 @@ struct GoalDetailView: View {
                     arrowEdge: .bottom
                 ) {
                     
-                    GoalForm(editing: true, goal: self.goal, isPresented: self.$showGoalEditForm, success: self.$goalUpdatedSuccess).environment(\.managedObjectContext, managedObjectContext)
+                    GoalForm(editing: true, passedGoal: self.goal, isPresented: self.$showGoalEditForm, success: self.$goalUpdatedSuccess).environment(\.managedObjectContext, managedObjectContext)
                     //NewGoalForm(isPresented: self.$showNewGoalForm)
                     
                 })
             
-        }.onAppear { self.updateProgress()}.toast(isShowing: self.$goalUpdatedSuccess, text: Text("Saved")).textFieldAlert(isShowing: self.$showCustomMinuteSheet, text: self.$newSessionText, title: "Add Minutes", saveAction: self.saveCustomMinuteSession)
+        }.onChange(of: self.showGoalEditForm) { newValue in
+            if(!newValue) {
+                print("changing")
+                print(self.remindersOnText)
+                    self.checkNotificationsExist(id: self.goal.id!)
+                
+                print(self.remindersOnText)
+                
+            }
+ 
+            
+            
+        }.onAppear { self.updateProgress()
+            self.checkNotificationsExist(id: self.goal.id!)
+        }.toast(isShowing: self.$goalUpdatedSuccess, text: Text("Saved")).textFieldAlert(isShowing: self.$showCustomMinuteSheet, text: self.$newSessionText, title: "Add Minutes", saveAction: self.saveCustomMinuteSession)
         
         
     }
@@ -303,6 +314,176 @@ struct GoalDetailView: View {
         }
     }
     
+    //MARK: - SUB VIEWS
+    private func createFrequencyInfoTile() -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 30) {
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("Frequency").font(Font.system(size: 18, weight: .regular, design: .default)).kerning(0.05).foregroundColor(Color.white)
+                    (
+                        Text(String(self.goal.frequency!))
+                            .font(Font.system(size: 25, weight: .regular, design: .rounded))
+                            .kerning(0.25)
+                            .foregroundColor(Color(goal.color!)).lineLimit(1)
+                        
+                    )
+                    .padding([.top], -3)
+                }.padding(.leading, 3)
+                Spacer()
+                
+                
+                if(self.goal.frequency! == "Weekly"){
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text("On Days:").font(Font.system(size: 18, weight: .regular, design: .default)).kerning(0.05).foregroundColor(Color.white)
+                        (
+                            Text(AppUtil.createWeekDaysString(days: self.goal.weekDay!))
+                                .font(Font.system(size: 20, weight: .regular, design: .rounded))
+                                .kerning(0.25)
+                                .foregroundColor(Color(goal.color!)).lineLimit(2)
+                            
+                        )
+                        .padding([.top], -3)
+                    }.padding(.trailing,8)
+                }
+                else if(self.goal.frequency! == "Monthly"){
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text("On Day:").font(Font.system(size: 18, weight: .regular, design: .default)).kerning(0.05).foregroundColor(Color.white)
+                        (
+                            Text(String(self.goal.monthDay))
+                                .font(Font.system(size: 25, weight: .regular, design: .rounded))
+                                .kerning(0.25)
+                                .foregroundColor(Color(goal.color!)).lineLimit(1)
+                            
+                        )
+                        .padding([.top], -3)
+                    }
+                }
+                
+                
+            }.padding(.vertical, 10)
+            
+            Divider().background(Color.white).padding(.horizontal, 2)
+            
+        }
+    }
+    
+    
+    
+    //MARK: - SUB VIEWS
+    private func createStreakInfoTile() -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 30) {
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("Current Streak").font(Font.system(size: 18, weight: .regular, design: .default)).kerning(0.05).foregroundColor(Color.white)
+                    (
+                        Text(String(self.calculateCurrentStreak()))
+                            .font(Font.system(size: 25, weight: .semibold, design: .rounded))
+                            .kerning(0.25).foregroundColor(Color(goal.color!))
+                        
+                    )
+                    .padding([.top], -3)
+                }.padding(.leading, 3)
+//                Spacer()
+                
+                
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("Best Streak").font(Font.system(size: 18, weight: .regular, design: .default)).kerning(0.05).foregroundColor(Color.white)
+                    (
+                        Text(String(self.calculateBestStreak()))
+                            .font(Font.system(size: 25, weight: .semibold, design: .rounded))
+                            .kerning(0.25)
+                            .foregroundColor(Color(goal.color!)).lineLimit(1)
+                        
+                    )
+                    .padding([.top], -3)
+                }
+                
+                
+            }.padding(.vertical, 10)
+            
+            Divider().background(Color.white).padding(.horizontal, 2)
+            
+        }
+    }
+    
+    private func createTotalTimeInfoTile() -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 30) {
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("Total Time").font(Font.system(size: 18, weight: .regular, design: .default)).kerning(0.05).foregroundColor(Color.white)
+                    (
+                        Text(AppUtil.getTotalTimeString(seconds: self.goal.totalTime))
+                            .font(Font.system(size: 25, weight: .semibold, design: .rounded))
+                            .kerning(0.25)
+                            .foregroundColor(Color(goal.color!))
+                        
+                    )
+                    .padding([.top], -3)
+                }.padding(.leading, 3)
+                //Spacer()
+                
+                
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("This Week").font(Font.system(size: 18, weight: .regular, design: .default)).kerning(0.05).foregroundColor(Color.white)
+                    (
+                        Text(AppUtil.calculateTimeThisWeek(goalRecords: self.filteredGoalRecordsCurrentGoal))
+                            .font(Font.system(size: 25, weight: .semibold, design: .rounded))
+                            .kerning(0.25)
+                            .foregroundColor(Color(goal.color!)).lineLimit(1)
+                        
+                    )
+                    .padding([.top], -3)
+                }.padding(.leading, 3)
+                
+                
+            }.padding(.vertical, 10)
+            
+            Divider().background(Color.white).padding(.horizontal, 2)
+            
+        }
+    }
+    
+    private func createReminderInfoTile() -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 30) {
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("Reminders").font(Font.system(size: 18, weight: .regular, design: .default)).kerning(0.05).foregroundColor(Color.white)
+                    (
+                        Text(self.remindersOnText)
+                            .font(Font.system(size: 25, weight: .regular, design: .rounded))
+                            .kerning(0.25)
+                            .foregroundColor(Color(goal.color!))
+                        
+                    )
+                    .padding([.top], -3)
+                }.padding(.leading, 3)
+                //Spacer()
+                
+                if(self.remindersOnText == "On"){
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text("At").font(Font.system(size: 18, weight: .regular, design: .default)).kerning(0.05).foregroundColor(Color.white)
+                        (
+                            Text(self.reminderTimeText)
+                                .font(Font.system(size: 25, weight: .semibold, design: .rounded))
+                                .kerning(0.25)
+                                .foregroundColor(Color(goal.color!)).lineLimit(1)
+                            
+                        )
+                        .padding([.top], -3)
+                    }
+                }
+   
+                
+                
+            }.padding(.vertical, 10)
+            
+            Divider().background(Color.white).padding(.horizontal, 2)
+            
+        }
+    }
+    
+
+    
     private func createProgressBox() -> some View {
         VStack{
             GroupBox{
@@ -311,37 +492,18 @@ struct GoalDetailView: View {
                         
                         Text("Today").font(Font.system(size: 20, weight: .regular, design: .default)).kerning(0.05).foregroundColor(Color.white)
                         (
-                            Text(self.filteredGoalRecordsToday.isEmpty ? "0/\(Int(self.goal.goalTime))":"\(Int(self.filteredGoalRecordsToday[0].dayTime/60))/\(Int(self.goal.goalTime))")
-                                .font(Font.system(size: 20, weight: .semibold, design: .rounded))
+                            Text(self.filteredCurrentGoalRecordsToday.isEmpty ? "0/\(Int(self.goal.goalTime))":"\(Int(self.filteredCurrentGoalRecordsToday[0].dayTime/60))/\(Int(self.goal.goalTime))")
+                                .font(Font.system(size: 25, weight: .semibold, design: .rounded))
                                 .kerning(0.25)
+                                //TODO: Must fix this
                                 .foregroundColor(Color(goal.color!))
                                 + Text("MIN")
                                 .font(Font.system(size: 20, weight: .semibold, design: .rounded))
                                 .kerning(0.3).foregroundColor(Color(goal.color!))
                         )
-                        .padding([.top], -3).padding(.bottom, 2)
+                        .padding([.top], -3).padding(.bottom, 3)
                         
-                        Text("Streak").font(Font.system(size: 20, weight: .regular, design: .default)).kerning(0.05).foregroundColor(Color.white)
-                        (
-                            Text(String(self.calculateCurrentStreak()))
-                                .font(Font.system(size: 20, weight: .semibold, design: .rounded))
-                                .kerning(0.3).foregroundColor(Color(goal.color!))
-                            
-                        )
-                        Text("Total Time")
-                            .font(Font.system(size: 18, weight: .regular, design: .default))
-                            .kerning(0.05)
-                            .foregroundColor(Color.white)
-                        (
-                            Text("\(self.getHoursFromSeconds(seconds: self.goal.totalTime)):\(self.getMinutesFromSeconds(seconds: self.goal.totalTime)):\(self.getSecondsFromSeconds(seconds: self.goal.totalTime))")
-                                .font(Font.system(size: 20, weight: .regular, design: .rounded))
-                                .kerning(0.25)
-                                .foregroundColor(Color(goal.color!))
-                        )
-                        .padding([.top], -3)
-                        
-                        
-                    }
+                    }.padding(.leading, 10)
                     Spacer()
                     
                     ZStack(alignment: .center){
@@ -363,7 +525,111 @@ struct GoalDetailView: View {
     
     //MARK: - HELPER METHODS
     
+    func checkNotificationsExist(id: UUID) {
+        
+         var finalString = ""
+            self.getPendingRequests(id: id) { (hour, minute) in
 
+                if let hr = hour {
+                    if let min = minute {
+                        var fullHour = ""
+                        var fullMinute = ""
+                        if(hr < 10) {
+                            fullHour = "0\(String(describing: hr))"
+                        }
+                        else {
+                            fullHour = "\(String(describing: hr))"
+                        }
+                        if(min < 10){
+                            fullMinute = "0\(String(describing: min))"
+                        }
+                        else {
+                            fullMinute = "\(String(describing: min))"
+                        }
+                        finalString = "\(fullHour):\(fullMinute)"
+                        
+                        let dateFormatter = DateFormatter()
+                        dateFormatter.dateFormat = "HH:mm"
+
+                        let date = dateFormatter.date(from: finalString)
+                        dateFormatter.dateFormat = "h:mm a"
+                        finalString = dateFormatter.string(from: date!)
+                        
+                        if(finalString == ""){
+                            self.remindersOnText = "Off"
+                        }
+                        else {
+                            self.remindersOnText = "On"
+                            self.reminderTimeText = finalString
+                        }
+                    }
+                }
+                else {
+                    if(finalString == ""){
+                        self.remindersOnText = "Off"
+                    }
+                    else {
+                        self.remindersOnText = "On"
+                        self.reminderTimeText = finalString
+                    }
+                }
+                
+
+            }
+
+     }
+    
+    func getPendingRequests(id: UUID, completion:@escaping (Int?, Int?)->Void){
+        
+        let queue = DispatchQueue.main
+        let group = DispatchGroup()
+        
+        queue.async(group: group) {
+            group.enter()
+        UNUserNotificationCenter.current().getPendingNotificationRequests { (notificationRequests) in
+            for notification:UNNotificationRequest in notificationRequests {
+                if notification.identifier == id.uuidString {
+                    guard let trigger = notification.trigger as? UNCalendarNotificationTrigger else {
+                        completion(nil, nil)
+                        return
+                    }
+                    let nextTriggerDate = trigger.nextTriggerDate()!
+                    //get date components
+                    let components = Calendar.current.dateComponents([.hour, .minute], from: nextTriggerDate)
+                    if let hour = components.hour {
+                        if let minute = components.minute {
+                            completion(hour, minute)
+                            return
+                        }
+                    }
+
+                }
+            }
+            completion(nil, nil)
+        }
+            group.leave()
+        }
+        
+        
+        }
+//
+//    private func checkNotificationsExist(id: UUID) -> Bool {
+//        var exist = false
+//        //Check if any notifications exist, if they do set reminders to true
+//        UNUserNotificationCenter.current().getPendingNotificationRequests { (notificationRequests) in
+//            for notification:UNNotificationRequest in notificationRequests {
+//                if notification.identifier == id.uuidString {
+//
+//                    exist = true
+//                    return
+//                }
+//            }
+//        }
+//        return exist
+//        //self.reminders = checkNotificationsExist(id: id)
+//
+//    }
+    
     private func addCustomMinutes() {
         self.showCustomMinuteSheet = true
     }
@@ -481,52 +747,11 @@ struct GoalDetailView: View {
     }
     //Calculates the current streak the user is on
     private func calculateCurrentStreak() -> Int {
-        if(filteredGoalRecordsCurrentGoal.count == 0){
-            return 0
-        }
-        else {
-            var count = 0
-            //most recent goal record where progress of greater than 1 was achieved
-            guard let first = filteredGoalRecordsCurrentGoal.sorted(by: {$0.date! > $1.date!}).first(where: {$0.progress >= 1}) else {
-                //no streaks possible
-                return 0
-            }
-            if(Calendar.current.isDate(Date(), inSameDayAs:first.date!)){
-                return 1
-            }
-            else if(Calendar.current.isDateInYesterday(first.date!)){
-                let completedGoals = goalRecords.sorted(by: {$0.date! > $1.date! && $0.name == self.goal.name!}).filter({$0.progress >= 1})
-                var tempDate = first.date!
-                for record in completedGoals {
-                    let diffComponents = Calendar.current.dateComponents([.hour], from: record.date!, to: tempDate)
-                    if let hours = diffComponents.hour {
-                        if(hours <= 24){
-                            count+=1
-                        }
-                        else {
-                            return count
-                        }
-                        tempDate = record.date!
-                    }
-                    else{
-                        #if DEBUG
-                        print("Error with counting hours between dates")
-                        #endif
-                    }
-                }
-                return count
-            }
-            else {
-                //you are not on a streak
-                return 0
-            }
-            
-        }
+        return AppUtil.calculateGoalCurrentStreak(records: filteredGoalRecordsCurrentGoal, goalName: self.goal.name!)
     }
     
     private func calculateBestStreak() -> Int {
-        
-        return 0
+        return AppUtil.calculateGoalBestStreak(goalName: self.goal.name!)
     }
     
     //Save the current time into the proper goal entity
@@ -560,12 +785,13 @@ struct GoalDetailView: View {
             self.goal.totalTime += Double(self.stopWatch.totalAccumulatedTime.seconds())
             //divide hours into four quadrants
             var hour = Calendar.current.component(.hour, from: Date())*4
-            let minutes = (newGoalRecord.progress * 60).truncatingRemainder(dividingBy: 60)
+            let minutes = (newGoalRecord.progress * 60.0).truncatingRemainder(dividingBy: 60)
             var entry = [Int:Double]()
             hour = hour + Date().minuteQuadrant
             entry[hour] = Double(minutes)
             newGoalRecord.goalUpdates = entry
-            
+            print("Progress: \(newGoalRecord.progress)")
+            print("Minutes:\(minutes)")
             //SAVES
             var save = [Date:Double]()
             save[Date()] = Double(self.stopWatch.totalAccumulatedTime.seconds())
@@ -587,9 +813,10 @@ struct GoalDetailView: View {
             
             
             var hour = Calendar.current.component(.hour, from: Date())*4
-            let minutes = (records[0].progress * 60).truncatingRemainder(dividingBy: 60)
+            let minutes = (records[0].progress * 59.0).truncatingRemainder(dividingBy: 60)
             hour = hour + Date().minuteQuadrant
-            
+            print("Progress: \(records[0].progress)")
+            print("Minutes:\(minutes)")
             let keyExists = records[0].goalUpdates![hour] != nil
             if(keyExists){
                 records[0].goalUpdates![hour] = (records[0].goalUpdates![hour]! + Double(minutes)).truncatingRemainder(dividingBy: 60)
@@ -615,6 +842,8 @@ struct GoalDetailView: View {
             
             
         }
+        //TODO Update this to check if active widget
+        WidgetCenter.shared.reloadTimelines(ofKind: AppGroup.facts.rawValue)
         
         
     }
@@ -640,6 +869,7 @@ struct GoalDetailView: View {
         else{
             self.dayTime = 0.0
         }
+        
     }
     
     func recalculateProgress() {
@@ -670,37 +900,7 @@ struct GoalDetailView: View {
         
     }
     
-    private func getHoursFromSeconds(seconds: Double) -> String {
-        let hours = Int(seconds/3600)
-        if(String(hours).count == 1){
-            return "0\(hours)"
-        }
-        else {
-            return "\(hours)"
-        }
-    }
     
-    private func getMinutesFromSeconds(seconds: Double) -> String {
-        let minutes = Int((seconds.truncatingRemainder(dividingBy: 3600))/60)
-        if(String(minutes).count == 1){
-            return "0\(minutes)"
-        }
-        else {
-            return "\(minutes)"
-        }
-    }
-    
-    private func getSecondsFromSeconds(seconds: Double) -> String {
-        let sec = seconds.truncatingRemainder(dividingBy: 3600)
-        let remSec = Int(sec.truncatingRemainder(dividingBy: 60))
-        if(String(remSec).count == 1){
-            return "0\(remSec)"
-        }
-        else {
-            return "\(remSec)"
-        }
-        
-    }
 }
 
 
