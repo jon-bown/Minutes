@@ -16,8 +16,7 @@ struct GoalCompletedNotificationView: View {
                 Text("Complete")
             }
             VStack{
-                //Progress rings
-                Text("ProgressRings")
+                ProgressRings(dateProvided: Date(), maxWidth: 30, maxLineWidth: Constants.weekdayRingThickness, maxRingLimit: 3).padding(2).clipShape(Circle()).padding(.vertical, 4)
                 Spacer()
             }
         }.onAppear{

@@ -27,4 +27,17 @@ struct Constants {
     static let miniBarChartColumnWidth: CGFloat = 2.6
     static let miniBarChartColumnSpacing: CGFloat = 1
     
+    
+    
+    //MARK: Progress Ring Sizes
+    //Standard
+    static let progressRingViewFrameHeightStandard: CGFloat = 150
+    static let progressRingViewFrameWidthStandard: CGFloat = 150
+    static let progressRingViewThicknessStandard: CGFloat = 15
+    static let progressRingViewMaxRingLimitStandard: Int = 3
+    
+    static let progressRingViewCalendarMaxWidth: CGFloat = 15
+    
+    static let globalCornerRadius: CGFloat = 10
+    
 }

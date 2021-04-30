@@ -51,7 +51,7 @@ struct MainProgressView: View {
                                 HStack{
                                     DailyStatsView(goalList: self.goals)
                                     Spacer()
-                                    ProgressRings(dateProvided: Date(), maxWidth: 120, maxLineWidth: 15, maxRingLimit: 3).frame(width: 150, height: 150).aspectRatio(contentMode: .fit)
+                                    ProgressRings(dateProvided: Date(), maxWidth: 120, maxLineWidth: Constants.progressRingViewThicknessStandard, maxRingLimit: Constants.progressRingViewMaxRingLimitStandard).frame(width: Constants.progressRingViewFrameWidthStandard, height: Constants.progressRingViewFrameHeightStandard).aspectRatio(contentMode: .fit)
                                 }
 
                             }.cornerRadius(15).padding()
@@ -60,7 +60,7 @@ struct MainProgressView: View {
                     }
                     VStack(alignment: .center){
                         if(goals.isEmpty){
-                            Text("Tap '+' to create a new minute goal!")
+                            Text("Tap '+' to create a new minute goal!").padding(.top, 10)
                         }
                         else {
                             Picker("", selection: self.$goalFilterCriteria){
@@ -68,8 +68,6 @@ struct MainProgressView: View {
                                         Text("All").font(.system(.subheadline, design: .rounded)).tag("All")
                             }.pickerStyle(SegmentedPickerStyle()).padding()
                         }
-
-                                //DropDownMenu(selection: self.$goalFilterCriteria)
                         ScrollView{
                             if(self.goalFilterCriteria == "Today"){
                                 ForEach(filteredGoals, id: \.self) { goal in
@@ -115,7 +113,7 @@ struct MainProgressView: View {
                 self.createNavigationBar(geometry.size)
             }
 
-        }
+        }.navigationViewStyle(StackNavigationViewStyle())
         
     }
     

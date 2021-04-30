@@ -6,6 +6,9 @@
 //
 
 import SwiftUI
+#if !os(watchOS)
+import CoreHaptics
+#endif
 
 
 struct StopWatchButton : View {
@@ -14,15 +17,20 @@ struct StopWatchButton : View {
     var color: Color
     var isPaused: Bool
     var playPause: Bool
-    
-    
+    #if !os(watchOS)
+    @State private var engine: CHHapticEngine?
+    #endif
     
     var body: some View {
         
         return Button(action: {
+            #if !os(watchOS)
+            self.complexSuccess()
+            #endif
             if self.isPaused {
                 self.actions[0]()
                 if(self.actions.count > 2){
+                
                     self.actions[2]()
                 }
             } else {
@@ -36,10 +44,72 @@ struct StopWatchButton : View {
                 Text(self.labels[1])
                     .foregroundColor(self.playPause ? .red:.white).clipped().frame(width: 100, height: 100)
             }
-        }.buttonStyle(CircleStopWatchStyle(isPaused: self.isPaused, playPause: self.playPause))
+        }.buttonStyle(CircleStopWatchStyle(isPaused: self.isPaused, playPause: self.playPause)).onAppear {
+            #if !os(watchOS)
+            self.prepareHaptics()
+            #endif
+        }
         
     }
+
     
+    
+    
+    #if !os(watchOS)
+    func prepareHaptics() {
+        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
+
+        do {
+            print("haptics enabled")
+            self.engine = try CHHapticEngine()
+            try engine?.start()
+        } catch {
+            print("There was an error creating the engine: \(error.localizedDescription)")
+        }
+    }
+    
+    func complexSuccess() {
+        // make sure that the device supports haptics
+        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
+        var events = [CHHapticEvent]()
+
+        // create one intense, sharp tap
+        let intensity = CHHapticEventParameter(parameterID: .hapticIntensity, value: 4)
+        let sharpness = CHHapticEventParameter(parameterID: .hapticSharpness, value: 4)
+        let event = CHHapticEvent(eventType: .hapticTransient, parameters: [intensity, sharpness], relativeTime: 0)
+        events.append(event)
+
+        // convert those events into a pattern and play it immediately
+        do {
+            let pattern = try CHHapticPattern(events: events, parameters: [])
+            let player = try engine?.makePlayer(with: pattern)
+            try player?.start(atTime: 0)
+        } catch {
+            print("Failed to play pattern: \(error.localizedDescription).")
+        }
+    }
+    
+    func buttonTap() {
+        // make sure that the device supports haptics
+        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
+        var events = [CHHapticEvent]()
+
+        // create one intense, sharp tap
+        let intensity = CHHapticEventParameter(parameterID: .hapticIntensity, value: 1)
+        let sharpness = CHHapticEventParameter(parameterID: .hapticSharpness, value: 1)
+        let event = CHHapticEvent(eventType: .hapticTransient, parameters: [intensity, sharpness], relativeTime: 0)
+        events.append(event)
+
+        // convert those events into a pattern and play it immediately
+        do {
+            let pattern = try CHHapticPattern(events: events, parameters: [])
+            let player = try engine?.makePlayer(with: pattern)
+            try player?.start(atTime: 0)
+        } catch {
+            print("Failed to play pattern: \(error.localizedDescription).")
+        }
+    }
+    #endif
     
 }
 

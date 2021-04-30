@@ -9,12 +9,12 @@ import SwiftUI
 
 @main
 struct MinutesApp: App {
-    let persistenceController = PersistenceController.shared
+    let persistenceController = PersistenceController.self
 
     var body: some Scene {
         WindowGroup {
             ContentView().accentColor(.white)
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .environment(\.managedObjectContext, persistenceController.persistentContainer.viewContext)
         }
     }
 }

@@ -13,7 +13,7 @@ fileprivate extension DateFormatter {
         formatter.dateFormat = "MMMM"
         return formatter
     }
-
+    
     static var monthAndYear: DateFormatter {
         let formatter = DateFormatter()
         formatter.dateFormat = "MMMM yyyy"
@@ -24,25 +24,25 @@ fileprivate extension DateFormatter {
 
 struct WeekView<DateView>: View where DateView: View {
     @Environment(\.calendar) var calendar
-
+    
     let week: Date
     let content: (Date) -> DateView
-
+    
     init(week: Date, @ViewBuilder content: @escaping (Date) -> DateView) {
         self.week = week
         self.content = content
     }
-
+    
     private var days: [Date] {
         guard
             let weekInterval = calendar.dateInterval(of: .weekOfYear, for: week)
-            else { return [] }
+        else { return [] }
         return calendar.generateDates(
             inside: weekInterval,
             matching: DateComponents(hour: 0, minute: 0, second: 0)
         )
     }
-
+    
     var body: some View {
         HStack {
             ForEach(days, id: \.self) { date in
@@ -60,11 +60,11 @@ struct WeekView<DateView>: View where DateView: View {
 
 struct MonthView<DateView>: View where DateView: View {
     @Environment(\.calendar) var calendar
-
+    
     let month: Date
     let showHeader: Bool
     let content: (Date) -> DateView
-
+    
     init(
         month: Date,
         showHeader: Bool = true,
@@ -74,30 +74,30 @@ struct MonthView<DateView>: View where DateView: View {
         self.content = content
         self.showHeader = showHeader
     }
-
+    
     private var weeks: [Date] {
         guard
             let monthInterval = calendar.dateInterval(of: .month, for: month)
-            else { return [] }
+        else { return [] }
         return calendar.generateDates(
             inside: monthInterval,
             matching: DateComponents(hour: 0, minute: 0, second: 0, weekday: calendar.firstWeekday)
         )
     }
-
+    
     private var header: some View {
         let formatter = DateFormatter.monthAndYear
         return Text(formatter.string(from: month))
             .font(.title)
             .padding()
     }
-
+    
     var body: some View {
         VStack {
             if showHeader {
                 header
             }
-
+            
             ForEach(weeks, id: \.self) { week in
                 WeekView(week: week, content: self.content)
             }
@@ -107,22 +107,22 @@ struct MonthView<DateView>: View where DateView: View {
 
 struct CalendarView<DateView>: View where DateView: View {
     @Environment(\.calendar) var calendar
-
+    
     let interval: DateInterval
     let content: (Date) -> DateView
-
+    
     init(interval: DateInterval, @ViewBuilder content: @escaping (Date) -> DateView) {
         self.interval = interval
         self.content = content
     }
-
+    
     private var months: [Date] {
         calendar.generateDates(
             inside: interval,
             matching: DateComponents(day: 1, hour: 0, minute: 0, second: 0)
         )
     }
-
+    
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack {
@@ -139,10 +139,10 @@ struct RootView: View {
     @Environment(\.managedObjectContext) var managedObjectContext
     
     @FetchRequest(
-      entity: Goal.entity(),
-      sortDescriptors: [
-        NSSortDescriptor(keyPath: \Goal.priority, ascending: true)
-      ]
+        entity: Goal.entity(),
+        sortDescriptors: [
+            NSSortDescriptor(keyPath: \Goal.priority, ascending: true)
+        ]
     ) var goals: FetchedResults<Goal>
     
     @FetchRequest(
@@ -151,7 +151,7 @@ struct RootView: View {
             NSSortDescriptor(keyPath: \GoalRecord.name, ascending: true)
         ]
     ) var goalRecords: FetchedResults<GoalRecord>
-
+    
     private var year: DateInterval {
         if let minDate = goalRecords.min(by: { $0.date! < $1.date! })?.date! {
             let maxDate = goalRecords.max(by: { $0.date! < $1.date! })?.date!
@@ -162,37 +162,37 @@ struct RootView: View {
             return calendar.dateInterval(of: .weekOfMonth, for: Date())!
         }
         
-       
-      ///create custom intervals
+        
+        ///create custom intervals
     }
     
     let screenSize = UIScreen.main.bounds.size
-
+    
     var body: some View {
         NavigationView{
-        CalendarView(interval: year) { date in
-//            Text("50")
-//                .hidden()
-//                .padding(8)
-//                .background(Color.blue)
-//                .clipShape(Circle())
-//                .padding(.vertical, 4)
-//                .overlay(
-//                    Text(String(self.calendar.component(.day, from: date)))
-//                )
-            
-            NavigationLink(destination: OverallProgressView(dateProvided: date)){
-            VStack {
-                Text(String(self.calendar.component(.day, from: date))).foregroundColor(.white)
-                //Text(date.dayOfTheWeek)
-                ProgressRings(dateProvided: date, maxWidth: 30, maxLineWidth: Int(Constants.weekdayRingThickness), maxRingLimit: 3).padding(2).clipShape(Circle()).padding(.vertical, 4)
+            CalendarView(interval: year) { date in
+                //            Text("50")
+                //                .hidden()
+                //                .padding(8)
+                //                .background(Color.blue)
+                //                .clipShape(Circle())
+                //                .padding(.vertical, 4)
+                //                .overlay(
+                //                    Text(String(self.calendar.component(.day, from: date)))
+                //                )
                 
-            }
-            }
+                NavigationLink(destination: OverallProgressView(dateProvided: date)){
+                    VStack {
+                        Text(String(self.calendar.component(.day, from: date))).font(Font.system(size: 18, weight: .regular, design: .default)).kerning(0.05).foregroundColor(.white)
+                        //Text(date.dayOfTheWeek)
+                        ProgressRings(dateProvided: date, maxWidth: 30, maxLineWidth: Constants.weekdayRingThickness, maxRingLimit: 3).padding(2).clipShape(Circle()).padding(.vertical, 4)
+                        
+                    }
+                }
+                
+            }.frame(width: screenSize.width-80)
             
-        }.frame(width: screenSize.width-80)
-            
-    }
+        }.navigationBarHidden(true).navigationViewStyle(StackNavigationViewStyle())
     }
 }
 
@@ -201,10 +201,10 @@ struct SmallCalendarView: View {
     @Environment(\.managedObjectContext) var managedObjectContext
     
     @FetchRequest(
-      entity: Goal.entity(),
-      sortDescriptors: [
-        NSSortDescriptor(keyPath: \Goal.priority, ascending: true)
-      ]
+        entity: Goal.entity(),
+        sortDescriptors: [
+            NSSortDescriptor(keyPath: \Goal.priority, ascending: true)
+        ]
     ) var goals: FetchedResults<Goal>
     
     @FetchRequest(
@@ -213,42 +213,28 @@ struct SmallCalendarView: View {
             NSSortDescriptor(keyPath: \GoalRecord.name, ascending: true)
         ]
     ) var goalRecords: FetchedResults<GoalRecord>
-
+    
     private var year: DateInterval {
- 
-            return calendar.dateInterval(of: .weekOfMonth, for: Date())!
-
-      ///create custom intervals
+        
+        return calendar.dateInterval(of: .weekOfMonth, for: Date())!
+        
+        ///create custom intervals
     }
     
     let screenSize = UIScreen.main.bounds.size
-
+    
     var body: some View {
         NavigationView{
-        CalendarView(interval: year) { date in
-//            Text("50")
-//                .hidden()
-//                .padding(8)
-//                .background(Color.blue)
-//                .clipShape(Circle())
-//                .padding(.vertical, 4)
-//                .overlay(
-//                    Text(String(self.calendar.component(.day, from: date)))
-//                )
-
-            VStack {
-                Text(String(self.calendar.component(.day, from: date))).foregroundColor(.white)
-                //Text(date.dayOfTheWeek)
-                ProgressRings(dateProvided: date, maxWidth: 30, maxLineWidth: Int(Constants.weekdayRingThickness), maxRingLimit: 3).padding(2).clipShape(Circle()).padding(.vertical, 4)
+            CalendarView(interval: year) { date in
                 
-            }
-
+                VStack {
+                    Text(String(self.calendar.component(.day, from: date))).foregroundColor(.white)
+                    //Text(date.dayOfTheWeek)
+                    ProgressRings(dateProvided: date, maxWidth: Constants.progressRingViewCalendarMaxWidth, maxLineWidth: Constants.weekdayRingThickness, maxRingLimit: 3).padding(2).clipShape(Circle()).padding(.vertical, 4)
+                    
+                }
+            }.frame(width: screenSize.width-80)
             
-        }.frame(width: screenSize.width-80)
-            
-    }
+        }
     }
 }
-
-
-//create week view similar to root view

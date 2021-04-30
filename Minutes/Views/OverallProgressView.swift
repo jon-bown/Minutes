@@ -67,7 +67,7 @@ struct OverallProgressView: View {
                             VStack {
                                 Spacer(minLength: Constants.navigationBarHeight).frame(width: geometry.size.width, height: Constants.navigationBarHeight+20, alignment: .top)
                                 //self.createRings()
-                                ProgressRings(dateProvided: self.selectedDate, maxWidth: 200, maxLineWidth: Int(Constants.mainRingThickness), maxRingLimit: 3).padding(10)
+                                ProgressRings(dateProvided: self.selectedDate, maxWidth: 200, maxLineWidth: Constants.mainRingThickness, maxRingLimit: 3).padding(10)
                                 self.createCharts()
                                 //self.createFooter()
                             }
@@ -75,15 +75,6 @@ struct OverallProgressView: View {
                         self.createNavigationBar(geometry.size)
                     }
         }
-//        ScrollView{
-//            VStack{
-//                //Weekly view of goals
-//                ProgressRings(dateProvided: Date(), maxWidth: 200, maxRingLimit: 3).padding(10)
-//                
-//                //scroll down and see charts for each goal today
-//            }
-//        }
-
        
     }
     
@@ -221,7 +212,7 @@ struct OverallProgressView: View {
                                         .foregroundColor(Color.white)
                                 }
                                 ZStack {
-                                    ProgressRings(dateProvided: item, maxWidth: 30, maxLineWidth: Int(Constants.weekdayRingThickness), maxRingLimit: 3).clipShape(Circle())
+                                    ProgressRings(dateProvided: item, maxWidth: 30, maxLineWidth: Constants.weekdayRingThickness, maxRingLimit: 3).clipShape(Circle())
                                         .frame(width: 45, height: 40)
                                         .aspectRatio(contentMode: .fit)
                                 }
@@ -237,8 +228,3 @@ struct OverallProgressView: View {
         }
 }
 
-//struct OverallProgressView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        OverallProgressView()
-//    }
-//}

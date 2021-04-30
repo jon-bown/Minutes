@@ -12,7 +12,7 @@ import UIKit
 
 class ComplicationController: NSObject, CLKComplicationDataSource {
     
-    let moc = PersistenceController.shared.container.viewContext
+    let moc = PersistenceController.persistentContainer.viewContext
     
     
     
@@ -22,7 +22,7 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
         let descriptors = [
             CLKComplicationDescriptor(identifier: "minuteProgress",
                                       displayName: "Minutes", supportedFamilies:
-                                        [.graphicCorner, .graphicCircular])
+                                        [.graphicCorner, .graphicCircular, .graphicExtraLarge])
             // Multiple complication support can be added here with more descriptors
         ]
         
@@ -126,19 +126,32 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
     
     func getLocalizableSampleTemplate(for complication: CLKComplication, withHandler handler: @escaping (CLKComplicationTemplate?) -> Void) {
         // This method will be called once per supported complication, and the results will be cached
+        
         switch complication.family {
         case .graphicCorner:
-            let template = CLKComplicationTemplateGraphicCornerCircularView(ProgressComplicationView(dateProvided: Date(), compFamily: complication.family).environment(\.managedObjectContext, moc))
+            let ms_image = UIImage(named: "Complication/Graphic Corner")
+            let modSmall = CLKComplicationTemplateGraphicCornerCircularImage(imageProvider: CLKFullColorImageProvider(fullColorImage: ms_image!))
+            let template = modSmall
             handler(template)
             break
         case .graphicCircular:
-            let template = CLKComplicationTemplateGraphicCircularView(ProgressComplicationView(dateProvided: Date(), compFamily: complication.family).environment(\.managedObjectContext, moc))
+            let ms_image = UIImage(named: "Complication/Graphic Circular")
+            let modSmall = CLKComplicationTemplateGraphicCircularImage(imageProvider: CLKFullColorImageProvider(fullColorImage: ms_image!))
+            let template = modSmall
+            handler(template)
+            break
+        case .graphicExtraLarge:
+            let ms_image = UIImage(named: "Complication/Graphic Extra Large")
+            let modSmall = CLKComplicationTemplateGraphicExtraLargeCircularImage(imageProvider: CLKFullColorImageProvider(fullColorImage: ms_image!))
+            let template = modSmall
             handler(template)
             break
         default:
             let template = CLKComplicationTemplateGraphicCircularView(ProgressComplicationView(dateProvided: Date(), compFamily: complication.family).environment(\.managedObjectContext, moc))
             handler(template)
+            break
         }
+        
         
     }
     
@@ -186,6 +199,9 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
         case .graphicCircular:
             let template = CLKComplicationTemplateGraphicCircularView(ProgressComplicationView(dateProvided: date, compFamily: family).environment(\.managedObjectContext, moc))
             return template
+        case .graphicExtraLarge:
+            let template = CLKComplicationTemplateGraphicCircularView(ProgressComplicationView(dateProvided: date, compFamily: family).environment(\.managedObjectContext, moc))
+            return template
         default:
             let template = CLKComplicationTemplateGraphicCircularView(ProgressComplicationView(dateProvided: date, compFamily: family).environment(\.managedObjectContext, moc))
             
@@ -202,7 +218,28 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
 
 class ExtensionDelegate: NSObject, ObservableObject, WKExtensionDelegate {
     
+//
+//    func extendedRuntimeSession(_ extendedRuntimeSession: WKExtendedRuntimeSession, didInvalidateWith reason: WKExtendedRuntimeSessionInvalidationReason, error: Error?) {
+//
+//    }
+//
+//    func extendedRuntimeSessionDidStart(_ extendedRuntimeSession: WKExtendedRuntimeSession) {
+//
+//    }
+//
+//    func extendedRuntimeSessionWillExpire(_ extendedRuntimeSession: WKExtendedRuntimeSession) {
+//
+//    }
+//
+    
     private var activeState: Bool = false
+//    let session = WKExtendedRuntimeSession()
+    
+    func applicationDidBecomeActive() {
+//        session.delegate = self   // self as session handler
+//        session.start()
+    }
+    
     
     func applicationDidFinishLaunching() {
         //self.updateActiveComplications()

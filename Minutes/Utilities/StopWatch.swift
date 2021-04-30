@@ -35,12 +35,14 @@ class StopWatch: ObservableObject {
     var isRunning: Bool { return state == .running }
     var isStopped: Bool { return state == .stopped }
     
+
+    
     private var sourceTimer: DispatchSourceTimer?
     private let queue = DispatchQueue(label: "stopwatch.timer")
     private var counter: Int = 0
     var cumCounter: Int = 0
     
-    var stopWatchTime:String = "00:00:00"
+    @Published var stopWatchTime: String = "00:00:00"
 
 
     var minutes: Float = 0.0
@@ -96,6 +98,10 @@ class StopWatch: ObservableObject {
             shutdownTimer()
             state = .stopped
         }
+    }
+    
+    func startRunning() {
+        state = .suspended
     }
     
     @objc private func update() {
@@ -199,43 +205,6 @@ class StopWatch: ObservableObject {
 }
 
 
-extension TimeInterval{
-
-        func stringFromTimeInterval() -> String {
-
-            let time = NSInteger(self)
-
-            let ms = Int((self.truncatingRemainder(dividingBy: 1)) * 1000)
-            let seconds = time % 60
-            let minutes = (time / 60) % 60
-            let hours = (time / 3600)
-
-            return String(format: "%0.2d:%0.2d:%0.2d",hours,minutes,seconds,ms)
-            
-            //return String(format: "%0.2d:%0.2d:%0.2d.%0.3d",hours,minutes,seconds,ms)
-
-        }
-    
-    
-    func seconds() -> Float {
-        let time = NSInteger(self)
-
-        let seconds = time
-        
-        return Float(seconds)
-    }
-    
-    
-    func minutes() -> Float {
-        let time = NSInteger(self)
-
-        let minutes = (time / 60) % 60
-        
-        return Float(minutes)
-    }
-    
-    
-    }
 
 
 extension StopWatch {

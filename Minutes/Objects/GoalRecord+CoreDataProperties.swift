@@ -17,6 +17,7 @@ extension GoalRecord {
     }
 
     @NSManaged public var date: Date?
+    //Number of seconds completed in the day
     @NSManaged public var dayTime: Double
     @NSManaged public var goalUpdates: [Int:Double]?
     @NSManaged public var id: UUID?

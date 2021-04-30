@@ -31,8 +31,8 @@ struct ProgressRings: View {
     
     //Parameters for minimized Ring View
     var dateProvided: Date = Date()
-    var maxWidth: Int = 100
-    var maxLineWidth: Int = 10
+    var maxWidth: CGFloat = 100
+    var maxLineWidth: CGFloat = 10
     var maxRingLimit: Int = 4
     var animate: Bool = true
     //var goalList: FetchedResults<Goal>
@@ -48,13 +48,7 @@ struct ProgressRings: View {
     var goalsArray: [Goal] {
         return goals.sorted(by: {$0.priority < $1.priority})
     }
-    //
-    
-    
-    //    var filteredGoals: [Goal] {
-    //        return goals.filter({(dateProvided > $0.startDate! ||  cal.isDate(dateProvided, inSameDayAs:$0.startDate!)) && ((dateProvided.dayOfTheWeek == $0.weekDay && $0.frequency == "Weekly") || ($0.frequency == "Monthly" && $0.monthDay == dateProvided.dayOfTheMonth) || $0.frequency == "Daily")}).sorted(by: {$0.priority < $1.priority})
-    //    }
-    
+
     var filteredGoalRecords: [GoalRecord] {
         return AppUtil.filterGoalRecordsByDate(goalRecords: self.goalRecordsArray, date: self.dateProvided)
         
@@ -62,7 +56,7 @@ struct ProgressRings: View {
     
     private var cal = Calendar.current
     
-    init(dateProvided: Date, maxWidth: Int, maxLineWidth: Int, maxRingLimit: Int, animate: Bool = true){
+    init(dateProvided: Date, maxWidth: CGFloat, maxLineWidth: CGFloat, maxRingLimit: Int, animate: Bool = true){
         self.dateProvided = dateProvided
         self.maxWidth = maxWidth
         self.maxLineWidth = maxLineWidth
@@ -106,7 +100,8 @@ struct ProgressRings: View {
     }
     
     private func calculateDim(index: Int) -> CGFloat{
-        return CGFloat(self.maxWidth - (self.maxLineWidth*2+4)*(index-1))
+        let differenceAmount = (self.maxLineWidth*2.0+4.0)*(CGFloat(index)-1.0)
+        return self.maxWidth - differenceAmount
     }
     
 }
@@ -134,8 +129,8 @@ struct ProgressRingsStatic: View {
     
     //Parameters for minimized Ring View
     var dateProvided: Date = Date()
-    var maxWidth: Int = 100
-    var maxLineWidth: Int = 10
+    var maxWidth: CGFloat = 100
+    var maxLineWidth: CGFloat = 10
     var maxRingLimit: Int = 4
     var animate: Bool = true
     //var goalList: FetchedResults<Goal>
@@ -144,35 +139,22 @@ struct ProgressRingsStatic: View {
         return goals.sorted(by: {$0.priority > $1.priority})
     }
     
+    var goalRecordsArray: [GoalRecord] {
+        return goalRecords.sorted(by: {$0.date! > $1.date!})
+    }
+    
     var filteredGoals: [Goal] {
-        if(!goalsArray.isEmpty){
             return AppUtil.filterCurrentGoals(goals: self.goalsArray, date: dateProvided)
-        }
-        else{
-            return []
-        }
         
     }
-    //
-    
-    
-    //    var filteredGoals: [Goal] {
-    //        return goals.filter({(dateProvided > $0.startDate! ||  cal.isDate(dateProvided, inSameDayAs:$0.startDate!)) && ((dateProvided.dayOfTheWeek == $0.weekDay && $0.frequency == "Weekly") || ($0.frequency == "Monthly" && $0.monthDay == dateProvided.dayOfTheMonth) || $0.frequency == "Daily")}).sorted(by: {$0.priority < $1.priority})
-    //    }
     
     var filteredGoalRecords: [GoalRecord] {
-        if(goalRecords.isEmpty){
-            return []
-        }
-        else{
-            return self.goalRecords.filter({cal.isDate(self.dateProvided, inSameDayAs:$0.date!)})
-        }
-        
+            return AppUtil.filterGoalRecordsByDate(goalRecords: self.goalRecordsArray, date: self.dateProvided)
     }
     
     private var cal = Calendar.current
     
-    init(dateProvided: Date, maxWidth: Int, maxLineWidth: Int, maxRingLimit: Int, animate: Bool = true){
+    init(dateProvided: Date, maxWidth: CGFloat, maxLineWidth: CGFloat, maxRingLimit: Int, animate: Bool = true){
         self.dateProvided = dateProvided
         self.maxWidth = maxWidth
         self.maxLineWidth = maxLineWidth
@@ -195,10 +177,10 @@ struct ProgressRingsStatic: View {
                     if let index = filteredGoals.firstIndex(of: goal){
                         if(index < maxRingLimit){
                             if(filteredGoalRecords.isEmpty){
-                                ProgressRingViewStatic(progress: 0.0, thickness: CGFloat(self.maxLineWidth), startColor: Color(goal.color!.darker(by: 10.0)!), endColor: Color(goal.color!.lighter(by: 15)!), backgroundColor: goal.color!, animate: animate).frame(width: calculateDim(index: index), height: calculateDim(index: index)).aspectRatio(contentMode: .fit)
+                                ProgressRingViewStatic(progress: 0.0, thickness: self.maxLineWidth, startColor: Color(goal.color!.darker(by: 10.0)!), endColor: Color(goal.color!.lighter(by: 15)!), backgroundColor: goal.color!, animate: animate).frame(width: calculateDim(index: index), height: calculateDim(index: index)).aspectRatio(contentMode: .fit)
                             }
                             else {
-                                ProgressRingViewStatic(progress: filteredGoalRecords.first(where: { goal.id == $0.id }) == nil ? 0.0: filteredGoalRecords.first(where: { goal.id == $0.id})!.progress, thickness: CGFloat(self.maxLineWidth), startColor: Color(goal.color!.darker(by: 10.0)!), endColor: Color(goal.color!.lighter(by: 15)!), backgroundColor: goal.color!, animate: animate).frame(width: calculateDim(index: index), height: calculateDim(index: index)).aspectRatio(contentMode: .fit)
+                                ProgressRingViewStatic(progress: filteredGoalRecords.first(where: { goal.id == $0.id }) == nil ? 0.0: filteredGoalRecords.first(where: { goal.id == $0.id})!.progress, thickness: self.maxLineWidth, startColor: Color(goal.color!.darker(by: 10.0)!), endColor: Color(goal.color!.lighter(by: 15)!), backgroundColor: goal.color!, animate: animate).frame(width: calculateDim(index: index), height: calculateDim(index: index)).aspectRatio(contentMode: .fit)
                             }
                             
                         }
@@ -216,7 +198,8 @@ struct ProgressRingsStatic: View {
     }
     
     private func calculateDim(index: Int) -> CGFloat{
-        return CGFloat(self.maxWidth - (self.maxLineWidth*2+4)*(index-1))
+        let differenceAmount = (self.maxLineWidth*2.0+4.0)*(CGFloat(index)-1.0)
+        return self.maxWidth - differenceAmount
     }
     
 }

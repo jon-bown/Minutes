@@ -33,7 +33,7 @@ struct ResetAppView: View {
                         
                     }.cornerRadius(15).padding()
                 }.alert(isPresented: $simpleAlertMessageWithButtons, content: {
-                    
+                    self.simpleWarning()
                     let firstButton = Alert.Button.default(Text("Erase")){
                         self.deleteAllGoals()
                         self.deleteAllGoalRecords()
@@ -50,7 +50,11 @@ struct ResetAppView: View {
        
     }
     
-    
+    //MARK: HAPTICS
+    func simpleWarning() {
+        let generator = UINotificationFeedbackGenerator()
+        generator.notificationOccurred(.warning)
+    }
     
     func deleteAllGoals() {
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Goal")

@@ -8,8 +8,9 @@
 import Foundation
 import CoreData
 import UserNotifications
+import UIKit
 
-
+//Contains functions that are used throughout the app to prevent repretition and to consolidate filtering logic for lists of goals and goal records
 class AppUtil {
     static func calculateMinuteQuadrant() {
         
@@ -24,25 +25,27 @@ class AppUtil {
         return goals.filter({(date > $0.startDate! || cal.isDate(date, inSameDayAs:$0.startDate!)) && ($0.endDate == nil || date <= $0.endDate!) && (($0.frequency == "Weekly" && $0.weekDay!.contains(date.dayOfTheWeek)) || ($0.frequency == "Monthly" && $0.monthDay == date.dayOfTheMonth) || $0.frequency == "Daily")}).sorted(by: {$0.priority < $1.priority})
     }
     
-    static func filterGoalRecordsByGoal(goalRecords: [GoalRecord], goalName: String) -> [GoalRecord]{
+    static func filterGoalRecordsByGoalID(goalRecords: [GoalRecord], goalID: UUID) -> [GoalRecord]{
         if(goalRecords.isEmpty){
             return []
         }
-        return goalRecords.filter({goalName == $0.name})
+        return goalRecords.filter({goalID == $0.id})
     }
     
-    static func filterGoalRecordsTodayByName(goalRecords: [GoalRecord], goalName: String) -> [GoalRecord] {
-        if(goalRecords.isEmpty){
-            return []
+    
+    static func getRecordTodayForGoal(goalRecords: [GoalRecord], goalId: UUID) -> GoalRecord? {
+        if(goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs: $0.date!) && goalId == $0.id}).isEmpty){
+            return nil
         }
-        return goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs:$0.date!) && goalName == $0.name})
+        return goalRecords.first(where: {Calendar.current.isDate(Date(), inSameDayAs: $0.date!) && goalId == $0.id})!
+        
     }
     
-    static func filterGoalRecordsToday(goalRecords: [GoalRecord], goalName: String) -> [GoalRecord] {
+    static func filterGoalRecordsTodayForGoal(goalRecords: [GoalRecord], goalID: UUID) -> [GoalRecord] {
         if(goalRecords.isEmpty){
             return []
         }
-            return goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs:$0.date!)})
+        return goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs: $0.date!) && goalID == $0.id})
         
     }
     
@@ -50,20 +53,20 @@ class AppUtil {
         if(goalRecords.isEmpty){
             return []
         }
-            return goalRecords.filter({Calendar.current.isDate(date, inSameDayAs:$0.date!)})
-
+        return goalRecords.filter({Calendar.current.isDate(date, inSameDayAs:$0.date!)})
+        
     }
     
-    static func filterGoalRecordSavesTodayByName(goalRecords: [GoalRecord], goalName: String) -> [Date: Double] {
+    static func filterGoalRecordSavesTodayByID(goalRecords: [GoalRecord], goalID: UUID) -> [Date: Double] {
         if(goalRecords.isEmpty){
             return [:]
         }
-        else if(goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs:$0.date!) && goalName == $0.name}).isEmpty){
+        else if(goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs:$0.date!) && goalID == $0.id}).isEmpty){
             return [:]
         }
         else {
             
-            let firstItem = (goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs:$0.date!) && goalName == $0.name}).first!)
+            let firstItem = (goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs:$0.date!) && goalID == $0.id}).first!)
             if(!(firstItem.goalSaves == nil)){
                 //it has goal saves
                 return firstItem.goalSaves!
@@ -77,6 +80,7 @@ class AppUtil {
         
     }
     
+
     //MARK: DATES & TIMES
     static func getCurrentDate(with format: String = "EEEE, MMM d") -> String { let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = format
@@ -145,13 +149,13 @@ class AppUtil {
     //MARK: STREAKS
     
     //Calculates current streak of the user for the goal with name 'goalName'
-    static func calculateGoalCurrentStreak(records: [GoalRecord], goalName: String) -> Int {
+    static func calculateGoalCurrentStreak(records: [GoalRecord], goalID: UUID) -> Int {
         
-        let recordsByName = records.filter({$0.name == goalName})
+        let recordsByName = records.filter({$0.id! == goalID})
         
         if(recordsByName.count == 0){
             //User can't have best streak if there are no records available
-            UserDefaults.standard.set(0, forKey: "Best\(goalName)")
+            UserDefaults.standard.set(0, forKey: "Best\(goalID)")
             
             return 0
             
@@ -161,15 +165,15 @@ class AppUtil {
             //most recent goal record where progress of greater than 1 was achieved
             guard let first = recordsByName.sorted(by: {$0.date! > $1.date!}).first(where: {$0.progress >= 1}) else {
                 //no streaks possible
-                UserDefaults.standard.set(count, forKey: "Best\(goalName)")
+                UserDefaults.standard.set(count, forKey: "Best\(goalID)")
                 return count
             }
             if(Calendar.current.isDate(Date(), inSameDayAs:first.date!)){
                 //The users first goal completion was today for this particular goal
-                let bestStreak = UserDefaults.standard.integer(forKey: "Best\(goalName)")
+                let bestStreak = UserDefaults.standard.integer(forKey: "Best\(goalID)")
                 count+=1
                 if(count > bestStreak){
-                    UserDefaults.standard.set(count, forKey: "Best\(goalName)")
+                    UserDefaults.standard.set(count, forKey: "Best\(goalID)")
                 }
                 //print("current count: \(count) current best: \(bestStreak)")
                 return count
@@ -183,18 +187,18 @@ class AppUtil {
                         count+=1
                     }
                     else {
-                        let bestStreak = UserDefaults.standard.integer(forKey: "Best\(goalName)")
+                        let bestStreak = UserDefaults.standard.integer(forKey: "Best\(goalID)")
                         if(count > bestStreak){
-                            UserDefaults.standard.set(count, forKey: "Best\(goalName)")
+                            UserDefaults.standard.set(count, forKey: "Best\(goalID)")
                         }
                         print("current count: \(count) current best: \(bestStreak)")
                         return count
                     }
                     tempDate = record.date!
                 }
-                let bestStreak = UserDefaults.standard.integer(forKey: "Best\(goalName)")
+                let bestStreak = UserDefaults.standard.integer(forKey: "Best\(goalID)")
                 if(count > bestStreak){
-                    UserDefaults.standard.set(count, forKey: "Best\(goalName)")
+                    UserDefaults.standard.set(count, forKey: "Best\(goalID)")
                 }
                 //print("current count: \(count) current best: \(bestStreak)")
                 return count
@@ -209,8 +213,8 @@ class AppUtil {
         
     }
     
-    static func calculateGoalBestStreak(goalName: String) -> Int {
-        let best = UserDefaults.standard.integer(forKey: "Best\(goalName)")
+    static func calculateGoalBestStreak(goalID: UUID) -> Int {
+        let best = UserDefaults.standard.integer(forKey: "Best\(goalID)")
         return best
     }
     
@@ -306,8 +310,11 @@ class AppUtil {
         })
     }
     
+    //MARK: DEVICE TYPE
     
-    
+//    static let isIpad: Bool = UIDevice.current.userInterfaceIdiom == .pad
+//    static let isIphone: Bool = UIDevice.current.userInterfaceIdiom == .phone
+//    
     
     
 }

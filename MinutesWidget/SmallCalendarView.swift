@@ -166,10 +166,10 @@ struct SmallCalendarView: View {
 
         WeekView(week: Date()) { date in
             
-            VStack {
+            VStack(alignment: .center) {
                 if(calendar.isDate(date, inSameDayAs: Date())){
                     ZStack{
-                        Circle().fill(Color.pink).clipped().opacity(0.9).frame(width: 17, height: 17)
+                        Circle().fill(Color.pink).clipped().opacity(0.9).frame(width: 18, height: 18)
                         Text(String(self.calendar.component(.day, from: date))).foregroundColor(.white).font(.system(size: 15))
                     }.aspectRatio(contentMode: .fit)
 
@@ -179,7 +179,41 @@ struct SmallCalendarView: View {
                 }
 
                 //Text(date.dayOfTheWeek)
-                ProgressRingsStatic(dateProvided: date, maxWidth: 30, maxLineWidth: Int(Constants.weekdayRingThickness), maxRingLimit: 3).clipShape(Circle()).padding(.top, 1)
+                ProgressRingsStatic(dateProvided: date, maxWidth: 30, maxLineWidth: Constants.weekdayRingThickness, maxRingLimit: 3).clipShape(Circle()).padding(.top, 1)
+                
+            }.frame(width: 45.0, height: 70.0)
+            
+        }
+            
+    
+    }
+}
+
+
+struct SmallCalendarViewDemo: View {
+    @Environment(\.calendar) var calendar
+
+    
+    //let screenSize = UIScreen.main.bounds.size
+
+    var body: some View {
+
+        WeekView(week: Date()) { date in
+            
+            VStack {
+                if(calendar.isDate(date, inSameDayAs: Date())){
+                    ZStack{
+                        Circle().fill(Color.pink).clipped().opacity(0.9).frame(width: 18, height: 18)
+                        Text(String(self.calendar.component(.day, from: date))).foregroundColor(.white).font(.system(size: 15))
+                    }.aspectRatio(contentMode: .fit)
+
+                }
+                else {
+                    Text(String(self.calendar.component(.day, from: date))).foregroundColor(.white).font(.system(size: 15))
+                }
+
+                //Text(date.dayOfTheWeek)
+                Image("WidgetDemo").resizable().frame(width: 32.0, height: 32.0)
                 
             }
             

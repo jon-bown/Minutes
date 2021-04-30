@@ -29,15 +29,16 @@ struct GoalDashboard: View {
         ]
     ) var records: FetchedResults<GoalRecord>
     
+    var goalsArray: [Goal] {
+        return goals.sorted(by: {$0.priority > $1.priority})
+    }
+
     
     var filteredGoalsToday: [Goal] {
+        //return AppUtil.filterCurrentGoals(goals: self.goalsArray, date: Date())
         let filteredArray = goals.filter({(Date() > $0.startDate! ||  cal.isDate(Date(), inSameDayAs:$0.startDate!)) && (   $0.frequency == "Weekly" && ($0.weekDay!.contains(Date().dayOfTheWeek)) || ($0.frequency == "Monthly" && $0.monthDay == Date().dayOfTheMonth) || $0.frequency == "Daily")})
-        if(!filteredArray.isEmpty){
-            return filteredArray
-        }
-        else {
-            return []
-        }
+        return filteredArray
+
     }
     
     
@@ -54,13 +55,13 @@ struct GoalDashboard: View {
 
     }
     
-    @State private var goalsEmpty: Bool = true
+
     
     var body: some View {
         //NavigationView{
 
         ScrollView{
-                    if(goalsEmpty){
+            if(filteredGoalsToday.isEmpty){
                         VStack{
                             Text("No Goals Set").padding()
                             Text("Use your phone to set a goal!").padding()
@@ -76,7 +77,7 @@ struct GoalDashboard: View {
                         //NavigationLink(destination: GoalDetailView(goal: goal)) {
                         //For all goals of today, show a individual progress
                         HStack{
-                            NavigationLink(destination: WKGoalDetailView(goal: goal).environment(\.managedObjectContext, managedObjectContext)){
+                            NavigationLink(destination: WKGoalDetailViewR(goal: goal).environment(\.managedObjectContext, managedObjectContext)){
                                 Text("\(goal.name!)").foregroundColor(.white)
                                 //Spacer()
                             }
@@ -85,19 +86,21 @@ struct GoalDashboard: View {
                         
                     }
                 }
-                
-                Section(header: Text("Other").bold()){
-                    ForEach(filteredGoalsNotToday, id: \.self) { goal in
-                        HStack{
-                            NavigationLink(destination: WKGoalDetailView(goal: goal).environment(\.managedObjectContext, managedObjectContext)){
-                                Text("\(goal.name!)").foregroundColor(.white)
-                                //Spacer()
-                            }
+                if(!filteredGoalsNotToday.isEmpty){
+                    Section(header: Text("Other").bold()){
+                        ForEach(filteredGoalsNotToday, id: \.self) { goal in
+                            HStack{
+                                NavigationLink(destination: WKGoalDetailViewR(goal: goal).environment(\.managedObjectContext, managedObjectContext)){
+                                    Text("\(goal.name!)").foregroundColor(.white)
+                                    //Spacer()
+                                }
+                                
+                            }.padding(.horizontal, 5).padding(.vertical, 2).cornerRadius(15)
                             
-                        }.padding(.horizontal, 5).padding(.vertical, 2).cornerRadius(15)
-                        
+                        }
                     }
                 }
+
                 
                 
 
@@ -106,80 +109,61 @@ struct GoalDashboard: View {
             
         }
         }.onChange(of: scenePhase) { newPhase in
-            if newPhase == .inactive {
-                #if DEBUG
-                print("Inactive")
-                #endif
-                let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Goal")
-                
-                fetchRequest.includesPropertyValues = false
-                
-                do {
-                    let items = try managedObjectContext.fetch(fetchRequest) as! [Goal]
-                    
-                    if(!items.isEmpty){
-                        goalsEmpty = false
-                    }
-                    else {
-                        goalsEmpty = true
-                    }
-                    
-                } catch {
-                    // Error Handling
-                    // ...
-                    #if DEBUG
-                    print("error")
-                    #endif
-                }
-            } else if newPhase == .active {
-                #if DEBUG
-                print("Active")
-                #endif
-                let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Goal")
-                
-                fetchRequest.includesPropertyValues = false
-                
-                do {
-                    let items = try managedObjectContext.fetch(fetchRequest) as! [Goal]
-                    
-                    if(!items.isEmpty){
-                        goalsEmpty = false
-                    }
-                    else {
-                        goalsEmpty = true
-                    }
-                    
-                } catch {
-                    // Error Handling
-                    // ...
-                    #if DEBUG
-                    print("error")
-                    #endif
-                }
-            } else if newPhase == .background {
-                print("Background")
-                let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Goal")
-                
-                fetchRequest.includesPropertyValues = false
-                
-                do {
-                    let items = try managedObjectContext.fetch(fetchRequest) as! [Goal]
-                    
-                    if(!items.isEmpty){
-                        goalsEmpty = false
-                    }
-                    else {
-                        goalsEmpty = true
-                    }
-                    
-                } catch {
-                    // Error Handling
-                    // ...
-                    #if DEBUG
-                    print("error")
-                    #endif
-                }
-            }
+//            if newPhase == .inactive {
+//                #if DEBUG
+//                print("Inactive")
+//                #endif
+//                let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Goal")
+//
+//                fetchRequest.includesPropertyValues = false
+//
+//                do {
+//                    let items = try managedObjectContext.fetch(fetchRequest) as! [Goal]
+//
+//                } catch {
+//                    // Error Handling
+//                    // ...
+//                    #if DEBUG
+//                    print("error")
+//                    #endif
+//                }
+//            } else if newPhase == .active {
+//                #if DEBUG
+//                print("Active")
+//                #endif
+//                let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Goal")
+//
+//                fetchRequest.includesPropertyValues = false
+//
+//                do {
+//                    let items = try managedObjectContext.fetch(fetchRequest) as! [Goal]
+//
+//
+//                } catch {
+//                    // Error Handling
+//                    // ...
+//                    #if DEBUG
+//                    print("error")
+//                    #endif
+//                }
+//            } else if newPhase == .background {
+//                print("Background")
+//                let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Goal")
+//
+//                fetchRequest.includesPropertyValues = false
+//
+//                do {
+//                    let items = try managedObjectContext.fetch(fetchRequest) as! [Goal]
+//
+//
+//                } catch {
+//                    // Error Handling
+//                    // ...
+//                    #if DEBUG
+//                    print("error")
+//                    #endif
+//                }
+//            }
         }
       //}
     }

@@ -1,14 +1,15 @@
 //
-//  StopwatchTimeSubview.swift
+//  StopwatchTimeWatchView.swift
 //  Watch Minutes Extension
 //
-//  Created by Jonathan Bown on 2/5/21.
+//  Created by Jonathan Bown on 4/21/21.
 //
 
 import SwiftUI
 
-struct StopwatchTimeSubview: View {
+struct StopwatchTimeWatchView: View {
     @Environment(\.managedObjectContext) var managedObjectContext
+    
     @FetchRequest(
         entity: GoalRecord.entity(),
         sortDescriptors: [
@@ -19,11 +20,10 @@ struct StopwatchTimeSubview: View {
     var filteredGoalRecords: [GoalRecord] {
         return self.goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs:$0.date!) && goal.name == $0.name})
     }
-    @ObservedObject var stopWatch: StopWatch
     @ObservedObject var goal: Goal
     @Binding var progress: Double
-    @Binding var dayTime: Double
     @Binding var selectedTab: Int
+    @Binding var totalTime: Double
     
     var body: some View {
         VStack{
@@ -31,37 +31,22 @@ struct StopwatchTimeSubview: View {
                 ProgressView(value: 0.0).progressViewStyle(LinearProgressViewStyle(tint: Color(self.goal.color!))).padding()
             }
             else{
-                ProgressView(value: filteredGoalRecords[0].progress >= 1.0 ? 1.0:filteredGoalRecords[0].progress).progressViewStyle(LinearProgressViewStyle(tint: Color(self.goal.color!))).padding()
+                ProgressView(value: filteredGoalRecords[0].progress >= 1.0 ? 1.0:self.progress).progressViewStyle(LinearProgressViewStyle(tint: Color(self.goal.color!))).padding()
             }
             //Timer UI
             RoundedRectangle(cornerRadius: 10)
                 .frame(height: 90).padding()
-                .foregroundColor(Color(UIColor.black.lighter(by: 20.0)!)).animatableStopWatchText(watchTime: self.stopWatch.stopWatchTime)
+                .foregroundColor(Color(UIColor.black.lighter(by: 20.0)!)).animatableStopWatchText(watchTime: AppUtil.getTotalTimeString(seconds: self.totalTime))
 
             
             Spacer()
 
 
-        }.onAppear { self.updateProgress()}.navigationTitle("Goals")
+        }.navigationTitle("Goals")
         
         
     }
     
-    
-
-    
-    private func updateProgress() {
-        let records = self.goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs: $0.date!) && $0.name == goal.name})
-            if(!records.isEmpty){
-                self.dayTime = records[0].dayTime
-                self.progress = records[0].progress
-                    }
-            else{
-                self.dayTime = 0.0
-                self.progress = 0.0
-            }
-                
-    }
 }
 
 
@@ -105,14 +90,8 @@ extension View {
 //    func animatableProgressText(progress: Double, textColor: Color = Color.primary)
 //    -> some View {
 //        self.modifier(ProgressTextModifier(progress: progress, textColor: textColor)) }
-//    
+//
     func animatableStopWatchText(watchTime: String, textColor: Color = Color.primary)
     -> some View {
         self.modifier(StopWatchTextModifier(watchTime: watchTime, textColor: textColor)) }
 }
-
-//struct StopwatchTimeSubview_Previews: PreviewProvider {
-//    static var previews: some View {
-//        StopwatchTimeSubview()
-//    }
-//}

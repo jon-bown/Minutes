@@ -43,35 +43,18 @@ struct ProgressRingView: View {
                     RingShape(currentPercentage: 0.005, thickness: thickness)
                         .fill(Color(backgroundColor)).rotationEffect(Angle(degrees: -90))
                 }
-                //            else{
-                ////                RingShape(progress: progress, thickness: thickness)
-                ////                    .fill(gradient).rotationEffect(.init(degrees: -90))
-                ////                    .shadow(radius: 2)
-                ////                    .drawingGroup()
-                ////                    .onAppear() {
-                ////                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                ////                            withAnimation(self.animation) {
-                ////                                self.currentPercentage = self.progress
-                ////                            }
-                ////                        }
-                ////                    }
-                //
-                //                RingBackgroundShape(thickness: thickness)
-                //                    .fill(Color(backgroundColor))
-                //            }
                 RingShape(currentPercentage: currentPercentage, thickness: thickness)
                     .fill(gradient)
                     .rotationEffect(.init(degrees: -90))
                     .shadow(radius: 2)
                     .drawingGroup()
                     .onChange(of: self.progress){ value in
-                        DispatchQueue.main.asyncAfter(deadline: .now()+0.3) {
+                        DispatchQueue.main.asyncAfter(deadline: .now()+0.2) {
                             if(animate){
                                 withAnimation(self.animation) {
                                     
                                     self.currentPercentage = value
-                                    
-                                    //self.shadowOffset = self.ringTipShadowOffset(progress: self.progress, radius: Double(geometry.size.width), thickness: self.thickness)
+                                
                                 }
                             }
                             else {

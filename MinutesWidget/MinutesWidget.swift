@@ -18,11 +18,18 @@ struct Provider: TimelineProvider {
     }
     
     func placeholder(in context: Context) -> SimpleEntry {
-        SimpleEntry(date: Date())
+        SimpleEntry(date: Date(), isDemo: "")
     }
 
     func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> ()) {
-        let entry = SimpleEntry(date: Date())
+        var entry: SimpleEntry
+        if(context.isPreview){
+            entry = SimpleEntry(date: Date(), isDemo: "Y")
+        }
+        else {
+            entry = SimpleEntry(date: Date(), isDemo: "")
+        }
+        
         completion(entry)
     }
 
@@ -33,7 +40,7 @@ struct Provider: TimelineProvider {
         let currentDate = Date()
         for hourOffset in 0 ..< 5 {
             let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
-            let entry = SimpleEntry(date: entryDate)
+            let entry = SimpleEntry(date: entryDate, isDemo: "")
             entries.append(entry)
         }
 
@@ -44,6 +51,7 @@ struct Provider: TimelineProvider {
 
 struct SimpleEntry: TimelineEntry {
     let date: Date
+    let isDemo: String
 }
 
 struct MinutesWidgetEntryView : View {
@@ -58,28 +66,76 @@ struct MinutesWidgetEntryView : View {
     ) var goals: FetchedResults<Goal>
     
     var entry: Provider.Entry
+    
 
     var body: some View {
-        ZStack{
-            Color.black.opacity(1)
-            if(widgetFamily == .systemSmall){
-                self.createSystemSmall()
-            }
-            else if(widgetFamily == .systemMedium){
-                self.createSystemMedium()
-            }
-            else {
-                self.createSystemLarge()
-            }
+        if(entry.isDemo != ""){
+            ZStack{
+                Color.black.opacity(1)
+                if(widgetFamily == .systemSmall){
+                    self.createSystemSmallDemo()
+                }
+                else if(widgetFamily == .systemMedium){
+                    self.createSystemMediumDemo()
+                }
+                else {
+                    self.createSystemLargeDemo()
+                }
 
+            }
         }
+        else {
+            ZStack{
+                Color.black.opacity(1)
+                if(widgetFamily == .systemSmall){
+                    self.createSystemSmall()
+                }
+                else if(widgetFamily == .systemMedium){
+                    self.createSystemMedium()
+                }
+                else {
+                    self.createSystemLarge()
+                }
 
+            }
+        }
     }
     
     func createSystemSmall() -> some View {
         ProgressRingsStatic(dateProvided: entry.date, maxWidth:120, maxLineWidth: 15, maxRingLimit: 3, animate: false).frame(width: 150, height: 150)
         .aspectRatio(contentMode: .fit).environment(\.managedObjectContext, managedObjectContext)
     }
+    
+    
+    //MARK: DEMO
+    func createSystemSmallDemo() -> some View {
+        Image("WidgetDemo").resizable().padding(EdgeInsets(top: 5, leading: 5, bottom: 5, trailing: 5))
+    }
+    
+    func createSystemMediumDemo() -> some View {
+        HStack{
+            Spacer()
+            DailyStatsViewDemo(type: "Horizontal").padding(EdgeInsets(top: 5, leading: 5, bottom: 5, trailing: 5))
+            Spacer()
+            Image("WidgetDemo").resizable().aspectRatio(contentMode: .fit).padding(EdgeInsets(top: 5, leading: 5, bottom: 5, trailing: 5))
+            Spacer()
+        }
+        
+    }
+    
+    func createSystemLargeDemo() -> some View {
+        VStack(alignment: .center){
+            SmallCalendarViewDemo().padding(EdgeInsets(top: 5, leading: 5, bottom: 5, trailing: 5))
+            Spacer()
+            MiniBarChartWidgetView()
+            Spacer()
+            DailyStatsViewDemo(type: "V")
+        }.frame(maxWidth: .infinity, maxHeight: .infinity)
+        
+        //Image("WidgetDemo").resizable().scaledToFit()
+    }
+    
+    
     
     func createSystemMedium() -> some View {
   
@@ -89,13 +145,16 @@ struct MinutesWidgetEntryView : View {
     
     func createSystemLarge() -> some View {
         
-        VStack{
-            SmallCalendarView().padding(.top, 10).padding(.horizontal, 5)
+        VStack(alignment: .center){
+  
+            HStack{
+                SmallCalendarView().padding(EdgeInsets(top: 8, leading: 0, bottom: 5, trailing: 0))
+            }
             Spacer()
             MiniBarChartWidgetView().environment(\.managedObjectContext, managedObjectContext)
             Spacer()
             HStack{
-                DailyStatsView(goalList: self.goals, type: "Vertical").padding(.leading, 5).padding(.bottom, 20)
+                DailyStatsView(goalList: self.goals, type: "V").padding(.leading, 5).padding(.bottom, 20)
             }
         }
 
@@ -103,10 +162,10 @@ struct MinutesWidgetEntryView : View {
     
     func createHStackInfo() -> some View {
         HStack{
-            DailyStatsView(goalList: self.goals).padding().padding(.leading, 5)
+            DailyStatsView(goalList: self.goals).padding().padding(.leading, 10)
             Spacer()
             ProgressRingsStatic(dateProvided: entry.date, maxWidth:120, maxLineWidth: 15, maxRingLimit: 3, animate: false).frame(width: 150, height: 150)
-                .aspectRatio(contentMode: .fit).environment(\.managedObjectContext, managedObjectContext).padding(.trailing, 5)
+                .aspectRatio(contentMode: .fit).environment(\.managedObjectContext, managedObjectContext).padding(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 10))
         }.padding(.vertical, 5)
     }
 }
@@ -120,8 +179,9 @@ struct MinutesWidget: Widget {
         StaticConfiguration(kind: kind, provider: Provider(context: persistentContainer.viewContext)) { entry in
             MinutesWidgetEntryView(entry: entry).environment(\.managedObjectContext, persistentContainer.viewContext)
         }
-        .configurationDisplayName("My Widget")
-        .description("This is an example widget.")
+        .configurationDisplayName("Minute Progress")
+        .description("Show overviews of progress throughout the day")
+        .supportedFamilies([.systemSmall, .systemMedium])
     }
     
     var persistentContainer: NSPersistentContainer = {
@@ -133,7 +193,7 @@ struct MinutesWidget: Widget {
 //        container.loadPersistentStores {
 //            handle,error  in
 //        }
-        return PersistenceController.shared.container
+        return PersistenceController.persistentContainer
     }()
 }
 

@@ -20,6 +20,7 @@ extension Goal {
     @NSManaged public var color: UIColor?
     @NSManaged public var endDate: Date?
     @NSManaged public var frequency: String?
+    //Goal time is the number of minutes
     @NSManaged public var goalTime: Double
     @NSManaged public var id: UUID?
     @NSManaged public var monthDay: Int

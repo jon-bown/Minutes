@@ -7,6 +7,7 @@
 
 import SwiftUI
 import UserNotifications
+import CoreHaptics
 
 struct GoalForm: View {
     @Environment(\.managedObjectContext) private var managedObjectContext
@@ -17,6 +18,17 @@ struct GoalForm: View {
             NSSortDescriptor(keyPath: \Goal.priority, ascending: true)
         ]
     ) var goals: FetchedResults<Goal>
+    
+    @FetchRequest(
+        entity: GoalRecord.entity(),
+        sortDescriptors: [
+            NSSortDescriptor(keyPath: \GoalRecord.name, ascending: true)
+        ]
+    ) var goalRecords: FetchedResults<GoalRecord>
+    
+    var goalRecordsArray: [GoalRecord] {
+        return goalRecords.sorted(by: {$0.date! > $1.date!})
+    }
     
     var editing: Bool
     var passedGoal: Goal?
@@ -37,6 +49,7 @@ struct GoalForm: View {
     @State private var notificationPermission: Bool = false
     @State private var showPermissionAlert: Bool = false
     @State private var endDate: Date = Date()
+    @State private var engine: CHHapticEngine?
     
     
     let freq = ["Daily", "Weekly", "Monthly"] //add custom
@@ -53,10 +66,13 @@ struct GoalForm: View {
         
     }
     
+    let screenSize = UIScreen.main.bounds.size
+    
     //MARK: - BODY
     var body: some View {
         NavigationView{
             VStack{
+                //Text(editing ? self.goalName:"New Goal").bold().font(.system(.largeTitle)).padding(.top, 5)
                 Form{
                     Section{
                         TextField("Name", text: self.$goalName)
@@ -171,13 +187,20 @@ struct GoalForm: View {
                     .padding(.horizontal, 50)
                     
                 }
-                
+                if(UIDevice.current.userInterfaceIdiom == .pad){
+                    Spacer()
+                }
                 //Spacer()
                 
                 
-            }.navigationTitle(editing ? self.goalName:"New Goal")
+            }
+            
+            .navigationTitle(editing ? self.goalName:"New Goal")
             .navigationBarTitleDisplayMode(.large)
-        }.navigationViewStyle(StackNavigationViewStyle()).onAppear(){
+        }.frame(width: screenSize.width-20, height: screenSize.height-150)
+        .navigationViewStyle(StackNavigationViewStyle())
+        .onAppear(){
+            self.prepareHaptics()
             if(editing){
                 //assign goal properties
                 guard let goal = self.passedGoal else {
@@ -192,8 +215,9 @@ struct GoalForm: View {
                 if(self.goalFrequency == "Weekly"){
                     self.dayOTW.populateSelections(currentDays: goal.weekDay!)
                 }
-                self.checkNotificationPermission()
                 self.checkNotificationsExist(id: goal.id!)
+                
+                
 
                 //check individual notifications
                 
@@ -330,7 +354,11 @@ struct GoalForm: View {
 
         group.notify(queue: queue) {
             self.reminders = remind
-            self.startTime = Calendar.current.date(bySettingHour: hour, minute: minute, second: 0, of: self.startTime)!
+            if(remind){
+                self.checkNotificationPermission()
+                self.startTime = Calendar.current.date(bySettingHour: hour, minute: minute, second: 0, of: self.startTime)!
+            }
+
            }
     }
     
@@ -340,12 +368,6 @@ struct GoalForm: View {
         
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [id.uuidString])
         UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [id.uuidString])
-        
-        
-//            AppUtil.removePendingRequests(id: id) { result in
-//                self.reminders = !result
-//                print("Reminders:\(self.reminders)")
-//            }
     }
     
     private func submitUserNotificationTrigger(id: UUID) {
@@ -415,7 +437,6 @@ struct GoalForm: View {
     
     private func submitNotificationTrigger(components: DateComponents, repeats: Bool, identifier: String, content: UNNotificationContent) {
         let center = UNUserNotificationCenter.current()
-        
         let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: repeats)
         let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
         center.add(request)
@@ -434,11 +455,52 @@ struct GoalForm: View {
             print("Error saving managed object context: \(error)")
         }
     }
+    //MARK: HAPTICS
+    func prepareHaptics() {
+        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
+
+        do {
+            print("haptics enabled")
+            self.engine = try CHHapticEngine()
+            try engine?.start()
+        } catch {
+            
+            print("There was an error creating the engine: \(error.localizedDescription)")
+        }
+    }
     
+    func complexSuccess() {
+        // make sure that the device supports haptics
+        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
+        var events = [CHHapticEvent]()
+
+        // create one intense, sharp tap
+        let intensity = CHHapticEventParameter(parameterID: .hapticIntensity, value: 6)
+        let sharpness = CHHapticEventParameter(parameterID: .hapticSharpness, value: 6)
+        let event = CHHapticEvent(eventType: .hapticTransient, parameters: [intensity, sharpness], relativeTime: 0)
+        events.append(event)
+
+        // convert those events into a pattern and play it immediately
+        do {
+            let pattern = try CHHapticPattern(events: events, parameters: [])
+            let player = try engine?.makePlayer(with: pattern)
+            try player?.start(atTime: 0)
+        } catch {
+            print("Failed to play pattern: \(error.localizedDescription).")
+        }
+    }
+    
+    func simpleSuccess() {
+        let generator = UINotificationFeedbackGenerator()
+        generator.notificationOccurred(.success)
+    }
+    
+    
+    
+    //MARK: EDITING
     private func addGoal(){
         let newGoal = Goal(context: managedObjectContext)
-        
-        // 2
+
         newGoal.name = goalName
         newGoal.color = UIColor(goalCol)
         newGoal.totalTime = 0.0
@@ -488,6 +550,8 @@ struct GoalForm: View {
         
         self.saveContext()
         
+        self.simpleSuccess()
+        
         self.success = true
         self.isPresented = false
     }
@@ -499,6 +563,9 @@ struct GoalForm: View {
         goal.color = UIColor(self.goalCol)
         goal.name = self.goalName
         goal.goalTime = Double(self.goalDailyTime)
+        if let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalId: goal.id!) {
+            record.progress = record.dayTime/(goal.goalTime*60.0)
+        }
         goal.startDate = self.startDate
         goal.frequency = self.goalFrequency
         switch self.goalFrequency {
@@ -535,8 +602,14 @@ struct GoalForm: View {
             print("removing")
             self.removeNotificationsForGoal(id: goal.id!)
         }
+        
+        self.simpleSuccess()
+        
         self.success = true
         self.isPresented = false
+        
+        //MARK: TODO: UPDATE PROGRESS
+        
     }
 }
 
