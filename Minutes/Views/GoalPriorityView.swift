@@ -37,7 +37,7 @@ struct GoalPriorityView: View {
         }
 
     }
-    
+    @State private var showError: Bool = false
     @State private var isEditable = false
     
     var body: some View {
@@ -55,6 +55,9 @@ struct GoalPriorityView: View {
                         
                     }
                     .onMove(perform: onMove).onDelete(perform: onDelete)
+                }.alert(isPresented: self.$showError) {
+                    return Alert(title: Text("Error Saving Goal"), message: Text("Try again!"), dismissButton: .default(Text("Ok")))
+                    
                 }.environment(\.editMode, isEditable ? .constant(.active) : .constant(.inactive)).padding()
 
             
@@ -73,8 +76,6 @@ struct GoalPriorityView: View {
             if(index == destination){
                 return
             }
-            print("Index: \(index)")
-            print("Destination: \(destination)")
             let sourceGoal = goals.first(where: {$0.priority == (index+1)})!
             
             
@@ -142,7 +143,7 @@ struct GoalPriorityView: View {
       do {
         try managedObjectContext.save()
       } catch {
-        print("Error saving managed object context: \(error)")
+        self.showError = true
       }
     }
     

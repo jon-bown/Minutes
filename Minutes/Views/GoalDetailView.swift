@@ -30,7 +30,7 @@ struct ProgressBar: View {
 
 struct GoalDetailView: View {
     @Environment(\.managedObjectContext) var managedObjectContext
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     
     @FetchRequest(
         entity: GoalRecord.entity(),
@@ -58,6 +58,7 @@ struct GoalDetailView: View {
     @State private var remindersOnText: String = "Off"
     @State private var reminderTimeText: String = ""
     @State private var engine: CHHapticEngine?
+    @State private var showError: Bool = false
     
     //Just check the list view model if the goal record exists
     var goalRecordsArray: [GoalRecord] {
@@ -79,7 +80,7 @@ struct GoalDetailView: View {
         
     }
     
-
+    
     
     var body: some View {
         
@@ -126,64 +127,65 @@ struct GoalDetailView: View {
             VStack{
                 
                 
-
+                
                 GroupBox(label: GroupBoxLabelButton(label: "Sessions", isEditable: self.$isSessionsEditable, action: self.makeListEditable)){
                     
                     //list of all goal updates today
                     
+                    
+                    ForEach(self.filteredGoalRecordsSavesToday.sorted(by: >), id: \.key){
+                        key, value in
                         
-                        ForEach(self.filteredGoalRecordsSavesToday.sorted(by: >), id: \.key){
-                            key, value in
-
-                                //Divider()
-                            GroupBox{
-                                HStack{
-                                    if(self.isSessionsEditable){
-                                        CheckListButton(dateKey: key, listOfSessions: self.$sessionsToRemove)
-                                    }
-                                    Text(key.shortTime)
-                                    Spacer()
-                                    Text(AppUtil.getTotalTimeString(seconds: value))
+                        //Divider()
+                        GroupBox{
+                            HStack{
+                                if(self.isSessionsEditable){
+                                    CheckListButton(dateKey: key, listOfSessions: self.$sessionsToRemove)
                                 }
+                                Text(key.shortTime)
+                                Spacer()
+                                Text(AppUtil.getTotalTimeString(seconds: value))
                             }
-
-                            
-
                         }
                         
-                    Divider().frame(height: 2).background(Color.white)
                         
-                        HStack{
-                            Spacer()
-                            Button(action: {
-                                if self.isSessionsEditable {
-                                    //delete the sessions
-                                    
-                                    if(!self.sessionsToRemove.isEmpty){
-                                        self.deleteGoalRecordSessions()
-                                    }
-                                    
-                                    self.isSessionsEditable = false
-                                }
-                                else {
-                                    self.addCustomMinutes()
+                        
+                    }
+                    
+                    Divider().frame(height: 2).background(Color.white)
+                    
+                    HStack{
+                        Spacer()
+                        Button(action: {
+                            self.complexSuccess()
+                            if self.isSessionsEditable {
+                                //delete the sessions
+                                
+                                if(!self.sessionsToRemove.isEmpty){
+                                    self.deleteGoalRecordSessions()
                                 }
                                 
-                            }){
-                                if(!self.isSessionsEditable){
-                                    Image(systemName: "plus").font(.system(size: 25, weight: .bold))
-                                        //.frame(width: 100, height: 40).background(Color.gray).cornerRadius(15)
-                                }
-                                else {
-                                    Image(systemName: "trash").font(.system(size: 20)).foregroundColor(.red)
-                                }
-                                
-                            }.buttonStyle(CircleStopWatchSaveStyle())
-                            Spacer()
+                                self.isSessionsEditable = false
+                            }
+                            else {
+                                self.addCustomMinutes()
+                            }
                             
-                        }.padding()
-
-
+                        }){
+                            if(!self.isSessionsEditable){
+                                Image(systemName: "plus").font(.system(size: 25, weight: .bold))
+                                //.frame(width: 100, height: 40).background(Color.gray).cornerRadius(15)
+                            }
+                            else {
+                                Image(systemName: "trash").font(.system(size: 20)).foregroundColor(.red)
+                            }
+                            
+                        }.buttonStyle(CircleStopWatchSaveStyle())
+                        Spacer()
+                        
+                    }.padding()
+                    
+                    
                 }.padding()
                 .background(Color.blue)
                 
@@ -194,29 +196,46 @@ struct GoalDetailView: View {
             //if(checkNotificationsExist(id: self.goal.id!)){
             self.createReminderInfoTile().padding([.leading, .trailing], 15)
             //}
-            self.createDateInfoTile().padding([.leading], 15).navigationBarTitle(Text(goal.name!), displayMode: .automatic).navigationBarItems(
-                //                    leading: Button(action: {
-                //                    self.presentationMode.wrappedValue.dismiss()
-                //                }){
-                //                    Image(systemName: "x.circle").font(Font.system(size: 30, weight: .regular)).foregroundColor(.white)
-                //                },
-                trailing: Button(action: {
-                    self.showGoalEditForm.toggle()
-                }){
-                    Text("Edit").font(Font.system(size: 15, weight: .regular))
-                }.popover(
-                    isPresented: self.$showGoalEditForm
-                ) {
+            self.createDateInfoTile().padding([.leading], 15).navigationBarTitle(Text(goal.name!), displayMode: .automatic).navigationBarBackButtonHidden(true).toolbar{
+                ToolbarItem(placement: .navigation) {
+                    Button(action: {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                            self.presentationMode.wrappedValue.dismiss()
+                        }
+                    }){
+                        HStack{
+                            Image(systemName: "chevron.left").foregroundColor(Color.white).font(Font.system(size: 20, weight: .light)).foregroundColor(.white)
+                            Text("Back").font(Font.system(size: 20, weight: .regular)).foregroundColor(.white)
+                        }
+                        
+                    }
+                }
+                ToolbarItem(placement: .primaryAction) {
                     
-                    GoalForm(editing: true, passedGoal: self.goal, isPresented: self.$showGoalEditForm, success: self.$goalUpdatedSuccess).environment(\.managedObjectContext, managedObjectContext)
-                    //NewGoalForm(isPresented: self.$showNewGoalForm)
-                    
-                })
+                    Button(action: {
+                        self.showGoalEditForm.toggle()
+                    }){
+                        Text("Edit").font(Font.system(size: 20, weight: .regular)).foregroundColor(.white)
+                    }
+                }
+            }
+            .popover(
+                isPresented: self.$showGoalEditForm
+            ) {
+                
+                GoalForm(editing: true, passedGoal: self.goal, isPresented: self.$showGoalEditForm, success: self.$goalUpdatedSuccess).environment(\.managedObjectContext, managedObjectContext)
+                
+            }
             
-        }.onChange(of: self.showGoalEditForm) { newValue in
+        }
+        //        .alert(isPresented: self.$showError) {
+        //            return Alert(title: Text("Error Saving Goal"), message: Text("Try again!"), dismissButton: .default(Text("Ok")))
+        //
+        //        }
+        .onChange(of: self.showGoalEditForm) { newValue in
             if(!newValue) {
-                    self.checkNotificationsExist(id: self.goal.id!)
-                    self.recalculateProgress()
+                self.checkNotificationsExist(id: self.goal.id!)
+                self.recalculateProgress()
                 
             }
             
@@ -341,7 +360,7 @@ struct GoalDetailView: View {
                     )
                     .padding([.top], -3)
                 }.padding(.leading, 3)
-//                Spacer()
+                //                Spacer()
                 
                 
                 VStack(alignment: .leading, spacing: 0) {
@@ -430,7 +449,7 @@ struct GoalDetailView: View {
                         .padding([.top], -3)
                     }
                 }
-   
+                
                 
                 
             }.padding(.vertical, 10)
@@ -440,7 +459,7 @@ struct GoalDetailView: View {
         }
     }
     
-
+    
     
     private func createProgressBox() -> some View {
         VStack{
@@ -472,57 +491,47 @@ struct GoalDetailView: View {
                 }.padding(2)
             }.cornerRadius(15).padding()
             
-
+            
         }
     }
     
     //create tile for total time
     
     //create tile for both streaks
-
+    
     
     //MARK: - HELPER METHODS
     
     func checkNotificationsExist(id: UUID) {
         
-         var finalString = ""
-            self.getPendingRequests(id: id) { (hour, minute) in
-
-                if let hr = hour {
-                    if let min = minute {
-                        var fullHour = ""
-                        var fullMinute = ""
-                        if(hr < 10) {
-                            fullHour = "0\(String(describing: hr))"
-                        }
-                        else {
-                            fullHour = "\(String(describing: hr))"
-                        }
-                        if(min < 10){
-                            fullMinute = "0\(String(describing: min))"
-                        }
-                        else {
-                            fullMinute = "\(String(describing: min))"
-                        }
-                        finalString = "\(fullHour):\(fullMinute)"
-                        
-                        let dateFormatter = DateFormatter()
-                        dateFormatter.dateFormat = "HH:mm"
-
-                        let date = dateFormatter.date(from: finalString)
-                        dateFormatter.dateFormat = "h:mm a"
-                        finalString = dateFormatter.string(from: date!)
-                        
-                        if(finalString == ""){
-                            self.remindersOnText = "Off"
-                        }
-                        else {
-                            self.remindersOnText = "On"
-                            self.reminderTimeText = finalString
-                        }
+        var finalString = ""
+        self.getPendingRequests(id: id) { (hour, minute) in
+            
+            if let hr = hour {
+                if let min = minute {
+                    var fullHour = ""
+                    var fullMinute = ""
+                    if(hr < 10) {
+                        fullHour = "0\(String(describing: hr))"
                     }
-                }
-                else {
+                    else {
+                        fullHour = "\(String(describing: hr))"
+                    }
+                    if(min < 10){
+                        fullMinute = "0\(String(describing: min))"
+                    }
+                    else {
+                        fullMinute = "\(String(describing: min))"
+                    }
+                    finalString = "\(fullHour):\(fullMinute)"
+                    
+                    let dateFormatter = DateFormatter()
+                    dateFormatter.dateFormat = "HH:mm"
+                    
+                    let date = dateFormatter.date(from: finalString)
+                    dateFormatter.dateFormat = "h:mm a"
+                    finalString = dateFormatter.string(from: date!)
+                    
                     if(finalString == ""){
                         self.remindersOnText = "Off"
                     }
@@ -531,11 +540,21 @@ struct GoalDetailView: View {
                         self.reminderTimeText = finalString
                     }
                 }
-                
-
             }
-
-     }
+            else {
+                if(finalString == ""){
+                    self.remindersOnText = "Off"
+                }
+                else {
+                    self.remindersOnText = "On"
+                    self.reminderTimeText = finalString
+                }
+            }
+            
+            
+        }
+        
+    }
     
     func getPendingRequests(id: UUID, completion:@escaping (Int?, Int?)->Void){
         
@@ -544,49 +563,49 @@ struct GoalDetailView: View {
         
         queue.async(group: group) {
             group.enter()
-        UNUserNotificationCenter.current().getPendingNotificationRequests { (notificationRequests) in
-            for notification:UNNotificationRequest in notificationRequests {
-                if notification.identifier == id.uuidString {
-                    guard let trigger = notification.trigger as? UNCalendarNotificationTrigger else {
-                        completion(nil, nil)
-                        return
-                    }
-                    let nextTriggerDate = trigger.nextTriggerDate()!
-                    //get date components
-                    let components = Calendar.current.dateComponents([.hour, .minute], from: nextTriggerDate)
-                    if let hour = components.hour {
-                        if let minute = components.minute {
-                            completion(hour, minute)
+            UNUserNotificationCenter.current().getPendingNotificationRequests { (notificationRequests) in
+                for notification:UNNotificationRequest in notificationRequests {
+                    if notification.identifier == id.uuidString {
+                        guard let trigger = notification.trigger as? UNCalendarNotificationTrigger else {
+                            completion(nil, nil)
                             return
                         }
+                        let nextTriggerDate = trigger.nextTriggerDate()!
+                        //get date components
+                        let components = Calendar.current.dateComponents([.hour, .minute], from: nextTriggerDate)
+                        if let hour = components.hour {
+                            if let minute = components.minute {
+                                completion(hour, minute)
+                                return
+                            }
+                        }
+                        
                     }
-
                 }
+                completion(nil, nil)
             }
-            completion(nil, nil)
-        }
             group.leave()
         }
         
         
-        }
-//
-//    private func checkNotificationsExist(id: UUID) -> Bool {
-//        var exist = false
-//        //Check if any notifications exist, if they do set reminders to true
-//        UNUserNotificationCenter.current().getPendingNotificationRequests { (notificationRequests) in
-//            for notification:UNNotificationRequest in notificationRequests {
-//                if notification.identifier == id.uuidString {
-//
-//                    exist = true
-//                    return
-//                }
-//            }
-//        }
-//        return exist
-//        //self.reminders = checkNotificationsExist(id: id)
-//
-//    }
+    }
+    //
+    //    private func checkNotificationsExist(id: UUID) -> Bool {
+    //        var exist = false
+    //        //Check if any notifications exist, if they do set reminders to true
+    //        UNUserNotificationCenter.current().getPendingNotificationRequests { (notificationRequests) in
+    //            for notification:UNNotificationRequest in notificationRequests {
+    //                if notification.identifier == id.uuidString {
+    //
+    //                    exist = true
+    //                    return
+    //                }
+    //            }
+    //        }
+    //        return exist
+    //        //self.reminders = checkNotificationsExist(id: id)
+    //
+    //    }
     
     private func addCustomMinutes() {
         self.showCustomMinuteSheet = true
@@ -605,13 +624,13 @@ struct GoalDetailView: View {
         for key in self.sessionsToRemove {
             // the date
             let timeToRemove = self.filteredGoalRecordsSavesToday[key]
-
+            
             
             record!.dayTime -= timeToRemove!
             self.goal.totalTime -= timeToRemove!
             record!.goalSaves!.removeValue(forKey: key)
             record!.goalUpdates!.removeValue(forKey: key.minuteQuadrant)
-
+            
         }
         self.sessionsToRemove.removeAll()
         self.recalculateDayTime()
@@ -629,7 +648,9 @@ struct GoalDetailView: View {
         }
         guard let customMinutes = Int(self.newSessionText)
         else {
+            print("couldn't save")
             return
+            
             //error
         }
         let customSeconds = Double(customMinutes) * 60.0
@@ -670,40 +691,40 @@ struct GoalDetailView: View {
         
         else {
             if let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalId: self.goal.id!) {
-            //add entry with hour: minutes
-            record.dayTime += customSeconds
+                //add entry with hour: minutes
+                record.dayTime += customSeconds
                 self.progress = record.dayTime/(self.goal.goalTime*60.0)
-            record.progress = self.progress
-            
-            
-            
-            var hour = Calendar.current.component(.hour, from: Date())*4
-            let minutes = (record.progress * 59.0).truncatingRemainder(dividingBy: 60)
-            hour = hour + Date().minuteQuadrant
-            
-            let keyExists = record.goalUpdates![hour] != nil
-            if(keyExists){
-                record.goalUpdates![hour] = (record.goalUpdates![hour]! + Double(minutes)).truncatingRemainder(dividingBy: 60)
-            }
-            else{
-                record.goalUpdates![hour] = Double(minutes)
-            }
-            //Goal Saves
-            let dateKey = Date()
-            let saveKeyExists = record.goalSaves![dateKey] != nil
-            if(saveKeyExists){
-                record.goalSaves![dateKey] = (record.goalSaves![dateKey]! + customSeconds)
-            }
-            else{
-                record.goalSaves![dateKey] = customSeconds
-            }
-            
-            
-        
-            
-            self.goal.totalTime += customSeconds
-            saveContext()
-            
+                record.progress = self.progress
+                
+                
+                
+                var hour = Calendar.current.component(.hour, from: Date())*4
+                let minutes = (record.progress * 59.0).truncatingRemainder(dividingBy: 60)
+                hour = hour + Date().minuteQuadrant
+                
+                let keyExists = record.goalUpdates![hour] != nil
+                if(keyExists){
+                    record.goalUpdates![hour] = (record.goalUpdates![hour]! + Double(minutes)).truncatingRemainder(dividingBy: 60)
+                }
+                else{
+                    record.goalUpdates![hour] = Double(minutes)
+                }
+                //Goal Saves
+                let dateKey = Date()
+                let saveKeyExists = record.goalSaves![dateKey] != nil
+                if(saveKeyExists){
+                    record.goalSaves![dateKey] = (record.goalSaves![dateKey]! + customSeconds)
+                }
+                else{
+                    record.goalSaves![dateKey] = customSeconds
+                }
+                
+                
+                
+                
+                self.goal.totalTime += customSeconds
+                saveContext()
+                
             }
             
         }
@@ -723,10 +744,11 @@ struct GoalDetailView: View {
         if managedObjectContext.hasChanges {
             do {
                 try managedObjectContext.save()
+                self.goalUpdatedSuccess = true
+                self.complexSuccess()
             } catch {
-                #if DEBUG
-                print("Error saving managed object context: \(error)")
-                #endif
+                
+                self.showError = true
             }
         }
     }
@@ -734,12 +756,12 @@ struct GoalDetailView: View {
     //MARK: HAPTICS
     func prepareHaptics() {
         guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
-
+        
         do {
             self.engine = try CHHapticEngine()
             try engine?.start()
         } catch {
-            print("There was an error creating the engine: \(error.localizedDescription)")
+            
         }
     }
     
@@ -747,20 +769,20 @@ struct GoalDetailView: View {
         // make sure that the device supports haptics
         guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
         var events = [CHHapticEvent]()
-
+        
         // create one intense, sharp tap
         let intensity = CHHapticEventParameter(parameterID: .hapticIntensity, value: 5)
         let sharpness = CHHapticEventParameter(parameterID: .hapticSharpness, value: 5)
         let event = CHHapticEvent(eventType: .hapticTransient, parameters: [intensity, sharpness], relativeTime: 0)
         events.append(event)
-
+        
         // convert those events into a pattern and play it immediately
         do {
             let pattern = try CHHapticPattern(events: events, parameters: [])
             let player = try engine?.makePlayer(with: pattern)
             try player?.start(atTime: 0)
         } catch {
-            print("Failed to play pattern: \(error.localizedDescription).")
+            
         }
     }
     
@@ -768,20 +790,20 @@ struct GoalDetailView: View {
         // make sure that the device supports haptics
         guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
         var events = [CHHapticEvent]()
-
+        
         // create one intense, sharp tap
         let intensity = CHHapticEventParameter(parameterID: .hapticIntensity, value: 1)
         let sharpness = CHHapticEventParameter(parameterID: .hapticSharpness, value: 1)
         let event = CHHapticEvent(eventType: .hapticTransient, parameters: [intensity, sharpness], relativeTime: 0)
         events.append(event)
-
+        
         // convert those events into a pattern and play it immediately
         do {
             let pattern = try CHHapticPattern(events: events, parameters: [])
             let player = try engine?.makePlayer(with: pattern)
             try player?.start(atTime: 0)
         } catch {
-            print("Failed to play pattern: \(error.localizedDescription).")
+            
         }
     }
     
@@ -813,19 +835,10 @@ struct GoalDetailView: View {
             hour = hour + Date().minuteQuadrant
             entry[hour] = Double(minutes)
             newGoalRecord.goalUpdates = entry
-            print("Progress: \(newGoalRecord.progress)")
-            print("Minutes:\(minutes)")
             //SAVES
             var save = [Date:Double]()
             save[Date()] = Double(self.stopWatch.totalAccumulatedTime.seconds())
             newGoalRecord.goalSaves = save
-            //add entry with hour: minutes
-            //newGoal.color = UIColor(goalCol)
-            //newGoal.cumTime = 0.0
-            //newGoal.dayTime = 0.0
-            //newGoal.goalTime = Double(self.goalDailyTime)
-            //newGoal.frequency = ""
-            //newGoal.id = UUID()
             saveContext()
         }
         
@@ -838,8 +851,6 @@ struct GoalDetailView: View {
                 var hour = Calendar.current.component(.hour, from: Date())*4
                 let minutes = (record.progress * 59.0).truncatingRemainder(dividingBy: 60)
                 hour = hour + Date().minuteQuadrant
-                print("Progress: \(record.progress)")
-                print("Minutes:\(minutes)")
                 let keyExists = record.goalUpdates![hour] != nil
                 if(keyExists){
                     record.goalUpdates![hour] = (record.goalUpdates![hour]! + Double(minutes)).truncatingRemainder(dividingBy: 60)
@@ -865,7 +876,7 @@ struct GoalDetailView: View {
             
         }
         //TODO Update this to check if active widget
-        WidgetCenter.shared.reloadTimelines(ofKind: AppGroup.facts.rawValue)
+        //WidgetCenter.shared.reloadTimelines(ofKind: AppGroup.facts.rawValue)
         
         
     }
@@ -876,9 +887,9 @@ struct GoalDetailView: View {
             self.progress = 0.0
             return
         }
-            self.dayTime = record.dayTime
-            self.progress = record.progress
-
+        self.dayTime = record.dayTime
+        self.progress = record.progress
+        
         
     }
     
@@ -888,14 +899,14 @@ struct GoalDetailView: View {
             return
         }
         self.dayTime = record.dayTime
-
+        
     }
     
     func recalculateProgress() {
         self.progress = (Double(self.stopWatch.totalAccumulatedTime.seconds()) + self.dayTime)/(self.goal.goalTime*60)
     }
     
-
+    
     
     func startLoading() {
         self.timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { timer in

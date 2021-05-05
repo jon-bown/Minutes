@@ -11,11 +11,11 @@ struct GoalRow: View {
     @ObservedObject var goal: Goal
     @State private var showPopover: Bool = false
     var body: some View {
-        VStack(alignment: .leading) {
-            NavigationLink(destination: GoalDetailView(goal: goal)){
-                Text(goal.name!)
-            }
-            
-        }
+        HStack{
+            Text(goal.name!).font(.system(.title2, design: .rounded)).foregroundColor(Color.white)
+            Spacer()
+            Image(systemName: "chevron.right").foregroundColor(Color.gray)
+        }.font(.system(size: 24, design: .rounded)).padding(4).cornerRadius(8)
+
     }
 }

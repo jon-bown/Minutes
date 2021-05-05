@@ -8,11 +8,12 @@
 import SwiftUI
 
 
-
+/*
+ A collection of ProgressRingViews
+ */
 struct ProgressRings: View {
     
     @Environment(\.managedObjectContext) var managedObjectContext
-    
     
     
     @FetchRequest(
@@ -132,7 +133,8 @@ struct ProgressRingsStatic: View {
     var maxWidth: CGFloat = 100
     var maxLineWidth: CGFloat = 10
     var maxRingLimit: Int = 4
-    var animate: Bool = true
+    var animate: Bool = false
+    var tinted: Bool = false
     //var goalList: FetchedResults<Goal>
     
     var goalsArray: [Goal] {
@@ -154,12 +156,13 @@ struct ProgressRingsStatic: View {
     
     private var cal = Calendar.current
     
-    init(dateProvided: Date, maxWidth: CGFloat, maxLineWidth: CGFloat, maxRingLimit: Int, animate: Bool = true){
+    init(dateProvided: Date, maxWidth: CGFloat, maxLineWidth: CGFloat, maxRingLimit: Int, animate: Bool = true, tinted: Bool = false){
         self.dateProvided = dateProvided
         self.maxWidth = maxWidth
         self.maxLineWidth = maxLineWidth
         self.maxRingLimit = maxRingLimit
         self.animate = animate
+        self.tinted = tinted
         //self.goalList = goalList
     }
     
@@ -177,18 +180,15 @@ struct ProgressRingsStatic: View {
                     if let index = filteredGoals.firstIndex(of: goal){
                         if(index < maxRingLimit){
                             if(filteredGoalRecords.isEmpty){
-                                ProgressRingViewStatic(progress: 0.0, thickness: self.maxLineWidth, startColor: Color(goal.color!.darker(by: 10.0)!), endColor: Color(goal.color!.lighter(by: 15)!), backgroundColor: goal.color!, animate: animate).frame(width: calculateDim(index: index), height: calculateDim(index: index)).aspectRatio(contentMode: .fit)
+                                ProgressRingViewStatic(progress: 0.0, thickness: self.maxLineWidth, startColor: tinted ? Color.white: Color(goal.color!.darker(by: 10.0)!), endColor: tinted ? Color.white: Color(goal.color!.lighter(by: 15)!), backgroundColor: tinted ? UIColor(Color.gray):goal.color!, animate: animate).frame(width: calculateDim(index: index), height: calculateDim(index: index)).aspectRatio(contentMode: .fit)
                             }
                             else {
-                                ProgressRingViewStatic(progress: filteredGoalRecords.first(where: { goal.id == $0.id }) == nil ? 0.0: filteredGoalRecords.first(where: { goal.id == $0.id})!.progress, thickness: self.maxLineWidth, startColor: Color(goal.color!.darker(by: 10.0)!), endColor: Color(goal.color!.lighter(by: 15)!), backgroundColor: goal.color!, animate: animate).frame(width: calculateDim(index: index), height: calculateDim(index: index)).aspectRatio(contentMode: .fit)
+                                ProgressRingViewStatic(progress: filteredGoalRecords.first(where: { goal.id == $0.id }) == nil ? 0.0: filteredGoalRecords.first(where: { goal.id == $0.id})!.progress, thickness: self.maxLineWidth, startColor: tinted ? Color.white: Color(goal.color!.darker(by: 10.0)!), endColor: tinted ? Color.white: Color(goal.color!.lighter(by: 15)!), backgroundColor: tinted ? UIColor(Color.gray):goal.color!, animate: animate).frame(width: calculateDim(index: index), height: calculateDim(index: index)).aspectRatio(contentMode: .fit)
                             }
                             
                         }
                     }
                     
-                    else {
-                        
-                    }
                 }
             }
             

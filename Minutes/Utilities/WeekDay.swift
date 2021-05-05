@@ -8,6 +8,9 @@
 import Foundation
 
 
+/*
+ Published array of weekdays that monitors if certain days of the week are selected. 
+ */
 class WeekDays: ObservableObject {
     @Published var weekDays: [WeekDay]
 

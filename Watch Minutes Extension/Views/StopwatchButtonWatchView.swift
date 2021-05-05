@@ -139,8 +139,6 @@ struct StopwatchButtonWatchView: View {
             hour = hour + Date().minuteQuadrant
             entry[hour] = Double(minutes)
             newGoalRecord.goalUpdates = entry
-            print("Progress: \(newGoalRecord.progress)")
-            print("Minutes:\(minutes)")
             //SAVES
             var save = [Date:Double]()
             save[Date()] = Double(self.watchTotalTime)
@@ -164,8 +162,6 @@ struct StopwatchButtonWatchView: View {
                 var hour = Calendar.current.component(.hour, from: Date())*4
                 let minutes = (record.progress * 59.0).truncatingRemainder(dividingBy: 60)
                 hour = hour + Date().minuteQuadrant
-                print("Progress: \(record.progress)")
-                print("Minutes:\(minutes)")
                 let keyExists = record.goalUpdates![hour] != nil
                 if(keyExists){
                     record.goalUpdates![hour] = (record.goalUpdates![hour]! + Double(minutes)).truncatingRemainder(dividingBy: 60)
@@ -199,7 +195,7 @@ struct StopwatchButtonWatchView: View {
             do {
                 try managedObjectContext.save()
             } catch {
-                print("Error saving managed object context: \(error)")
+                
             }
         }
     }

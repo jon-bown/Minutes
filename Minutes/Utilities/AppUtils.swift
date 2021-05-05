@@ -191,7 +191,6 @@ class AppUtil {
                         if(count > bestStreak){
                             UserDefaults.standard.set(count, forKey: "Best\(goalID)")
                         }
-                        print("current count: \(count) current best: \(bestStreak)")
                         return count
                     }
                     tempDate = record.date!
@@ -200,11 +199,10 @@ class AppUtil {
                 if(count > bestStreak){
                     UserDefaults.standard.set(count, forKey: "Best\(goalID)")
                 }
-                //print("current count: \(count) current best: \(bestStreak)")
                 return count
             }
             else {
-                //you are not on a streak
+                //user is not on a streak
                 return 0
             }
             

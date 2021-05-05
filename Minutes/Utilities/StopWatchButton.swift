@@ -60,11 +60,10 @@ struct StopWatchButton : View {
         guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
 
         do {
-            print("haptics enabled")
             self.engine = try CHHapticEngine()
             try engine?.start()
         } catch {
-            print("There was an error creating the engine: \(error.localizedDescription)")
+            
         }
     }
     
@@ -85,7 +84,7 @@ struct StopWatchButton : View {
             let player = try engine?.makePlayer(with: pattern)
             try player?.start(atTime: 0)
         } catch {
-            print("Failed to play pattern: \(error.localizedDescription).")
+            
         }
     }
     
@@ -106,7 +105,7 @@ struct StopWatchButton : View {
             let player = try engine?.makePlayer(with: pattern)
             try player?.start(atTime: 0)
         } catch {
-            print("Failed to play pattern: \(error.localizedDescription).")
+
         }
     }
     #endif

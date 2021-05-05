@@ -10,6 +10,10 @@ import UIKit
 
 var kDisableTimerWhenAppIsNotActive = true
 
+
+/*
+ StopWatch used for Timer on iPhone/iPad
+ */
 class StopWatch: ObservableObject {
     
     

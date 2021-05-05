@@ -9,6 +9,9 @@ import SwiftUI
 import UserNotifications
 import CoreHaptics
 
+/*
+ Form for adding or editing a goal
+ */
 struct GoalForm: View {
     @Environment(\.managedObjectContext) private var managedObjectContext
     
@@ -50,6 +53,7 @@ struct GoalForm: View {
     @State private var showPermissionAlert: Bool = false
     @State private var endDate: Date = Date()
     @State private var engine: CHHapticEngine?
+    @State private var showError: Bool = false
     
     
     let freq = ["Daily", "Weekly", "Monthly"] //add custom
@@ -138,6 +142,10 @@ struct GoalForm: View {
                             
                         }.alert(isPresented: self.$showPermissionAlert) {
                             Alert(title: Text("Error"), message: Text("You must enable notifications in Settings"), dismissButton: .default(Text("Go to Settings")))
+                        }.alert(isPresented: self.$showError) {
+                            self.isPresented = false
+                            return Alert(title: Text("Error Saving Goal"), message: Text("Try again!"), dismissButton: .default(Text("Ok")))
+                            
                         }
                         
                         if(self.reminders){
@@ -299,14 +307,17 @@ struct GoalForm: View {
                     self.requestNotificationAuthorization()
                 case .provisional:
                     // @available(iOS 12.0, *)
-                    print("The application is authorized to post non-interruptive user notifications.")
+                    //print("The application is authorized to post non-interruptive user notifications.")
+                    self.notificationPermission = true
                 case .ephemeral:
                     // @available(iOS 14.0, *)
-                    print("The application is temporarily authorized to post notifications. Only available to app clips.")
+                    //print("The application is temporarily authorized to post notifications. Only available to app clips.")
+                    self.notificationPermission = true
                 @unknown default:
-                    print("Unknow Status")
+                    //print("Unknow Status")
+                    self.notificationPermission = false
                 }
-                print(result.rawValue)
+                //print(result.rawValue)
             }
             //group.wait()
             group.leave()
@@ -342,8 +353,6 @@ struct GoalForm: View {
                         let components = Calendar.current.dateComponents([.hour, .minute], from: nextTriggerDate)
                         hour = components.hour!
                         minute = components.minute!
-                        print(hour)
-                        print(minute)
                         return
                     }
                 }
@@ -452,7 +461,7 @@ struct GoalForm: View {
         do {
             try managedObjectContext.save()
         } catch {
-            print("Error saving managed object context: \(error)")
+            self.showError = true
         }
     }
     //MARK: HAPTICS
@@ -460,12 +469,10 @@ struct GoalForm: View {
         guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
 
         do {
-            print("haptics enabled")
             self.engine = try CHHapticEngine()
             try engine?.start()
         } catch {
-            
-            print("There was an error creating the engine: \(error.localizedDescription)")
+            self.showError = true
         }
     }
     
@@ -486,7 +493,7 @@ struct GoalForm: View {
             let player = try engine?.makePlayer(with: pattern)
             try player?.start(atTime: 0)
         } catch {
-            print("Failed to play pattern: \(error.localizedDescription).")
+            
         }
     }
     
@@ -591,15 +598,13 @@ struct GoalForm: View {
             break
         }
         if managedObjectContext.hasChanges {
-            try? self.managedObjectContext.save()
+            self.saveContext()
         }
         
         if(self.reminders){
-            //print("submit")
             self.submitUserNotificationTrigger(id: goal.id!)
         }
         else {
-            print("removing")
             self.removeNotificationsForGoal(id: goal.id!)
         }
         

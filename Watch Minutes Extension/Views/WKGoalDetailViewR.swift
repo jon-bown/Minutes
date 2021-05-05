@@ -66,14 +66,14 @@ struct WKGoalDetailViewR: View {
                 }
             })
         .onReceive(NotificationCenter.default.publisher(for: WKExtension.applicationWillResignActiveNotification)) { _ in
-            print("Moving to the background")
+            //print("Moving to the background")
             if(self.watchState){
                 self.backgroundDate = Date()
             }
             
         }
         .onReceive(NotificationCenter.default.publisher(for: WKExtension.applicationDidBecomeActiveNotification)) { _ in
-            print("Moving to the foreground")
+            //print("Moving to the foreground")
             if(self.watchState){
                 //self.stopWatch.reset()
                 let deltaTime: Int = Int(Date().timeIntervalSince(backgroundDate))

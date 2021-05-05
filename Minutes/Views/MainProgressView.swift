@@ -11,6 +11,7 @@ import CoreData
 struct MainProgressView: View {
     
     @Environment(\.managedObjectContext) var managedObjectContext
+    @Environment(\.presentationMode) var presentationMode
     
     @FetchRequest(
       entity: Goal.entity(),
@@ -31,12 +32,20 @@ struct MainProgressView: View {
     }
     
     var goalsArray: [Goal] {
-        return goals.sorted(by: {$0.priority > $1.priority})
+        return goals.sorted(by: {$0.priority < $1.priority})
     }
     
     @State private var showNewGoalForm: Bool = false
     @State private var goalFilterCriteria: String = "Today"
     @State private var goalAddSuccess: Bool = false
+    @State var selection: Int?
+    
+    
+    @State private var selectedItem: String?
+    @State private var listViewId = UUID()
+    
+    
+    
     private var cal = Calendar.current
     
     
@@ -44,7 +53,14 @@ struct MainProgressView: View {
         NavigationView{
             GeometryReader{geometry in
                 VStack{
-                    Spacer(minLength: Constants.navigationBarHeight+20).frame(width: geometry.size.width, height: Constants.navigationBarHeight+40, alignment: .top)
+//                    Spacer(minLength: Constants.navigationBarHeight+20).frame(width: geometry.size.width, height: Constants.navigationBarHeight+40, alignment: .top)
+                    HStack{
+                        Text(AppUtil.getCurrentDate().uppercased())
+                            .font(.headline)
+                            .foregroundColor(.secondary).padding(.leading, 20)
+                        Spacer()
+                        
+                    }
                     if(!goals.isEmpty){
                         NavigationLink(destination: OverallProgressView(dateProvided: Date())){
                             GroupBox{
@@ -68,50 +84,103 @@ struct MainProgressView: View {
                                         Text("All").font(.system(.subheadline, design: .rounded)).tag("All")
                             }.pickerStyle(SegmentedPickerStyle()).padding()
                         }
-                        ScrollView{
+                        //ScrollView{
                             if(self.goalFilterCriteria == "Today"){
-                                ForEach(filteredGoals, id: \.self) { goal in
-                                    NavigationLink(destination: GoalDetailView(goal: goal)){
-                                        GroupBox{
-                                            HStack{
-                                                Text(goal.name!).font(.system(.title2, design: .rounded)).foregroundColor(Color.white)
-                                                Spacer()
-                                                Image(systemName: "chevron.right").foregroundColor(Color.gray)
-                                            }.font(.system(size: 24, design: .rounded)).padding(4).cornerRadius(15)
-
-                                        }
+                                List(filteredGoals) { goal in
+                                    GroupBox{
+                                        NavigationLink(destination: GoalDetailView(goal: goal), tag: "\(goal.id!)", selection: $selectedItem) {
                                             
-                                       
-                                        
+                                            GoalRow(goal: goal)
+                                        }
                                     }
-                                }
+                                            
+                                        //Goal}
+                                }.id(listViewId)
+       
                             }
                             else {
-                                ForEach(goalsArray, id: \.self) { goal in
-                                    NavigationLink(destination: GoalDetailView(goal: goal)){
-                                        GroupBox{
-                                            HStack{
-                                                Text(goal.name!).font(.system(.title2, design: .rounded)).foregroundColor(Color.white)
-                                                Spacer()
-                                                Image(systemName: "chevron.right").foregroundColor(Color.gray)
-                                            }.font(.system(size: 24, design: .rounded)).padding(4).cornerRadius(8)
-
-                                        }.cornerRadius(15)
+                                List(goalsArray) { goal in
+                                    GroupBox{
+                                        NavigationLink(destination: GoalDetailView(goal: goal), tag: "\(goal.id!)", selection: $selectedItem) {
                                             
-                                       
-                                        
+                                            GoalRow(goal: goal)
+                                        }
                                     }
-                                }
+                                            
+                                        //Goal}
+                                }.id(listViewId)
                             }
-                        }
+                        //}
                        
 
                     }.padding()
                         
                     //}.padding()
+                }.onAppear {
+                    if selectedItem != nil {
+                        selectedItem = nil
+                        listViewId = UUID()
+                    }
                 }
-                self.createNavigationBar(geometry.size)
-            }
+                //self.createNavigationBar(geometry.size)
+            }.toolbar{
+//                ToolbarItemGroup(placement: .navigation){
+//
+//                            HStack {
+//
+//                                VStack(alignment: .leading) {
+//                                    //Text(AppUtil.getCurrentDate().uppercased())
+//                                        //.font(.headline)
+//                                        //.foregroundColor(.secondary)
+//                                    Text("Summary")
+//                                        .font(.largeTitle)
+//                                        .fontWeight(.heavy)
+//                                }.padding()
+//                                Spacer()
+//
+//                            }
+//                }
+                
+                ToolbarItemGroup(placement: .primaryAction){
+                    Button(action: {
+                        self.showNewGoalForm.toggle()
+                    }){
+                        Image(systemName: "plus.circle.fill").imageScale(.large)
+                    }.popover(
+                        isPresented: self.$showNewGoalForm
+                    ) {
+                        
+                        GoalForm(editing: false, isPresented: self.$showNewGoalForm, success: self.$goalAddSuccess ).environment(\.managedObjectContext, self.managedObjectContext)
+                        
+                    }
+
+                }
+//                ToolbarItem(placement: .navigation){
+//                    VStack(alignment: .leading) {
+//
+//                        Text(AppUtil.getCurrentDate().uppercased())
+//                            .font(.headline)
+//                            .foregroundColor(.secondary)
+//                        Text("Summary")
+//                            .font(.largeTitle)
+//                            .fontWeight(.heavy)
+//                    }.padding()
+//                }
+//                ToolbarItem(placement: .primaryAction){
+//                    Button(action: {
+//                        self.showNewGoalForm.toggle()
+//                    }){
+//                        Image(systemName: "plus.circle.fill").font(Font.system(size: 40, weight: .regular))
+//                    }.padding(10).popover(
+//                        isPresented: self.$showNewGoalForm
+//                    ) {
+//
+//                        GoalForm(editing: false, isPresented: self.$showNewGoalForm, success: self.$goalAddSuccess ).environment(\.managedObjectContext, self.managedObjectContext)
+//
+//                    }.padding()
+//
+//                }
+            }.navigationTitle("Summary").navigationBarTitleDisplayMode(.large)
 
         }.navigationViewStyle(StackNavigationViewStyle())
         
@@ -146,7 +215,7 @@ struct MainProgressView: View {
 
                     }
         }
-        .frame(width: geometrySize.width, height: Constants.navigationBarHeight, alignment: .top).navigationBarHidden(true)
+        .frame(width: geometrySize.width, height: Constants.navigationBarHeight, alignment: .top)
 
     }
     

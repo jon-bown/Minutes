@@ -9,7 +9,9 @@ import CoreData
 import UIKit
 import SwiftUI
 
-
+/*
+ Contains all necessary extensions for Minutes App
+ */
 
 @objc(UIColorValueTransformer)
 final class UIColorValueTransformer: NSSecureUnarchiveFromDataTransformer {

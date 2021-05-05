@@ -32,9 +32,3 @@ struct CheckListButton: View {
         }
     }
 }
-
-//struct CheckListButton_Previews: PreviewProvider {
-//    static var previews: some View {
-//        CheckListButton()
-//    }
-//}
