@@ -55,7 +55,7 @@ struct ChangeGoalsView: View {
                 Button(action: {
                     goal.goalTime = newMinutes
                     //UPDATE PROGRESS IN GOAL RECORD
-                    if let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalId: goal.id!) {
+                    if let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalID: goal.id!) {
                         record.progress = record.dayTime/(self.goal.goalTime*60.0)
                     }
                     saveContext()

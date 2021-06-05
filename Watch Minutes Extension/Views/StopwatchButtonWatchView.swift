@@ -28,6 +28,7 @@ struct StopwatchButtonWatchView: View {
     @State var timer: Timer?
     @Binding var progress: Double
     @Binding var selectedTab: Int
+    @Binding var showedNotification: Bool
     @State private var showEditView: Bool = false
     var actions: [() -> Void]
     
@@ -37,6 +38,7 @@ struct StopwatchButtonWatchView: View {
                 Button(action: {
                     self.actions[0]()
                     WKInterfaceDevice.current().play(.stop)
+                    self.showedNotification = false
                 }){
                     
                     Text("Reset").foregroundColor(.white)
@@ -115,7 +117,7 @@ struct StopwatchButtonWatchView: View {
     
     func updateGoalRecord() {
         var newRecord = false
-        let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalId: self.goal.id!)
+        let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalID: self.goal.id!)
         if(record == nil){
             newRecord = true
         }
@@ -154,7 +156,7 @@ struct StopwatchButtonWatchView: View {
         }
         
         else {
-            if let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalId: self.goal.id!) {
+            if let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalID: self.goal.id!) {
                 record.progress = self.progress
                 record.dayTime += Double(self.watchTotalTime)
                 

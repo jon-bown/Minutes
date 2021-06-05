@@ -35,6 +35,7 @@ struct ProgressRings: View {
     var maxWidth: CGFloat = 100
     var maxLineWidth: CGFloat = 10
     var maxRingLimit: Int = 4
+    var showClear: Bool = true
     var animate: Bool = true
     //var goalList: FetchedResults<Goal>
     var filteredGoals: [Goal] {
@@ -49,7 +50,7 @@ struct ProgressRings: View {
     var goalsArray: [Goal] {
         return goals.sorted(by: {$0.priority < $1.priority})
     }
-
+    
     var filteredGoalRecords: [GoalRecord] {
         return AppUtil.filterGoalRecordsByDate(goalRecords: self.goalRecordsArray, date: self.dateProvided)
         
@@ -57,21 +58,43 @@ struct ProgressRings: View {
     
     private var cal = Calendar.current
     
-    init(dateProvided: Date, maxWidth: CGFloat, maxLineWidth: CGFloat, maxRingLimit: Int, animate: Bool = true){
+    init(dateProvided: Date, maxWidth: CGFloat, maxLineWidth: CGFloat, maxRingLimit: Int, animate: Bool = true, showClear: Bool = true){
         self.dateProvided = dateProvided
         self.maxWidth = maxWidth
         self.maxLineWidth = maxLineWidth
         self.maxRingLimit = maxRingLimit
         self.animate = animate
+        self.showClear = showClear
         //self.goalList = goalList
     }
     
     var body: some View {
         
         ZStack {
-            if(filteredGoals.isEmpty){
-                ProgressRingView(progress: 0.0, thickness: CGFloat(self.maxLineWidth), startColor: Color.clear, endColor: Color.clear, backgroundColor: UIColor.clear).frame(width: calculateDim(index: 0), height: calculateDim(index: 0)).aspectRatio(contentMode: .fit)
+            if(filteredGoals.isEmpty && filteredGoalRecords.isEmpty){
+                if(showClear){
+                    ProgressRingView(progress: 0.0, thickness: CGFloat(self.maxLineWidth), startColor: Color.clear, endColor: Color.clear, backgroundColor: UIColor.clear, empty: true).frame(width: calculateDim(index: 0), height: calculateDim(index: 0)).aspectRatio(contentMode: .fit)
+                }
+                else {
+                    ProgressRingView(progress: 0.0, thickness: CGFloat(self.maxLineWidth), startColor: Color.clear, endColor: Color.clear, backgroundColor: UIColor.white, empty: true).frame(width: calculateDim(index: 0), height: calculateDim(index: 0)).aspectRatio(contentMode: .fit)
+                    ProgressRingView(progress: 0.0, thickness: CGFloat(self.maxLineWidth), startColor: Color.clear, endColor: Color.clear, backgroundColor: UIColor.white, empty: true).frame(width: calculateDim(index: 1), height: calculateDim(index: 0)).aspectRatio(contentMode: .fit)
+                    ProgressRingView(progress: 0.0, thickness: CGFloat(self.maxLineWidth), startColor: Color.clear, endColor: Color.clear, backgroundColor: UIColor.white, empty: true).frame(width: calculateDim(index: 2), height: calculateDim(index: 0)).aspectRatio(contentMode: .fit)
+                }
+                
             }
+            else if(filteredGoals.isEmpty) {
+                
+                ForEach(AppUtil.sortGoalRecordsByPriority(goalRecords: self.filteredGoalRecords, goals: self.goalsArray), id: \.self){ goalRecord in
+                    if let index = AppUtil.sortGoalRecordsByPriority(goalRecords: self.filteredGoalRecords, goals: self.goalsArray).firstIndex(of: goalRecord){
+                        if(index < maxRingLimit){
+                            ProgressRingView(progress: goalRecord.progress, thickness: CGFloat(self.maxLineWidth), startColor: Color(AppUtil.getGoalColorFromRecord(goals: self.goalsArray, id: goalRecord.id!).darker(by: 10.0)!), endColor: Color(AppUtil.getGoalColorFromRecord(goals: self.goalsArray, id: goalRecord.id!).lighter(by: 15)!), backgroundColor: goalsArray.first(where: {$0.id! == goalRecord.id!})!.color!, animate: animate).frame(width: calculateDim(index: index), height: calculateDim(index: index)).aspectRatio(contentMode: .fit)
+                        }
+                        
+                    }
+                    
+                }
+            }
+            
             else {
                 ForEach(filteredGoals, id: \.self){ goal in
                     
@@ -89,14 +112,17 @@ struct ProgressRings: View {
                         }
                     }
                     
+                    
                     else {
-                        
+                        EmptyView()
                     }
                 }
             }
             
-            
         }
+        
+        
+        
         
     }
     
@@ -146,12 +172,12 @@ struct ProgressRingsStatic: View {
     }
     
     var filteredGoals: [Goal] {
-            return AppUtil.filterCurrentGoals(goals: self.goalsArray, date: dateProvided)
+        return AppUtil.filterCurrentGoals(goals: self.goalsArray, date: dateProvided)
         
     }
     
     var filteredGoalRecords: [GoalRecord] {
-            return AppUtil.filterGoalRecordsByDate(goalRecords: self.goalRecordsArray, date: self.dateProvided)
+        return AppUtil.filterGoalRecordsByDate(goalRecords: self.goalRecordsArray, date: self.dateProvided)
     }
     
     private var cal = Calendar.current

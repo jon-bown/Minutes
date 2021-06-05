@@ -23,7 +23,7 @@ struct CheckListButton: View {
             
         }){
             if(self.isChecked){
-                Image(systemName: "checkmark.circle.fill").font(.system(size: 20))
+                Image(systemName: "checkmark.circle.fill").font(.system(size: 20)).foregroundColor(Constants.checkMarkColor)
             }
             else {
                 Image(systemName: "circlebadge").font(.system(size: 20))

@@ -58,9 +58,90 @@ struct DailyStatsView: View {
     
     var body: some View {
         
-        if(filteredGoals.isEmpty){
-            Text("No Goals Today")
+        if(filteredGoals.isEmpty && filteredGoalRecords.isEmpty){
+            VStack(alignment: .center){
+                HStack{
+                    
+                    Text("No Goals Today").foregroundColor(Color.white)
+                        .font(Font.system(size: 20, weight: .bold, design: .rounded)).multilineTextAlignment(.center).frame(alignment:.center).padding(.trailing, 10)
+                }
+                
+            }
+            
         }
+        else if (filteredGoals.isEmpty) {
+            if(type == "Horizontal"){
+                VStack(alignment: .leading){
+                    ForEach(AppUtil.sortGoalRecordsByPriority(goalRecords: self.filteredGoalRecords, goals: self.goalsArray), id: \.self){ goalRecord in
+                        if let index = AppUtil.sortGoalRecordsByPriority(goalRecords: self.filteredGoalRecords, goals: self.goalsArray).firstIndex(of: goalRecord){
+                            if(index < maxStatLimit){
+                                Text("\(AppUtil.getGoalNameFromRecord(goals: self.goalsArray, id: goalRecord.id!))").bold().foregroundColor(Color.white)
+                                Text("\(fetchGoalDayTimeFromRecord(goalRec: goalRecord))/\(Int(AppUtil.getGoalTimeFromRecord(goals: self.goalsArray, id: goalRecord.id!))) MIN").foregroundColor(Color(AppUtil.getGoalColorFromRecord(goals: self.goalsArray, id: goalRecord.id!))).bold().padding(.bottom, 4)
+                            }
+                            
+                        }
+                        
+                    }
+                }
+            }
+            else {
+                
+                HStack{
+                    //Row Names
+                    VStack(alignment: .leading, spacing: 1){
+                        Text("Goal").foregroundColor(Color.white)                           .font(Font.system(size: 15, weight: .semibold, design: .rounded))
+                        Text("Today").foregroundColor(Color.white)                          .font(Font.system(size: 15, weight: .semibold, design: .rounded))
+                        Text("Streak").foregroundColor(Color.white)
+                            .font(Font.system(size: 15, weight: .semibold, design: .rounded))
+                        Text("Best").foregroundColor(Color.white).font(Font.system(size: 15, weight: .semibold, design: .rounded))
+                        Text("Week").foregroundColor(Color.white)
+                            .font(Font.system(size: 15, weight: .semibold, design: .rounded))
+                        Text("Total").foregroundColor(Color.white)
+                            .font(Constants.globalBodyTextFont)
+                    }
+                    HStack{
+                        Divider().frame(width: 2).background(Color.white)
+                    }.frame(height: 100)
+                    //Columns
+                    ForEach(filteredGoals){ goal in
+                        if let index = filteredGoals.firstIndex(of: goal){
+                            if(index < maxStatLimit){
+                                //numerical limit here
+                                VStack(alignment: .leading, spacing: 1){
+                                    Text("\(goal.name!)").foregroundColor(Color.white).font(Font.system(size: 15, weight: .semibold, design: .rounded))
+                                    Text("\(Int(fetchGoalDayTime(goal: goal)))/\(Int(goal.goalTime)) MIN").foregroundColor(Color(goal.color!)).font(Font.system(size: 15, weight: .semibold, design: .rounded))
+                                        .foregroundColor(Color(goal.color!))
+                                    Text(String(AppUtil.calculateGoalCurrentStreak(records: filteredGoalRecords, goalID: goal.id!)))
+                                        .font(Constants.globalBodyTextFont)
+                                        .foregroundColor(Color(goal.color!))
+                                    Text(String(AppUtil.calculateGoalBestStreak(goalID: goal.id!)))
+                                        .font(Font.system(size: 15, weight: .semibold, design: .rounded))
+                                        .foregroundColor(Color(goal.color!))
+                                    Text(String(AppUtil.calculateTimeThisWeek(goalRecords: AppUtil.filterGoalRecordsByGoalID(goalRecords: self.goalRecordsArray, goalID: goal.id!))))
+                                        .font(Font.system(size: 15, weight: .semibold, design: .rounded))
+                                        .foregroundColor(Color(goal.color!))
+                                    //                                    Text(String(AppUtil.getTotalTimeString(seconds: Double(0.0))))
+                                    //                                                                            .font(Font.system(size: 15, weight: .semibold, design: .rounded))
+                                    //                                                                            .foregroundColor(Color(goal.color!))
+                                }
+                                //Spacer()
+                            }
+                            if(index < (maxStatLimit - 1)){
+                                HStack{
+                                    Divider()
+                                }.frame(height: 100)
+                                
+                            }
+                        }
+                        
+                    }
+                    
+                }.padding(.bottom, 2)
+                
+            }
+            
+        }
+        //Filtered goals is NOT empty act as normal
         else {
             if(type == "Horizontal"){
                 VStack(alignment: .leading){
@@ -76,64 +157,8 @@ struct DailyStatsView: View {
                     }
                 }
             }
-            else {
-                HStack{
-                    //Row Names
-                    VStack(alignment: .leading, spacing: 1){
-                        Text("Goal").foregroundColor(Color.white)                           .font(Font.system(size: 15, weight: .semibold, design: .rounded))
-                        Text("Today").foregroundColor(Color.white)                          .font(Font.system(size: 15, weight: .semibold, design: .rounded))
-                        Text("Streak").foregroundColor(Color.white)
-                            .font(Font.system(size: 15, weight: .semibold, design: .rounded))
-                        Text("Best").foregroundColor(Color.white).font(Font.system(size: 15, weight: .semibold, design: .rounded))
-                        Text("Week").foregroundColor(Color.white)
-                            .font(Font.system(size: 15, weight: .semibold, design: .rounded))
-                        Text("Total").foregroundColor(Color.white)
-                            .font(Font.system(size: 15, weight: .semibold, design: .rounded))
-                    }
-                    HStack{
-                        Divider().frame(width: 2).background(Color.white)
-                    }.frame(height: 100)
-                    //Columns
-                    ForEach(filteredGoals){ goal in
-                        if let index = filteredGoals.firstIndex(of: goal){
-                            if(index < maxStatLimit){
-                                //numerical limit here
-                                VStack(alignment: .leading, spacing: 1){
-                                    Text("\(goal.name!)").foregroundColor(Color.white).font(Font.system(size: 15, weight: .semibold, design: .rounded))
-                                    Text("\(Int(fetchGoalDayTime(goal: goal)))/\(Int(goal.goalTime)) MIN").foregroundColor(Color(goal.color!)).font(Font.system(size: 15, weight: .semibold, design: .rounded))
-                                        .foregroundColor(Color(goal.color!))
-                                    Text(String(AppUtil.calculateGoalCurrentStreak(records: filteredGoalRecords, goalID: goal.id!)))
-                                        .font(Font.system(size: 15, weight: .semibold, design: .rounded))
-                                        .foregroundColor(Color(goal.color!))
-                                    Text(String(AppUtil.calculateGoalBestStreak(goalID: goal.id!)))
-                                        .font(Font.system(size: 15, weight: .semibold, design: .rounded))
-                                        .foregroundColor(Color(goal.color!))
-                                    Text(String(AppUtil.calculateTimeThisWeek(goalRecords: AppUtil.filterGoalRecordsByGoalID(goalRecords: self.goalRecordsArray, goalID: goal.id!))))
-                                        .font(Font.system(size: 15, weight: .semibold, design: .rounded))
-                                        .foregroundColor(Color(goal.color!))
-                                    Text(String(AppUtil.getTotalTimeString(seconds: Double(0.0))))
-                                                                            .font(Font.system(size: 15, weight: .semibold, design: .rounded))
-                                                                            .foregroundColor(Color(goal.color!))
-                                }
-                                //Spacer()
-                            }
-                            if(index < (maxStatLimit - 1)){
-                                HStack{
-                                    Divider()
-                                }.frame(height: 100)
-                                
-                            }
-                        }
-                        
-                    }
-                }.padding(.bottom, 2)
-                
-            }
-            
         }
     }
-    
-    
     
     // MARK: - HELPERS
     
@@ -144,6 +169,12 @@ struct DailyStatsView: View {
         else {
             return 0
         }
+    }
+    
+    private func fetchGoalDayTimeFromRecord(goalRec: GoalRecord) -> Int {
+        
+            return Int(goalRec.dayTime/60)
+
     }
     
 }

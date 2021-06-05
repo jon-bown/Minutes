@@ -15,10 +15,10 @@ struct GoalPriorityView: View {
     @Environment(\.managedObjectContext) var managedObjectContext
     
     @FetchRequest(
-      entity: Goal.entity(),
-      sortDescriptors: [
-        NSSortDescriptor(keyPath: \Goal.priority, ascending: true)
-      ]
+        entity: Goal.entity(),
+        sortDescriptors: [
+            NSSortDescriptor(keyPath: \Goal.priority, ascending: true)
+        ]
     ) var goals: FetchedResults<Goal>
     
     @FetchRequest(
@@ -35,43 +35,44 @@ struct GoalPriorityView: View {
         else{
             return []
         }
-
+        
     }
     @State private var showError: Bool = false
     @State private var isEditable = false
+    @State private var refreshingID = UUID()
     
     var body: some View {
-        NavigationView{
-
-                List {
-                    ForEach(filteredGoals, id: \.priority) { goal in
-                        GroupBox{
-                            HStack{
-                                Text(goal.name!)
-                                Spacer()
-                                Text("\(goal.priority)")
-                            }
+            
+            List {
+                ForEach(filteredGoals, id: \.priority) { goal in
+                    GroupBox{
+                        HStack{
+                            Text(goal.name!)
+                            Spacer()
+                            Text("\(goal.priority)")
                         }
-                        
                     }
-                    .onMove(perform: onMove).onDelete(perform: onDelete)
-                }.alert(isPresented: self.$showError) {
-                    return Alert(title: Text("Error Saving Goal"), message: Text("Try again!"), dismissButton: .default(Text("Ok")))
                     
-                }.environment(\.editMode, isEditable ? .constant(.active) : .constant(.inactive)).padding()
-
-            
-            
-            //Spacer()
-        }.navigationBarItems(trailing: Button(self.isEditable ? "Done":"Edit"){
-            self.isEditable.toggle()
-        }).navigationBarTitleDisplayMode(.inline)
-
+                }
+                .onMove(perform: onMove).onDelete(perform: onDelete).id(self.refreshingID)
+            }
+            .alert(isPresented: self.$showError) {
+                return Alert(title: Text("Error Saving Goal"), message: Text("Try again!"), dismissButton: .default(Text("Ok")))
+                
+            }
+            .environment(\.editMode, isEditable ? .constant(.active) : .constant(.inactive)).padding().toolbar{
+            ToolbarItem(placement: .primaryAction) {
+                Button(self.isEditable ? "Done":"Edit"){
+                    self.isEditable.toggle()
+                }
+            }
+        }.navigationBarTitleDisplayMode(.inline)
+        
     }
     
     //Moves the priorities and the goal items
     func onMove(from source: IndexSet, to destination: Int) {
-
+        
         for index in source {
             if(index == destination){
                 return
@@ -99,55 +100,60 @@ struct GoalPriorityView: View {
                 goal.priority = Int64(Int(marker!)+1)
             }
             
-      
+            
         }
-    
+        
         DispatchQueue.main.async {
             saveContext()
         }
         
-        withAnimation {
-            isEditable = false
-        }
+        //        withAnimation {
+        //            isEditable = false
+        //        }
     }
     
     func onDelete(at offsets: IndexSet) {
-
-            for index in offsets {
-                let goal = self.goals.first(where: {$0.id == goals[index].id})!
-                
-                if(!goalRecords.isEmpty){
-                    let goalRecords = self.goalRecords.filter({$0.id == goals[index].id})
-                    for record in goalRecords {
-                        managedObjectContext.delete(record)
-                    }
+        
+        for index in offsets {
+            let goal = self.goals.first(where: {$0.id == goals[index].id})!
+            
+            if(!goalRecords.isEmpty){
+                let goalRecords = self.goalRecords.filter({$0.id == goals[index].id})
+                for record in goalRecords {
+                    managedObjectContext.delete(record)
+                    //managedObjectContext.reset()
+                    
                 }
-                let priorityMark = goal.priority
-                managedObjectContext.delete(goal)
-                for goal in goals {
-                    if(goal.priority > priorityMark){
-                        goal.priority = goal.priority - 1
-                    }
-                }
-
-                
-
             }
-            saveContext()
+            let priorityMark = goal.priority
+            managedObjectContext.delete(goal)
+            //managedObjectContext.reset()
+            for goal in goals {
+                if(goal.priority > priorityMark){
+                    goal.priority = goal.priority - 1
+                }
+            }
+            
+            
+            
+        }
+        saveContext()
         
         
-
+        
     }
     
     private func saveContext() {
-      do {
-        try managedObjectContext.save()
-      } catch {
-        self.showError = true
-      }
+        do {
+            try managedObjectContext.save()
+            
+            self.refreshingID = UUID()
+        } catch {
+            self.showError = true
+        }
     }
     
-
+    
 }
 
 #if DEBUG

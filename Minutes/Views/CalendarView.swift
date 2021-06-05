@@ -87,9 +87,12 @@ struct MonthView<DateView>: View where DateView: View {
     
     private var header: some View {
         let formatter = DateFormatter.monthAndYear
-        return Text(formatter.string(from: month))
-            .font(.title)
+        return
+            Text(formatter.string(from: month)).font(
+                Font.system(size: 30, weight: .semibold, design: .rounded)).background(Rectangle().frame(width: 180, height: 50).cornerRadius(15).foregroundColor(.lightBlack))
+            //.font(.title)
             .padding()
+        
     }
     
     var body: some View {
@@ -171,15 +174,7 @@ struct RootView: View {
     var body: some View {
         NavigationView{
             CalendarView(interval: year) { date in
-                //            Text("50")
-                //                .hidden()
-                //                .padding(8)
-                //                .background(Color.blue)
-                //                .clipShape(Circle())
-                //                .padding(.vertical, 4)
-                //                .overlay(
-                //                    Text(String(self.calendar.component(.day, from: date)))
-                //                )
+
                 
                 NavigationLink(destination: OverallProgressView(dateProvided: date)){
                     VStack {
@@ -227,12 +222,16 @@ struct SmallCalendarView: View {
         NavigationView{
             CalendarView(interval: year) { date in
                 
-                VStack {
+                VStack(alignment: .center) {
                     Text(String(self.calendar.component(.day, from: date))).foregroundColor(.white)
                     //Text(date.dayOfTheWeek)
                     ProgressRings(dateProvided: date, maxWidth: Constants.progressRingViewCalendarMaxWidth, maxLineWidth: Constants.weekdayRingThickness, maxRingLimit: 3).padding(2).clipShape(Circle()).padding(.vertical, 4)
                     
                 }
+                //.frame(width: 100, height: 200)
+//                .background(Color.black.lighter(by: 50)).clipShape(RoundedRectangle(cornerRadius: 25, style: .continuous))
+                
+                //.background(Rectangle().frame(width: Constants.progressRingViewCalendarMaxWidth, height: 200).cornerRadius(15).foregroundColor(Color.black.lighter(by: 15)))
             }.frame(width: screenSize.width-80)
             
         }

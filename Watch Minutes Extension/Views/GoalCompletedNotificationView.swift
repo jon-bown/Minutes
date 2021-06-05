@@ -9,17 +9,24 @@ import SwiftUI
 
 struct GoalCompletedNotificationView: View {
     @Environment(\.presentationMode) var presentationMode
+    var goal: Goal
     var body: some View {
         HStack {
-            VStack{
-                Text("Goal")
-                Text("Complete")
+            VStack(alignment: .leading){
+                Text(goal.name!).font(.system(size: 20)).foregroundColor(Color(goal.color!)).bold()
+                Text("Goal").font(.system(size: 20))
+                Text("Complete").font(.system(size: 20))
             }
             VStack{
-                ProgressRings(dateProvided: Date(), maxWidth: 30, maxLineWidth: Constants.weekdayRingThickness, maxRingLimit: 3).padding(2).clipShape(Circle()).padding(.vertical, 4)
+//                ProgressRingView(progress: 1.0, startColor: Color(goal.color!), endColor: Color(goal.color!))
+                
+                Spacer()
+                ProgressRingViewStatic(progress: 1.0, thickness: 4, startColor: Color(goal.color!), endColor: Color(goal.color!), backgroundColor: goal.color!).frame(width: 50, height: 50).aspectRatio(contentMode: .fit)
+//                ProgressRings(dateProvided: Date(), maxWidth: 30, maxLineWidth: Constants.weekdayRingThickness, maxRingLimit: 3).padding(2).clipShape(Circle()).padding(.vertical, 4)
                 Spacer()
             }
         }.onAppear{
+            WKInterfaceDevice.current().play(.success)
             self.dismissNotificationView()
         }
     }
@@ -32,8 +39,8 @@ struct GoalCompletedNotificationView: View {
     }
 }
 
-struct GoalCompletedNotificationView_Previews: PreviewProvider {
-    static var previews: some View {
-        GoalCompletedNotificationView()
-    }
-}
+//struct GoalCompletedNotificationView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        GoalCompletedNotificationView()
+//    }
+//}

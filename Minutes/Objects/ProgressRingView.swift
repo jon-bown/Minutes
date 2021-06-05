@@ -22,6 +22,7 @@ struct ProgressRingView: View {
     var startAngle = -90.0
     var backgroundColor = UIColor.red
     var animate: Bool = true
+    var empty: Bool = false
     
     
     var animation: Animation {
@@ -39,8 +40,12 @@ struct ProgressRingView: View {
                     .fill(Color(backgroundColor).opacity(0.3))
                 //            Circle()
                 //                .stroke(Color(backgroundColor).opacity(0.2), lineWidth: thickness)
-                if(self.progress == 0.0){
+                if(self.progress == 0.0 && !empty){
                     RingShape(currentPercentage: 0.005, thickness: thickness)
+                        .fill(Color(backgroundColor)).rotationEffect(Angle(degrees: -90))
+                }
+                else{
+                    RingShape(currentPercentage: 0.0, thickness: thickness)
                         .fill(Color(backgroundColor)).rotationEffect(Angle(degrees: -90))
                 }
                 RingShape(currentPercentage: currentPercentage, thickness: thickness)

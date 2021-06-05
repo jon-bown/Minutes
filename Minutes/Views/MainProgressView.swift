@@ -39,8 +39,7 @@ struct MainProgressView: View {
     @State private var goalFilterCriteria: String = "Today"
     @State private var goalAddSuccess: Bool = false
     @State var selection: Int?
-    
-    
+    //List variables
     @State private var selectedItem: String?
     @State private var listViewId = UUID()
     
@@ -67,7 +66,8 @@ struct MainProgressView: View {
                                 HStack{
                                     DailyStatsView(goalList: self.goals)
                                     Spacer()
-                                    ProgressRings(dateProvided: Date(), maxWidth: 120, maxLineWidth: Constants.progressRingViewThicknessStandard, maxRingLimit: Constants.progressRingViewMaxRingLimitStandard).frame(width: Constants.progressRingViewFrameWidthStandard, height: Constants.progressRingViewFrameHeightStandard).aspectRatio(contentMode: .fit)
+                                    ProgressRings(dateProvided: Date(), maxWidth: 120,
+                                                  maxLineWidth: Constants.progressRingViewThicknessStandard, maxRingLimit: Constants.progressRingViewMaxRingLimitStandard, showClear: false).frame(width: Constants.progressRingViewFrameWidthStandard, height: Constants.progressRingViewFrameHeightStandard).aspectRatio(contentMode: .fit)
                                 }
 
                             }.cornerRadius(15).padding()
@@ -76,7 +76,9 @@ struct MainProgressView: View {
                     }
                     VStack(alignment: .center){
                         if(goals.isEmpty){
-                            Text("Tap '+' to create a new minute goal!").padding(.top, 10)
+                            
+                                Text("Tap '+' to create a new minute goal!").font(.system(.title2, design: .rounded)).padding(.top, 10)
+                            
                         }
                         else {
                             Picker("", selection: self.$goalFilterCriteria){
@@ -107,10 +109,8 @@ struct MainProgressView: View {
                                         }
                                     }
                                             
-                                        //Goal}
                                 }.id(listViewId)
                             }
-                        //}
                        
 
                     }.padding()
@@ -123,63 +123,25 @@ struct MainProgressView: View {
                     }
                 }
                 //self.createNavigationBar(geometry.size)
-            }.toolbar{
-//                ToolbarItemGroup(placement: .navigation){
-//
-//                            HStack {
-//
-//                                VStack(alignment: .leading) {
-//                                    //Text(AppUtil.getCurrentDate().uppercased())
-//                                        //.font(.headline)
-//                                        //.foregroundColor(.secondary)
-//                                    Text("Summary")
-//                                        .font(.largeTitle)
-//                                        .fontWeight(.heavy)
-//                                }.padding()
-//                                Spacer()
-//
-//                            }
-//                }
+            
+            }
+            .navigationBarItems(trailing:
+                                    Button(action: {
+                                        self.showNewGoalForm.toggle()
+                                    }){
+                                        Image(systemName: "plus.circle").resizable().font(Font.system(.title))
+                                            .frame(width: 35, height: 35)
+                                            .foregroundColor(Color.white)
+                                            //.font(Font.system(size: 50, weight: .bold))
+                                    }
+            
+            )
+        .sheet(
+                isPresented: self.$showNewGoalForm
+            ) {
                 
-                ToolbarItemGroup(placement: .primaryAction){
-                    Button(action: {
-                        self.showNewGoalForm.toggle()
-                    }){
-                        Image(systemName: "plus.circle.fill").imageScale(.large)
-                    }.popover(
-                        isPresented: self.$showNewGoalForm
-                    ) {
-                        
-                        GoalForm(editing: false, isPresented: self.$showNewGoalForm, success: self.$goalAddSuccess ).environment(\.managedObjectContext, self.managedObjectContext)
-                        
-                    }
-
-                }
-//                ToolbarItem(placement: .navigation){
-//                    VStack(alignment: .leading) {
-//
-//                        Text(AppUtil.getCurrentDate().uppercased())
-//                            .font(.headline)
-//                            .foregroundColor(.secondary)
-//                        Text("Summary")
-//                            .font(.largeTitle)
-//                            .fontWeight(.heavy)
-//                    }.padding()
-//                }
-//                ToolbarItem(placement: .primaryAction){
-//                    Button(action: {
-//                        self.showNewGoalForm.toggle()
-//                    }){
-//                        Image(systemName: "plus.circle.fill").font(Font.system(size: 40, weight: .regular))
-//                    }.padding(10).popover(
-//                        isPresented: self.$showNewGoalForm
-//                    ) {
-//
-//                        GoalForm(editing: false, isPresented: self.$showNewGoalForm, success: self.$goalAddSuccess ).environment(\.managedObjectContext, self.managedObjectContext)
-//
-//                    }.padding()
-//
-//                }
+                GoalForm(editing: false, isPresented: self.$showNewGoalForm, success: self.$goalAddSuccess ).environment(\.managedObjectContext, self.managedObjectContext)
+                
             }.navigationTitle("Summary").navigationBarTitleDisplayMode(.large)
 
         }.navigationViewStyle(StackNavigationViewStyle())

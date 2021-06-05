@@ -39,16 +39,21 @@ struct WKGoalDetailViewR: View {
     var body: some View {
 
         TabView(selection: $selectedTab) {
-            StopwatchButtonWatchView(watchRunning: self.$watchState, watchTotalTime: self.$totalTime, goal: self.goal, progress: self.$progress, selectedTab: self.$selectedTab, actions: [self.reset, self.start, self.stop]).environment(\.managedObjectContext, managedObjectContext).tag(0)
+            StopwatchButtonWatchView(watchRunning: self.$watchState, watchTotalTime: self.$totalTime, goal: self.goal, progress: self.$progress, selectedTab: self.$selectedTab, showedNotification: self.$showedCompleted, actions: [self.reset, self.start, self.stop]).environment(\.managedObjectContext, managedObjectContext).tag(0)
             StopwatchTimeWatchView(goal: self.goal, progress: self.$progress, selectedTab: self.$selectedTab, totalTime: self.$totalTime).environment(\.managedObjectContext, managedObjectContext).onReceive(timer) { _ in
                     
                     if self.watchState {
                         if(!filteredGoalRecordsToday.isEmpty){
                             self.progress = (Double(self.totalTime) + self.filteredGoalRecordsToday[0].dayTime)/(self.goal.goalTime*60)
-                            
+
                         }
                         else{
                             self.progress = (Double(self.totalTime))/(self.goal.goalTime*60)
+                        }
+                        if(self.progress >= 1.0 && !self.showedCompleted){
+                            self.showModal = true
+                            self.showedCompleted = true
+                            
                         }
                         self.totalTime = Date().timeIntervalSince(startDate)
                     }
@@ -57,14 +62,8 @@ struct WKGoalDetailViewR: View {
             
 
             }.tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic)).sheet(isPresented: self.$showModal) {
-                GoalCompletedNotificationView()
-            }.onChange(of: progress, perform: { value in
-                if(value >= 1.0 && !self.showedCompleted){
-                    self.showModal = true
-                    self.showedCompleted = true
-                    
-                }
-            })
+                GoalCompletedNotificationView(goal: self.goal)
+            }
         .onReceive(NotificationCenter.default.publisher(for: WKExtension.applicationWillResignActiveNotification)) { _ in
             //print("Moving to the background")
             if(self.watchState){
@@ -72,22 +71,17 @@ struct WKGoalDetailViewR: View {
             }
             
         }
-        .onReceive(NotificationCenter.default.publisher(for: WKExtension.applicationDidBecomeActiveNotification)) { _ in
-            //print("Moving to the foreground")
-            if(self.watchState){
-                //self.stopWatch.reset()
-                let deltaTime: Int = Int(Date().timeIntervalSince(backgroundDate))
-                self.totalTime = Double(deltaTime) + totalTime
-                //self.totalTimeText = AppUtil.getTotalTimeString(seconds: self.totalTime)
-                //self.startDate = Date()
-                //self.stopWatch.start()
-            }
-        }.onAppear{
-            if(filteredGoalRecordsToday.count != 0){
-                self.progress = filteredGoalRecordsToday[0].progress
-            }
-            
-        }
+//        .onReceive(NotificationCenter.default.publisher(for: WKExtension.applicationDidBecomeActiveNotification)) { _ in
+//            //print("Moving to the foreground")
+//            if(self.watchState){
+//                //self.stopWatch.reset()
+//                let deltaTime: Int = Int(Date().timeIntervalSince(backgroundDate))
+//                //self.totalTime = Double(deltaTime) + totalTime
+//                //self.totalTimeText = AppUtil.getTotalTimeString(seconds: self.totalTime)
+//                //self.startDate = Date()
+//                //self.stopWatch.start()
+//            }
+//        }
 //        .onChange(of: scenePhase) { newScenePhase in
 //                if newScenePhase == .background {
 ////                    // Make sure to save any unsaved changes to the products model.

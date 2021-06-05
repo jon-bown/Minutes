@@ -68,7 +68,7 @@ struct TextFieldAlert<Presenting>: View where Presenting: View {
 
 
                     }.padding(.horizontal, 4)
-                }.background(Color(UIColor.white)).cornerRadius(15)
+                }.background(Color(UIColor.white.darker(by: 20)!)).cornerRadius(15)
                 .padding()
                 .frame(
                     width: 280,
@@ -112,7 +112,7 @@ struct CustomTextField: UIViewRepresentable {
         let placeholder = NSAttributedString(string: "Minutes", attributes: [NSAttributedString.Key.foregroundColor : UIColor.darkGray])
         textField.attributedPlaceholder = placeholder
         textField.textColor = UIColor.black
-        textField.backgroundColor = UIColor.lightGray
+        textField.backgroundColor = UIColor.white
         textField.keyboardType = UIKeyboardType.numberPad
         return textField
     }

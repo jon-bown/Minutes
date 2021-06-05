@@ -6,6 +6,7 @@
 //  Copyright © 2019 Exyte. All rights reserved.
 //
 import CoreGraphics
+import SwiftUI
 
 struct Constants {
     
@@ -39,5 +40,21 @@ struct Constants {
     static let progressRingViewCalendarMaxWidth: CGFloat = 15
     
     static let globalCornerRadius: CGFloat = 10
+    
+    //MARK: FONTS
+    
+    static let globalBodyTextFont: Font = Font.system(size: 20, weight: .semibold, design: .rounded)
+    
+    
+    static let stopWatchTimerFontSize: CGFloat = 44
+    
+    
+    //MARK: COLORS
+    
+    static let checkMarkColor: Color = Color.green
+    
+    //MARK: USER DEFAULTS
+    
+    static let generalCompletionReminder: String = "CompletionReminder"
     
 }

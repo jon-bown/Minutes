@@ -59,19 +59,24 @@ struct GoalDetailView: View {
     @State private var reminderTimeText: String = ""
     @State private var engine: CHHapticEngine?
     @State private var showError: Bool = false
+    @State private var showedCompleted: Bool = false
     
     //Just check the list view model if the goal record exists
     var goalRecordsArray: [GoalRecord] {
+        
+        //return DataServer().goalRecords.sorted(by: {$0.date! > $1.date!})
+        
         return goalRecords.sorted(by: {$0.date! > $1.date!})
     }
     
     
     var filteredCurrentGoalRecordToday: GoalRecord? {
-        return AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalId: self.goal.id!)
+        return AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalID: self.goal.id)
+    
     }
     
     var filteredGoalRecordsCurrentGoal: [GoalRecord] {
-        return AppUtil.filterGoalRecordsByGoalID(goalRecords: self.goalRecordsArray, goalID: self.goal.id!)
+        return AppUtil.filterGoalRecordsByGoalID(goalRecords: self.goalRecordsArray, goalID: self.goal.id == nil ? nil:self.goal.id!)
     }
     
     //Extract dictionary used to display todays sessions
@@ -204,7 +209,7 @@ struct GoalDetailView: View {
                         }
                     }){
                         HStack{
-                            Image(systemName: "chevron.left").foregroundColor(Color.white).font(Font.system(size: 20, weight: .light)).foregroundColor(.white)
+                            Image(systemName: "chevron.left").foregroundColor(Color.white).font(Font.system(size: 20, weight: .light))
                             Text("Back").font(Font.system(size: 20, weight: .regular)).foregroundColor(.white)
                         }
                         
@@ -219,7 +224,7 @@ struct GoalDetailView: View {
                     }
                 }
             }
-            .popover(
+            .sheet(
                 isPresented: self.$showGoalEditForm
             ) {
                 
@@ -235,15 +240,28 @@ struct GoalDetailView: View {
         .onChange(of: self.showGoalEditForm) { newValue in
             if(!newValue) {
                 self.checkNotificationsExist(id: self.goal.id!)
-                self.recalculateProgress()
+                self.recalculateProgressFromTimer()
                 
             }
             
             
             
+        }.onChange(of: self.stopWatch.isRunning){ newValue in
+            //Removes pending notifications for goal
+            if(newValue == false){
+                UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [AppUtil.getGoalNotificationSpecificIdString(id: self.goal.id!)])
+            }
+            
         }.onAppear {
-            self.recalculateProgress()
-            self.updateProgress()
+            
+            if(self.stopWatch.isRunning){
+                self.recalculateProgressFromTimer()
+            }
+            else{
+                self.updateProgress()
+            }
+            
+            
             self.checkNotificationsExist(id: self.goal.id!)
             self.prepareHaptics()
         }.toast(isShowing: self.$goalUpdatedSuccess, text: Text("Saved")).textFieldAlert(isShowing: self.$showCustomMinuteSheet, text: self.$newSessionText, title: "Add Minutes", saveAction: self.saveCustomMinuteSession)
@@ -306,7 +324,7 @@ struct GoalDetailView: View {
                     )
                     .padding([.top], -3)
                 }.padding(.leading, 3)
-                Spacer()
+                
                 
                 
                 if(self.goal.frequency! == "Weekly"){
@@ -314,13 +332,14 @@ struct GoalDetailView: View {
                         Text("On Days:").font(Font.system(size: 18, weight: .regular, design: .default)).kerning(0.05).foregroundColor(Color.white)
                         (
                             Text(AppUtil.createWeekDaysString(days: self.goal.weekDay!))
-                                .font(Font.system(size: 20, weight: .regular, design: .rounded))
+                                .font(Font.system(size: 25, weight: .regular, design: .rounded))
                                 .kerning(0.25)
                                 .foregroundColor(Color(goal.color!)).lineLimit(2)
                             
                         )
                         .padding([.top], -3)
-                    }.padding(.trailing,8)
+                    }
+                    //.padding(.leading, 5)
                 }
                 else if(self.goal.frequency! == "Monthly"){
                     VStack(alignment: .leading, spacing: 0) {
@@ -334,6 +353,7 @@ struct GoalDetailView: View {
                         )
                         .padding([.top], -3)
                     }
+                    //.padding(.leading, 5)
                 }
                 
                 
@@ -467,7 +487,7 @@ struct GoalDetailView: View {
                 HStack{
                     VStack(alignment: .leading, spacing: 2) {
                         
-                        Text("Today").font(Font.system(size: 20, weight: .regular, design: .default)).kerning(0.05).foregroundColor(Color.white)
+                        Text("Today").font(Font.system(size: 20, weight: .regular, design: .default)).kerning(0.05).foregroundColor(Color.white).padding(.bottom, 5)
                         (
                             Text(self.filteredCurrentGoalRecordToday == nil ? "0/\(Int(self.goal.goalTime))":"\(Int(self.filteredCurrentGoalRecordToday!.dayTime/60))/\(Int(self.goal.goalTime))")
                                 .font(Font.system(size: 25, weight: .semibold, design: .rounded))
@@ -634,21 +654,20 @@ struct GoalDetailView: View {
         }
         self.sessionsToRemove.removeAll()
         self.recalculateDayTime()
-        self.recalculateProgress()
         record!.progress = self.progress
-        
+        self.updateProgress()
         self.saveContext()
     }
     
     private func saveCustomMinuteSession(){
         var newRecord = false
-        let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalId: self.goal.id!)
+        let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalID: self.goal.id!)
         if(record == nil){
             newRecord = true
         }
         guard let customMinutes = Int(self.newSessionText)
         else {
-            print("couldn't save")
+            //print("couldn't save")
             return
             
             //error
@@ -669,7 +688,7 @@ struct GoalDetailView: View {
             self.goal.totalTime += customSeconds
             //divide hours into four quadrants
             var hour = Calendar.current.component(.hour, from: Date())*4
-            let minutes = (newGoalRecord.progress * 60).truncatingRemainder(dividingBy: 60)
+            let minutes = (newGoalRecord.progress * 59).truncatingRemainder(dividingBy: 60)
             var entry = [Int:Double]()
             hour = hour + Date().minuteQuadrant
             entry[hour] = Double(minutes)
@@ -690,7 +709,7 @@ struct GoalDetailView: View {
         }
         
         else {
-            if let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalId: self.goal.id!) {
+            if let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalID: self.goal.id) {
                 //add entry with hour: minutes
                 record.dayTime += customSeconds
                 self.progress = record.dayTime/(self.goal.goalTime*60.0)
@@ -728,7 +747,7 @@ struct GoalDetailView: View {
             }
             
         }
-        
+        self.updateProgress()
     }
     //Calculates the current streak the user is on
     private func calculateCurrentStreak() -> Int {
@@ -747,7 +766,7 @@ struct GoalDetailView: View {
                 self.goalUpdatedSuccess = true
                 self.complexSuccess()
             } catch {
-                
+                managedObjectContext.rollback()
                 self.showError = true
             }
         }
@@ -811,7 +830,7 @@ struct GoalDetailView: View {
     
     func updateGoalRecord() {
         var newRecord = false
-        let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalId: self.goal.id!)
+        let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalID: self.goal.id)
         if(record == nil){
             newRecord = true
         }
@@ -843,7 +862,7 @@ struct GoalDetailView: View {
         }
         
         else {
-            if let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalId: self.goal.id!) {
+            if let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalID: self.goal.id) {
                 record.progress = self.progress
                 record.dayTime += Double(self.stopWatch.totalAccumulatedTime.seconds())
                 
@@ -882,7 +901,7 @@ struct GoalDetailView: View {
     }
     
     func updateProgress() {
-        guard let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalId: goal.id!) else {
+        guard let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalID: goal.id) else {
             self.dayTime = 0.0
             self.progress = 0.0
             return
@@ -894,7 +913,7 @@ struct GoalDetailView: View {
     }
     
     func recalculateDayTime() {
-        guard let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalId: goal.id!) else {
+        guard let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalID: goal.id) else {
             self.dayTime = 0.0
             return
         }
@@ -902,20 +921,130 @@ struct GoalDetailView: View {
         
     }
     
-    func recalculateProgress() {
+    func recalculateProgressFromTimer() {
         self.progress = (Double(self.stopWatch.totalAccumulatedTime.seconds()) + self.dayTime)/(self.goal.goalTime*60)
+        
+        //Schedule a notification when the user reaches a multiple of 100%
+        
+
+        
+        if(self.progress > 1.0 && (self.progress*100.0).truncatingRemainder(dividingBy: 100.0) == 0.0 && !self.showedCompleted){
+            self.alertUserCompletedAfterFirst()
+            self.complexSuccess()
+        }
+
+    }
+    
+    func recalculateProgress() {
+        self.progress = (Double(self.dayTime)/(self.goal.goalTime*60))
+        
+        //Schedule a notification when the user reaches a multiple of 100%
+        
+
+        
+        if(self.progress > 1.0 && (self.progress*100.0).truncatingRemainder(dividingBy: 100.0) == 0.0 && !self.showedCompleted){
+            self.alertUserCompletedAfterFirst()
+            self.complexSuccess()
+        }
+
+    }
+    
+    func scheduleCompletionNotification() {
+        
+        //TODO: Check if app is in foreground and display aleart instead
+        let center = UNUserNotificationCenter.current()
+        let options: UNAuthorizationOptions = [.alert, .badge, .sound]
+        
+        center.requestAuthorization(options: options) { (granted, error) in
+            if !granted {
+                //print("Not Authorized")
+                return
+            }
+        }
+        
+        center.getNotificationSettings { (settings) in
+            if settings.authorizationStatus != .authorized {
+                //print("Notifications not allowed")
+                return
+            }
+        }
+        //print("Creating completed notification")
+        
+        let content = UNMutableNotificationContent()
+        content.title = self.goal.name!
+        content.body = "You completed your Minute goal for \(self.goal.name!)! Take a second to save your progress!"
+        content.categoryIdentifier = "alarm"
+        content.sound = UNNotificationSound.default
+        //MARK: FIND OUT HOW TO DISMISS BADGE
+        content.badge = NSNumber(value: UIApplication.shared.applicationIconBadgeNumber + 1)
+        
+        //Calculate Interval
+        
+        
+        var secondsTillComplete = goal.goalTime*60.0
+        
+        if let goalRecord = filteredCurrentGoalRecordToday {
+            secondsTillComplete -= goalRecord.dayTime
+        }
+        
+        
+        
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: secondsTillComplete, repeats: false)
+        let request = UNNotificationRequest(identifier: AppUtil.getGoalNotificationSpecificIdString(id: goal.id!), content: content, trigger: trigger)
+        center.add(request)
+        self.showedCompleted = true
+    }
+    
+    
+    func alertUserCompletedAfterFirst() {
+        //TODO: Check if app is in foreground and display alert instead
+        let center = UNUserNotificationCenter.current()
+        let options: UNAuthorizationOptions = [.alert, .badge, .sound]
+        
+        center.requestAuthorization(options: options) { (granted, error) in
+            if !granted {
+                //print("Something went wrong")
+            }
+        }
+        
+        center.getNotificationSettings { (settings) in
+            if settings.authorizationStatus != .authorized {
+                //print("Notifications not allowed")
+                return
+            }
+        }
+        //print("Creating completed notification")
+        
+        let content = UNMutableNotificationContent()
+        content.title = self.goal.name!
+        content.body = "You completed your Minute goal for \(self.goal.name!)! Take a second to save your progress!"
+        content.categoryIdentifier = "alarm"
+        content.sound = UNNotificationSound.default
+        content.badge = NSNumber(value: UIApplication.shared.applicationIconBadgeNumber + 1)
+        
+        //Calculate Interval
+        
+        
+        
+        
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+        let request = UNNotificationRequest(identifier: AppUtil.getGoalNotificationSpecificIdString(id: goal.id!), content: content, trigger: trigger)
+        center.add(request)
+        self.showedCompleted = true
     }
     
     
     
     func startLoading() {
+        if(self.progress < 1.0){
+            if(UserDefaults.standard.bool(forKey: Constants.generalCompletionReminder) == true){
+                self.scheduleCompletionNotification()
+            }
+        }
         self.timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { timer in
             withAnimation() {
                 
-                recalculateProgress()
-                //                if self.stopWatch.seconds >= Float(self.goal.goalTime*60) {
-                //                    timer.invalidate()
-                //                }
+                recalculateProgressFromTimer()
             }
         }
     }
@@ -924,9 +1053,12 @@ struct GoalDetailView: View {
         _ = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: false) { timer in
             withAnimation() {
                 recalculateDayTime()
+                //remove pending completion notifications
+                UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [AppUtil.getGoalNotificationSpecificIdString(id: goal.id!)])
                 self.timer?.invalidate()
             }
         }
+        
         
     }
     
@@ -970,27 +1102,27 @@ struct StopWatchTextModifier: AnimatableModifier {
     func body(content: Content) -> some View {
         content
             .overlay(
-                HStack{
-                    Text(watchTime.components(separatedBy: ":")[0]).font(.system(.largeTitle, design: .rounded)).fontWeight(.bold)
+                HStack(alignment: .center){
+                    Text(watchTime.components(separatedBy: ":")[0]).font(.system(size: Constants.stopWatchTimerFontSize, design: .rounded)).fontWeight(.bold)
                         .foregroundColor(textColor)
-                        .animation(nil).frame(width: 50, height: 50, alignment: .center)
-                    Text(":").font(.system(.largeTitle, design: .rounded))
-                        .fontWeight(.bold)
-                        .foregroundColor(textColor)
-                        .animation(nil).frame(width: 10, height: 50, alignment: .center)
-                    Text(watchTime.components(separatedBy: ":")[1]).font(.system(.largeTitle, design: .rounded))
-                        .fontWeight(.bold)
-                        .foregroundColor(textColor)
-                        .animation(nil).frame(width: 50, height: 50, alignment: .center)
-                    Text(":").font(.system(.largeTitle, design: .rounded))
-                        .fontWeight(.bold)
+                        .animation(nil).frame(width: 60, height: 50, alignment: .center)
+                    Text(":").font(.system(size: Constants.stopWatchTimerFontSize, design: .rounded))
+                        //.fontWeight(.bold)
                         .foregroundColor(textColor)
                         .animation(nil).frame(width: 10, height: 50, alignment: .center)
-                    Text(watchTime.components(separatedBy: ":")[2]).font(.system(.largeTitle, design: .rounded))
+                    Text(watchTime.components(separatedBy: ":")[1]).font(.system(size: Constants.stopWatchTimerFontSize, design: .rounded))
                         .fontWeight(.bold)
                         .foregroundColor(textColor)
-                        .animation(nil).frame(width: 50, height: 50, alignment: .center)
-                }.frame(width: 400, height: /*@START_MENU_TOKEN@*/100/*@END_MENU_TOKEN@*/, alignment: .center)
+                        .animation(nil).frame(width: 60, height: 50, alignment: .center)
+                    Text(":").font(.system(size: Constants.stopWatchTimerFontSize, design: .rounded))
+                        //.fontWeight(.bold)
+                        .foregroundColor(textColor)
+                        .animation(nil).frame(width: 10, height: 50, alignment: .center)
+                    Text(watchTime.components(separatedBy: ":")[2]).font(.system(size: Constants.stopWatchTimerFontSize, design: .rounded))
+                        .fontWeight(.bold)
+                        .foregroundColor(textColor)
+                        .animation(nil).frame(width: 60, height: 50, alignment: .center)
+                }.frame(width: 500, height: 120, alignment: .center)
                 
             ) }
 }

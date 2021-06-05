@@ -21,6 +21,9 @@ struct SettingsView: View {
         return goals.count == 0
     }
     
+    @State private var completionNotifications: Bool = UserDefaults.standard.bool(forKey: Constants.generalCompletionReminder)
+    
+    
     var body: some View {
         NavigationView {
             ScrollView(.vertical, showsIndicators: false){
@@ -43,10 +46,23 @@ struct SettingsView: View {
                 }
 
                 // MARK: - SECTION 3
-//                Section(header: Text("NOTIFICATIONS")){
-//                    
-//                }
+                GroupBox(label: Text("NOTIFICATIONS").bold()){
+                    VStack{
+                        Divider().padding(.vertical,4)
+                    
+                            Toggle(isOn: self.$completionNotifications){
+                                Text("100% Completion Notifications")
+                            }
+                            
+                       
+                            
+                        
+                    }
+                }
             }.navigationTitle(Text("Settings")).navigationBarTitleDisplayMode(.large).padding()
+            .onChange(of: self.completionNotifications){ newValue in
+                UserDefaults.standard.set(self.completionNotifications, forKey: Constants.generalCompletionReminder)
+            }
 
         }.navigationViewStyle(StackNavigationViewStyle())
     }

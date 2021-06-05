@@ -52,9 +52,6 @@ struct StopWatchButton : View {
         
     }
 
-    
-    
-    
     #if !os(watchOS)
     func prepareHaptics() {
         guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
@@ -145,8 +142,6 @@ struct WatchStopWatchButton : View {
         }.background(Capsule().foregroundColor(self.playPause ? (self.isPaused ? Color.green: Color.red) : .gray).opacity(0.3)).buttonStyle(WatchStopWatchSaveStyle())
         
         
-        //        .background(HalfCapsuleShape().foregroundColor(self.playPause ? (self.isPaused ? Color.green: Color.red) : .gray).frame(width: 50, height: 80).rotationEffect(.degrees(degreeRotation)))
-        
     }
     
 }
@@ -212,16 +207,7 @@ struct WatchStopWatchButtonTest : View {
     var body: some View {
         
         return Button(action: {
-            
-//
-//            if self.isPaused {
-//                //self.actions[0]()
-//                if(self.actions.count > 2){
-//                    //self.actions[2]()
-//                }
-//            } else {
-//                //self.actions[1]()
-//            }
+
         }) {
             if isPaused {
                 Text(self.labels[0])
@@ -232,8 +218,6 @@ struct WatchStopWatchButtonTest : View {
             }
         }.buttonStyle(WatchStopWatchStyle()).background(Capsule().foregroundColor(self.playPause ? (self.isPaused ? Color.green: Color.red) : .gray).opacity(0.3))
         
-        
-        //        .background(HalfCapsuleShape().foregroundColor(self.playPause ? (self.isPaused ? Color.green: Color.red) : .gray).frame(width: 50, height: 80).rotationEffect(.degrees(degreeRotation)))
         
     }
     

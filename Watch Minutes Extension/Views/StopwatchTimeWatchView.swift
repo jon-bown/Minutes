@@ -31,7 +31,7 @@ struct StopwatchTimeWatchView: View {
                 ProgressView(value: 0.0).progressViewStyle(LinearProgressViewStyle(tint: Color(self.goal.color!))).padding()
             }
             else{
-                ProgressView(value: filteredGoalRecords[0].progress >= 1.0 ? 1.0:self.progress).progressViewStyle(LinearProgressViewStyle(tint: Color(self.goal.color!))).padding()
+                ProgressView(value: filteredGoalRecords[0].progress >= 1.0 ? 1.0:filteredGoalRecords[0].progress).progressViewStyle(LinearProgressViewStyle(tint: Color(self.goal.color!))).padding()
             }
             //Timer UI
             RoundedRectangle(cornerRadius: 10)

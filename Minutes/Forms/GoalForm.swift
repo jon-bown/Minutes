@@ -80,16 +80,18 @@ struct GoalForm: View {
                 Form{
                     Section{
                         TextField("Name", text: self.$goalName)
-                        ColorPicker("Color Theme", selection: self.$goalCol, supportsOpacity: true)
+                        ColorPicker(selection: self.$goalCol, supportsOpacity: true){
+                            Text("Color Theme").font(Constants.globalBodyTextFont).bold()
+                        }
                         HStack{
-                            Text("Minutes:")
+                            Text("Minutes:").font(Constants.globalBodyTextFont)
                             NumberTextField(value: self.$goalDailyTime, formatter: NumberFormatter(), keyType: UIKeyboardType.numberPad)
                             
                         }
                         
-                        Picker("Frequency", selection: self.$goalFrequency) {
+                        Picker(selection: self.$goalFrequency, label: Text("Frequency").font(Constants.globalBodyTextFont).bold()) {
                             ForEach(self.freq, id: \.self) { freq in
-                                Text(freq)
+                                Text(freq).font(Constants.globalBodyTextFont)
                             }
                         }
                         if(self.goalFrequency == "Weekly"){
@@ -103,14 +105,14 @@ struct GoalForm: View {
                                         HStack{
                                             if self.dayOTW.weekDays[index].isSelected {
                                                 Image(systemName: "checkmark.circle.fill")
-                                                    .foregroundColor(.green)
+                                                    .foregroundColor(Constants.checkMarkColor)
                                                     .animation(.easeIn)
                                             } else {
                                                 Image(systemName: "circle")
                                                     .foregroundColor(.primary)
                                                     .animation(.easeOut)
                                             }
-                                            Text(self.dayOTW.weekDays[index].weekDayString).foregroundColor(.white).font(Font.body.bold())
+                                            Text(self.dayOTW.weekDays[index].weekDayString).foregroundColor(.white).font(Constants.globalBodyTextFont)
                                             
                                         }.accentColor(.red)
                                     }.buttonStyle(BorderlessButtonStyle())
@@ -123,18 +125,22 @@ struct GoalForm: View {
                         }
                         
                         
-                        DatePicker("Start on:", selection: self.$startDate, displayedComponents: .date)
+                        DatePicker(selection: self.$startDate, displayedComponents: .date) {
+                            Text("Start On:").font(Constants.globalBodyTextFont)
+                        }
                         
                         Toggle(isOn: self.$setEndDate){
-                            Text("End Date")
+                            Text("End Date").font(Constants.globalBodyTextFont)
                         }
                         if(self.setEndDate){
-                            DatePicker("End On:", selection: self.$endDate, displayedComponents: .date)
+                            DatePicker(selection: self.$endDate, displayedComponents: .date) {
+                                Text("End On:").font(Constants.globalBodyTextFont)
+                            }
                             
                         }
                         
                         Toggle(isOn: self.$reminders){
-                            Text("Reminders")
+                            Text("Reminders").font(Constants.globalBodyTextFont)
                         }.onTapGesture {
                             if(!self.notificationPermission){
                                 self.checkNotificationPermission()
@@ -150,7 +156,9 @@ struct GoalForm: View {
                         
                         if(self.reminders){
                             
-                            DatePicker("Alert at:", selection: self.$startTime, displayedComponents: .hourAndMinute)
+                            DatePicker(selection: self.$startTime, displayedComponents: .hourAndMinute){
+                                Text("Alert At:").font(Constants.globalBodyTextFont)
+                            }
                         }
                     }.padding(5)
                 }
@@ -166,8 +174,8 @@ struct GoalForm: View {
                     }) {
                         HStack(alignment: .center) {
                             Spacer()
-                            Text("Save")
-                                .font(.headline)
+                            Text("Save").font(Constants.globalBodyTextFont).bold()
+                                //.font(.headline)
                                 .foregroundColor(Color.white)
                             Spacer()
                         }
@@ -183,12 +191,12 @@ struct GoalForm: View {
                     }) {
                         HStack(alignment: .center) {
                             Spacer()
-                            Text("Cancel")
-                                .font(.headline)
+                            Text("Cancel").font(Constants.globalBodyTextFont).bold()
+                                //.font(.headline)
                                 .foregroundColor(Color.white)
                             Spacer()
                         }
-                    }
+                    }.disabled(false)
                     .padding(.vertical, 10.0)
                     .background(Color.blue)
                     .cornerRadius(15)
@@ -205,7 +213,8 @@ struct GoalForm: View {
             
             .navigationTitle(editing ? self.goalName:"New Goal")
             .navigationBarTitleDisplayMode(.large)
-        }.frame(width: screenSize.width-20, height: screenSize.height-150)
+        }
+        //.frame(width: screenSize.width-20, height: screenSize.height-150)
         .navigationViewStyle(StackNavigationViewStyle())
         .onAppear(){
             self.prepareHaptics()
@@ -453,7 +462,7 @@ struct GoalForm: View {
     }
     
     private func dismissView() {
-        
+        print("dismiss")
         self.isPresented = false
     }
     
@@ -570,7 +579,7 @@ struct GoalForm: View {
         goal.color = UIColor(self.goalCol)
         goal.name = self.goalName
         goal.goalTime = Double(self.goalDailyTime)
-        if let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalId: goal.id!) {
+        if let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalID: goal.id) {
             record.progress = record.dayTime/(goal.goalTime*60.0)
         }
         goal.startDate = self.startDate
@@ -602,6 +611,7 @@ struct GoalForm: View {
         }
         
         if(self.reminders){
+            self.removeNotificationsForGoal(id: goal.id!)
             self.submitUserNotificationTrigger(id: goal.id!)
         }
         else {
