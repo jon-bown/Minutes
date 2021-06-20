@@ -29,17 +29,12 @@ struct ProgressBar: View {
 }
 
 struct GoalDetailView: View {
-    @Environment(\.managedObjectContext) var managedObjectContext
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+        
+    var goal: GoalViewModel
     
-    @FetchRequest(
-        entity: GoalRecord.entity(),
-        sortDescriptors: [
-            NSSortDescriptor(keyPath: \GoalRecord.name, ascending: true)
-        ]
-    ) var goalRecords: FetchedResults<GoalRecord>
-    
-    @ObservedObject var goal: Goal
+    @StateObject private var goalListVM = GoalListViewModel()
+    @StateObject private var goalRecordListVM = GoalRecordListViewModel()
     
     @State private var hours: Int = 0
     @State private var minutes: Int = 0
@@ -61,29 +56,29 @@ struct GoalDetailView: View {
     @State private var showError: Bool = false
     @State private var showedCompleted: Bool = false
     
-    //Just check the list view model if the goal record exists
-    var goalRecordsArray: [GoalRecord] {
-        
-        //return DataServer().goalRecords.sorted(by: {$0.date! > $1.date!})
-        
-        return goalRecords.sorted(by: {$0.date! > $1.date!})
-    }
-    
-    
-    var filteredCurrentGoalRecordToday: GoalRecord? {
-        return AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalID: self.goal.id)
-    
-    }
-    
-    var filteredGoalRecordsCurrentGoal: [GoalRecord] {
-        return AppUtil.filterGoalRecordsByGoalID(goalRecords: self.goalRecordsArray, goalID: self.goal.id == nil ? nil:self.goal.id!)
-    }
-    
-    //Extract dictionary used to display todays sessions
-    var filteredGoalRecordsSavesToday: [Date: Double] {
-        return AppUtil.filterGoalRecordSavesTodayByID(goalRecords: self.goalRecordsArray, goalID: self.goal.id!)
-        
-    }
+//    //Just check the list view model if the goal record exists
+//    var goalRecordsArray: [GoalRecord] {
+//
+//        //return DataServer().goalRecords.sorted(by: {$0.date! > $1.date!})
+//
+//        return goalRecords.sorted(by: {$0.date! > $1.date!})
+//    }
+//
+//
+//    var filteredCurrentGoalRecordToday: GoalRecord? {
+//        return AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalID: self.goal.id)
+//
+//    }
+//
+//    var filteredGoalRecordsCurrentGoal: [GoalRecord] {
+//        return AppUtil.filterGoalRecordsByGoalID(goalRecords: self.goalRecordsArray, goalID: self.goal.id == nil ? nil:self.goal.id!)
+//    }
+//
+//    //Extract dictionary used to display todays sessions
+//    var filteredGoalRecordsSavesToday: [Date: Double] {
+//        return AppUtil.filterGoalRecordSavesTodayByID(goalRecords: self.goalRecordsArray, goalID: self.goal.id!)
+//
+//    }
     
     
     
@@ -138,7 +133,7 @@ struct GoalDetailView: View {
                     //list of all goal updates today
                     
                     
-                    ForEach(self.filteredGoalRecordsSavesToday.sorted(by: >), id: \.key){
+                    ForEach(self.goalRecordListVM.filteredGoalRecordsSavesToday().sorted(by: >), id: \.key){
                         key, value in
                         
                         //Divider()
@@ -201,7 +196,7 @@ struct GoalDetailView: View {
             //if(checkNotificationsExist(id: self.goal.id!)){
             self.createReminderInfoTile().padding([.leading, .trailing], 15)
             //}
-            self.createDateInfoTile().padding([.leading], 15).navigationBarTitle(Text(goal.name!), displayMode: .automatic).navigationBarBackButtonHidden(true).toolbar{
+            self.createDateInfoTile().padding([.leading], 15).navigationBarTitle(Text(goal.name), displayMode: .automatic).navigationBarBackButtonHidden(true).toolbar{
                 ToolbarItem(placement: .navigation) {
                     Button(action: {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
@@ -228,7 +223,7 @@ struct GoalDetailView: View {
                 isPresented: self.$showGoalEditForm
             ) {
                 
-                GoalForm(editing: true, passedGoal: self.goal, isPresented: self.$showGoalEditForm, success: self.$goalUpdatedSuccess).environment(\.managedObjectContext, managedObjectContext)
+                GoalForm(editing: true, passedGoal: self.goal, isPresented: self.$showGoalEditForm, success: self.$goalUpdatedSuccess)
                 
             }
             
@@ -276,10 +271,10 @@ struct GoalDetailView: View {
                 VStack(alignment: .leading, spacing: 0) {
                     Text("Started").font(Font.system(size: 18, weight: .regular, design: .default)).kerning(0.05).foregroundColor(Color.white)
                     (
-                        Text(String(self.goal.startDate!.mediumDate))
+                        Text(String(self.goal.startDate.mediumDate))
                             .font(Font.system(size: 25, weight: .regular, design: .rounded))
                             .kerning(0.25)
-                            .foregroundColor(Color(goal.color!)).lineLimit(1)
+                            .foregroundColor(goal.color).lineLimit(1)
                         
                     )
                     .padding([.top], -3)
@@ -294,7 +289,7 @@ struct GoalDetailView: View {
                             Text(String(self.goal.endDate!.mediumDate))
                                 .font(Font.system(size: 25, weight: .regular, design: .rounded))
                                 .kerning(0.25)
-                                .foregroundColor(Color(goal.color!)).lineLimit(1)
+                                .foregroundColor(goal.color).lineLimit(1)
                             
                         )
                         .padding([.top], -3)
@@ -319,7 +314,7 @@ struct GoalDetailView: View {
                         Text(String(self.goal.frequency!))
                             .font(Font.system(size: 25, weight: .regular, design: .rounded))
                             .kerning(0.25)
-                            .foregroundColor(Color(goal.color!)).lineLimit(1)
+                            .foregroundColor(goal.color).lineLimit(1)
                         
                     )
                     .padding([.top], -3)
@@ -334,7 +329,7 @@ struct GoalDetailView: View {
                             Text(AppUtil.createWeekDaysString(days: self.goal.weekDay!))
                                 .font(Font.system(size: 25, weight: .regular, design: .rounded))
                                 .kerning(0.25)
-                                .foregroundColor(Color(goal.color!)).lineLimit(2)
+                                .foregroundColor(goal.color).lineLimit(2)
                             
                         )
                         .padding([.top], -3)
@@ -348,7 +343,7 @@ struct GoalDetailView: View {
                             Text(String(self.goal.monthDay))
                                 .font(Font.system(size: 25, weight: .regular, design: .rounded))
                                 .kerning(0.25)
-                                .foregroundColor(Color(goal.color!)).lineLimit(1)
+                                .foregroundColor(goal.color).lineLimit(1)
                             
                         )
                         .padding([.top], -3)
@@ -373,9 +368,9 @@ struct GoalDetailView: View {
                 VStack(alignment: .leading, spacing: 0) {
                     Text("Current Streak").font(Font.system(size: 18, weight: .regular, design: .default)).kerning(0.05).foregroundColor(Color.white)
                     (
-                        Text(String(self.calculateCurrentStreak()))
+                        Text(String(self.goalRecordListVM.calculateCurrentStreak(goalID: goal.id)))
                             .font(Font.system(size: 25, weight: .semibold, design: .rounded))
-                            .kerning(0.25).foregroundColor(Color(goal.color!))
+                            .kerning(0.25).foregroundColor(goal.color)
                         
                     )
                     .padding([.top], -3)
@@ -386,10 +381,10 @@ struct GoalDetailView: View {
                 VStack(alignment: .leading, spacing: 0) {
                     Text("Best Streak").font(Font.system(size: 18, weight: .regular, design: .default)).kerning(0.05).foregroundColor(Color.white)
                     (
-                        Text(String(self.calculateBestStreak()))
+                        Text(String(self.goalRecordListVM.calculateBestStreak(goalID: goal.id)))
                             .font(Font.system(size: 25, weight: .semibold, design: .rounded))
                             .kerning(0.25)
-                            .foregroundColor(Color(goal.color!)).lineLimit(1)
+                            .foregroundColor(goal.color).lineLimit(1)
                         
                     )
                     .padding([.top], -3)
@@ -412,7 +407,7 @@ struct GoalDetailView: View {
                         Text(AppUtil.getTotalTimeString(seconds: self.goal.totalTime))
                             .font(Font.system(size: 25, weight: .semibold, design: .rounded))
                             .kerning(0.25)
-                            .foregroundColor(Color(goal.color!))
+                            .foregroundColor(goal.color)
                         
                     )
                     .padding([.top], -3)
@@ -423,10 +418,10 @@ struct GoalDetailView: View {
                 VStack(alignment: .leading, spacing: 0) {
                     Text("This Week").font(Font.system(size: 18, weight: .regular, design: .default)).kerning(0.05).foregroundColor(Color.white)
                     (
-                        Text(AppUtil.calculateTimeThisWeek(goalRecords: self.filteredGoalRecordsCurrentGoal))
+                        Text(self.goalRecordListVM.calculateTimeThisWeek())
                             .font(Font.system(size: 25, weight: .semibold, design: .rounded))
                             .kerning(0.25)
-                            .foregroundColor(Color(goal.color!)).lineLimit(1)
+                            .foregroundColor(goal.color).lineLimit(1)
                         
                     )
                     .padding([.top], -3)
@@ -449,7 +444,7 @@ struct GoalDetailView: View {
                         Text(self.remindersOnText)
                             .font(Font.system(size: 25, weight: .regular, design: .rounded))
                             .kerning(0.25)
-                            .foregroundColor(Color(goal.color!))
+                            .foregroundColor(goal.color)
                         
                     )
                     .padding([.top], -3)
@@ -463,7 +458,7 @@ struct GoalDetailView: View {
                             Text(self.reminderTimeText)
                                 .font(Font.system(size: 25, weight: .semibold, design: .rounded))
                                 .kerning(0.25)
-                                .foregroundColor(Color(goal.color!)).lineLimit(1)
+                                .foregroundColor(goal.color).lineLimit(1)
                             
                         )
                         .padding([.top], -3)
@@ -489,14 +484,14 @@ struct GoalDetailView: View {
                         
                         Text("Today").font(Font.system(size: 20, weight: .regular, design: .default)).kerning(0.05).foregroundColor(Color.white).padding(.bottom, 5)
                         (
-                            Text(self.filteredCurrentGoalRecordToday == nil ? "0/\(Int(self.goal.goalTime))":"\(Int(self.filteredCurrentGoalRecordToday!.dayTime/60))/\(Int(self.goal.goalTime))")
+                            Text(self.goalRecordListVM.getRecordTodayForGoal(goal: self.goal) == nil ? "0/\(Int(self.goal.goalTime))":"\(Int(self.self.goalRecordListVM.getRecordTodayForGoal(goal: self.goal)!.dayTime/60))/\(Int(self.goal.goalTime))")
                                 .font(Font.system(size: 25, weight: .semibold, design: .rounded))
                                 .kerning(0.25)
                                 //TODO: Must fix this
-                                .foregroundColor(Color(goal.color!))
+                                .foregroundColor(goal.color)
                                 + Text("MIN")
                                 .font(Font.system(size: 20, weight: .semibold, design: .rounded))
-                                .kerning(0.3).foregroundColor(Color(goal.color!))
+                                .kerning(0.3).foregroundColor(goal.color)
                         )
                         .padding([.top], -3).padding(.bottom, 3)
                         
@@ -504,7 +499,7 @@ struct GoalDetailView: View {
                     Spacer()
                     
                     ZStack(alignment: .center){
-                        ProgressRingView(progress: self.progress, thickness: Constants.progressRingViewThicknessStandard, startColor: Color(self.goal.color!.darker(by: 10.0)!), endColor: Color(self.goal.color!.lighter(by: 15)!), backgroundColor: self.goal.color!).frame(width: 175, height: 175).aspectRatio(contentMode: .fit).animatableProgressText(progress: progress)
+                        ProgressRingView(progress: self.progress, thickness: Constants.progressRingViewThicknessStandard, startColor: self.goal.color.darker(by: 10.0), endColor: self.goal.color.lighter(by: 15), backgroundColor: self.goal.color).frame(width: 175, height: 175).aspectRatio(contentMode: .fit).animatableProgressText(progress: progress)
                     }
                     
                     
@@ -637,31 +632,20 @@ struct GoalDetailView: View {
     }
     
     private func deleteGoalRecordSessions() {
-        // remove the goalrecord from goal saves
-        
-        //remove the goalrecord from goal updates
-        let record = self.goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs: $0.date!) && $0.name == goal.name}).first
-        for key in self.sessionsToRemove {
-            // the date
-            let timeToRemove = self.filteredGoalRecordsSavesToday[key]
+        if let record = self.goalRecordListVM.getRecordTodayForGoal(goal: self.goal) {
+            self.goalRecordListVM.removeTimeFromGoalRecord(id: record.id, datesToRemove: self.sessionsToRemove)
             
-            
-            record!.dayTime -= timeToRemove!
-            self.goal.totalTime -= timeToRemove!
-            record!.goalSaves!.removeValue(forKey: key)
-            record!.goalUpdates!.removeValue(forKey: key.minuteQuadrant)
-            
+            self.sessionsToRemove.removeAll()
+            self.progress = record.progress
+            self.recalculateDayTime()
+            self.updateProgress()
         }
-        self.sessionsToRemove.removeAll()
-        self.recalculateDayTime()
-        record!.progress = self.progress
-        self.updateProgress()
-        self.saveContext()
+
     }
     
     private func saveCustomMinuteSession(){
         var newRecord = false
-        let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalID: self.goal.id!)
+        let record = self.goalRecordListVM.getRecordTodayForGoal(goal: self.goal)
         if(record == nil){
             newRecord = true
         }
@@ -674,103 +658,27 @@ struct GoalDetailView: View {
         }
         let customSeconds = Double(customMinutes) * 60.0
         //Add date to array of records for the goal record
-        
+        self.goal.updateTotalTime(time: customSeconds, add: true)
         if(newRecord){
-            
-            let newGoalRecord = GoalRecord(context: managedObjectContext)
-            newGoalRecord.name = self.goal.name!
-            newGoalRecord.date = Date()
+
             self.progress = customSeconds/(self.goal.goalTime*60)
-            newGoalRecord.progress = self.progress
-            newGoalRecord.id = self.goal.id!
+
             
-            newGoalRecord.dayTime = customSeconds
-            self.goal.totalTime += customSeconds
-            //divide hours into four quadrants
-            var hour = Calendar.current.component(.hour, from: Date())*4
-            let minutes = (newGoalRecord.progress * 59).truncatingRemainder(dividingBy: 60)
-            var entry = [Int:Double]()
-            hour = hour + Date().minuteQuadrant
-            entry[hour] = Double(minutes)
-            newGoalRecord.goalUpdates = entry
-            
-            //SAVES
-            var save = [Date:Double]()
-            save[Date()] = customSeconds
-            newGoalRecord.goalSaves = save
-            //add entry with hour: minutes
-            //newGoal.color = UIColor(goalCol)
-            //newGoal.cumTime = 0.0
-            //newGoal.dayTime = 0.0
-            //newGoal.goalTime = Double(self.goalDailyTime)
-            //newGoal.frequency = ""
-            //newGoal.id = UUID()
-            saveContext()
+            //TODO: Add method to add goalrecord
+            self.goalRecordListVM.addNewGoalRecord(name: self.goal.name, date: Date(), progress: self.progress, seconds: customSeconds, id: self.goal.id)
+
         }
         
         else {
-            if let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalID: self.goal.id) {
-                //add entry with hour: minutes
-                record.dayTime += customSeconds
-                self.progress = record.dayTime/(self.goal.goalTime*60.0)
-                record.progress = self.progress
-                
-                
-                
-                var hour = Calendar.current.component(.hour, from: Date())*4
-                let minutes = (record.progress * 59.0).truncatingRemainder(dividingBy: 60)
-                hour = hour + Date().minuteQuadrant
-                
-                let keyExists = record.goalUpdates![hour] != nil
-                if(keyExists){
-                    record.goalUpdates![hour] = (record.goalUpdates![hour]! + Double(minutes)).truncatingRemainder(dividingBy: 60)
-                }
-                else{
-                    record.goalUpdates![hour] = Double(minutes)
-                }
-                //Goal Saves
-                let dateKey = Date()
-                let saveKeyExists = record.goalSaves![dateKey] != nil
-                if(saveKeyExists){
-                    record.goalSaves![dateKey] = (record.goalSaves![dateKey]! + customSeconds)
-                }
-                else{
-                    record.goalSaves![dateKey] = customSeconds
-                }
-                
-                
-                
-                
-                self.goal.totalTime += customSeconds
-                saveContext()
-                
-            }
+            
+            self.goalRecordListVM.updateGoalRecord(goalRecordID: record!.id, seconds: customSeconds)
+            self.updateProgress()
             
         }
         self.updateProgress()
     }
-    //Calculates the current streak the user is on
-    private func calculateCurrentStreak() -> Int {
-        return AppUtil.calculateGoalCurrentStreak(records: filteredGoalRecordsCurrentGoal, goalID: self.goal.id!)
-    }
-    
-    private func calculateBestStreak() -> Int {
-        return AppUtil.calculateGoalBestStreak(goalID: self.goal.id!)
-    }
     
     //Save the current time into the proper goal entity
-    private func saveContext() {
-        if managedObjectContext.hasChanges {
-            do {
-                try managedObjectContext.save()
-                self.goalUpdatedSuccess = true
-                self.complexSuccess()
-            } catch {
-                managedObjectContext.rollback()
-                self.showError = true
-            }
-        }
-    }
     
     //MARK: HAPTICS
     func prepareHaptics() {
@@ -830,8 +738,7 @@ struct GoalDetailView: View {
     
     func updateGoalRecord() {
         var newRecord = false
-        let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalID: self.goal.id)
-        if(record == nil){
+        guard let record = self.goalRecordListVM.getRecordTodayForGoal(goal: self.goal) else {
             newRecord = true
         }
         
@@ -839,58 +746,65 @@ struct GoalDetailView: View {
         
         if(newRecord){
             
-            let newGoalRecord = GoalRecord(context: managedObjectContext)
-            newGoalRecord.name = self.goal.name!
-            newGoalRecord.date = Date()
-            newGoalRecord.progress = self.progress
-            newGoalRecord.id = self.goal.id!
+            self.goal.updateTotalTime(time: Double(self.stopWatch.totalAccumulatedTime.seconds()), add: true)
+            self.goalRecordListVM.addNewGoalRecord(name: self.goal.name, date: Date(), progress: self.progress, seconds: Double(self.stopWatch.totalAccumulatedTime.seconds()), id: self.goal.id)
             
-            newGoalRecord.dayTime = Double(self.stopWatch.totalAccumulatedTime.seconds())
-            self.goal.totalTime += Double(self.stopWatch.totalAccumulatedTime.seconds())
-            //divide hours into four quadrants
-            var hour = Calendar.current.component(.hour, from: Date())*4
-            let minutes = (newGoalRecord.progress * 59.0).truncatingRemainder(dividingBy: 60)
-            var entry = [Int:Double]()
-            hour = hour + Date().minuteQuadrant
-            entry[hour] = Double(minutes)
-            newGoalRecord.goalUpdates = entry
-            //SAVES
-            var save = [Date:Double]()
-            save[Date()] = Double(self.stopWatch.totalAccumulatedTime.seconds())
-            newGoalRecord.goalSaves = save
-            saveContext()
+            
+//            let newGoalRecord = GoalRecord(context: managedObjectContext)
+//            newGoalRecord.name = self.goal.name
+//            newGoalRecord.date = Date()
+//            newGoalRecord.progress = self.progress
+//            
+//            newGoalRecord.dayTime = Double(self.stopWatch.totalAccumulatedTime.seconds())
+//            self.goal.totalTime += Double(self.stopWatch.totalAccumulatedTime.seconds())
+//            //divide hours into four quadrants
+//            var hour = Calendar.current.component(.hour, from: Date())*4
+//            let minutes = (newGoalRecord.progress * 59.0).truncatingRemainder(dividingBy: 60)
+//            var entry = [Int:Double]()
+//            hour = hour + Date().minuteQuadrant
+//            entry[hour] = Double(minutes)
+//            newGoalRecord.goalUpdates = entry
+//            //SAVES
+//            var save = [Date:Double]()
+//            save[Date()] = Double(self.stopWatch.totalAccumulatedTime.seconds())
+//            newGoalRecord.goalSaves = save
         }
         
         else {
-            if let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalID: self.goal.id) {
-                record.progress = self.progress
-                record.dayTime += Double(self.stopWatch.totalAccumulatedTime.seconds())
-                
-                
-                var hour = Calendar.current.component(.hour, from: Date())*4
-                let minutes = (record.progress * 59.0).truncatingRemainder(dividingBy: 60)
-                hour = hour + Date().minuteQuadrant
-                let keyExists = record.goalUpdates![hour] != nil
-                if(keyExists){
-                    record.goalUpdates![hour] = (record.goalUpdates![hour]! + Double(minutes)).truncatingRemainder(dividingBy: 60)
-                }
-                else{
-                    record.goalUpdates![hour] = Double(minutes)
-                }
-                //Goal Saves
-                let dateKey = Date()
-                let saveKeyExists = record.goalSaves![dateKey] != nil
-                if(saveKeyExists){
-                    record.goalSaves![dateKey] = (record.goalSaves![dateKey]! + Double(self.stopWatch.totalAccumulatedTime.seconds()))
-                }
-                else{
-                    record.goalSaves![dateKey] = Double(self.stopWatch.totalAccumulatedTime.seconds())
-                }
-                
-                self.goal.totalTime += Double(self.stopWatch.totalAccumulatedTime.seconds())
-                saveContext()
-                
-            }
+            
+            self.goalRecordListVM.updateGoalRecord(goalRecordID: record.id, seconds: Double(self.stopWatch.totalAccumulatedTime.seconds()))
+            self.updateProgress()
+            
+            
+            
+//            if let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalID: self.goal.id) {
+//                record.progress = self.progress
+//                record.dayTime += Double(self.stopWatch.totalAccumulatedTime.seconds())
+//
+//
+//                var hour = Calendar.current.component(.hour, from: Date())*4
+//                let minutes = (record.progress * 59.0).truncatingRemainder(dividingBy: 60)
+//                hour = hour + Date().minuteQuadrant
+//                let keyExists = record.goalUpdates![hour] != nil
+//                if(keyExists){
+//                    record.goalUpdates![hour] = (record.goalUpdates![hour]! + Double(minutes)).truncatingRemainder(dividingBy: 60)
+//                }
+//                else{
+//                    record.goalUpdates![hour] = Double(minutes)
+//                }
+//                //Goal Saves
+//                let dateKey = Date()
+//                let saveKeyExists = record.goalSaves![dateKey] != nil
+//                if(saveKeyExists){
+//                    record.goalSaves![dateKey] = (record.goalSaves![dateKey]! + Double(self.stopWatch.totalAccumulatedTime.seconds()))
+//                }
+//                else{
+//                    record.goalSaves![dateKey] = Double(self.stopWatch.totalAccumulatedTime.seconds())
+//                }
+//
+//                self.goal.totalTime += Double(self.stopWatch.totalAccumulatedTime.seconds())
+//
+//            }
             
             
         }
@@ -901,7 +815,7 @@ struct GoalDetailView: View {
     }
     
     func updateProgress() {
-        guard let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalID: goal.id) else {
+        guard let record = self.goalRecordListVM.getRecordTodayForGoal(goal: self.goal) else {
             self.dayTime = 0.0
             self.progress = 0.0
             return
@@ -913,10 +827,15 @@ struct GoalDetailView: View {
     }
     
     func recalculateDayTime() {
-        guard let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalID: goal.id) else {
+        
+        guard let record = goal.records?.first(where: {Calendar.current.isDate(Date(), inSameDayAs: $0.date)}) else {
             self.dayTime = 0.0
             return
         }
+//        guard let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalID: goal.id) else {
+//            self.dayTime = 0.0
+//            return
+//        }
         self.dayTime = record.dayTime
         
     }
@@ -971,8 +890,8 @@ struct GoalDetailView: View {
         //print("Creating completed notification")
         
         let content = UNMutableNotificationContent()
-        content.title = self.goal.name!
-        content.body = "You completed your Minute goal for \(self.goal.name!)! Take a second to save your progress!"
+        content.title = self.goal.name
+        content.body = "You completed your Minute goal for \(self.goal.name)! Take a second to save your progress!"
         content.categoryIdentifier = "alarm"
         content.sound = UNNotificationSound.default
         //MARK: FIND OUT HOW TO DISMISS BADGE
@@ -983,14 +902,14 @@ struct GoalDetailView: View {
         
         var secondsTillComplete = goal.goalTime*60.0
         
-        if let goalRecord = filteredCurrentGoalRecordToday {
+        if let goalRecord = self.goalRecordListVM.getRecordTodayForGoal(goal: self.goal) {
             secondsTillComplete -= goalRecord.dayTime
         }
         
         
         
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: secondsTillComplete, repeats: false)
-        let request = UNNotificationRequest(identifier: AppUtil.getGoalNotificationSpecificIdString(id: goal.id!), content: content, trigger: trigger)
+        let request = UNNotificationRequest(identifier: AppUtil.getGoalNotificationSpecificIdString(id: goal.uuid), content: content, trigger: trigger)
         center.add(request)
         self.showedCompleted = true
     }
@@ -1016,8 +935,8 @@ struct GoalDetailView: View {
         //print("Creating completed notification")
         
         let content = UNMutableNotificationContent()
-        content.title = self.goal.name!
-        content.body = "You completed your Minute goal for \(self.goal.name!)! Take a second to save your progress!"
+        content.title = self.goal.name
+        content.body = "You completed your Minute goal for \(self.goal.name)! Take a second to save your progress!"
         content.categoryIdentifier = "alarm"
         content.sound = UNNotificationSound.default
         content.badge = NSNumber(value: UIApplication.shared.applicationIconBadgeNumber + 1)
@@ -1028,7 +947,7 @@ struct GoalDetailView: View {
         
         
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
-        let request = UNNotificationRequest(identifier: AppUtil.getGoalNotificationSpecificIdString(id: goal.id!), content: content, trigger: trigger)
+        let request = UNNotificationRequest(identifier: AppUtil.getGoalNotificationSpecificIdString(id: goal.uuid), content: content, trigger: trigger)
         center.add(request)
         self.showedCompleted = true
     }
@@ -1054,7 +973,7 @@ struct GoalDetailView: View {
             withAnimation() {
                 recalculateDayTime()
                 //remove pending completion notifications
-                UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [AppUtil.getGoalNotificationSpecificIdString(id: goal.id!)])
+                UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [AppUtil.getGoalNotificationSpecificIdString(id: goal.uuid)])
                 self.timer?.invalidate()
             }
         }

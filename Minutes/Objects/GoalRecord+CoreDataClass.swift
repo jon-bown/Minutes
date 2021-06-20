@@ -2,7 +2,7 @@
 //  GoalRecord+CoreDataClass.swift
 //  Minutes
 //
-//  Created by Jonathan Bown on 3/8/21.
+//  Created by Jonathan Bown on 6/6/21.
 //
 //
 

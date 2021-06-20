@@ -11,38 +11,9 @@ struct MiniBarChartWidgetView: View {
     @Environment(\.managedObjectContext) var managedObjectContext
     @Environment(\.calendar) var calendar
     
-    @FetchRequest(
-      entity: Goal.entity(),
-      sortDescriptors: [
-        NSSortDescriptor(keyPath: \Goal.priority, ascending: true)
-      ]
-    ) var goals: FetchedResults<Goal>
-    
-    @FetchRequest(
-        entity: GoalRecord.entity(),
-        sortDescriptors: [
-            NSSortDescriptor(keyPath: \GoalRecord.name, ascending: true)
-        ]
-    ) var goalRecords: FetchedResults<GoalRecord>
-    
-    var goalsArray: [Goal] {
-        return goals.sorted(by: {$0.priority > $1.priority})
-    }
-    
-
-
-    var filteredGoalRecords: [GoalRecord] {
-        if(goalRecords.isEmpty){
-            return []
-        }
-        else{
-            return self.goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs:$0.date!)})
-        }
+    @StateObject private var goalListVM = GoalListViewModel()
+    @StateObject private var goalRecordListVM = GoalRecordListViewModel()
         
-    }
-    
-    
-    
 //    var title: String
 //    var progress: String
 //    var goal: String
@@ -86,14 +57,8 @@ struct MiniBarChartWidgetView: View {
     }
     //MARK: - HELPERS
     private func getGoalName(id: UUID) -> String{
-        if let goal = goalsArray.first(where: {$0.id == id}) {
-            if let name = goal.name {
-                return name
-            }
-            else {
-                return ""
-            }
-            
+        if let goal = goalListVM.goals.first(where: {$0.uuid == id}) {
+            return goal.name
         }
         else {
             return ""
@@ -102,14 +67,8 @@ struct MiniBarChartWidgetView: View {
     }
     
     private func getGoalColor(id: UUID) -> Color{
-        if let goal = goalsArray.first(where: {$0.id == id}) {
-            if let col = goal.color {
-                return Color(col)
-            }
-            else {
-                return Color.white
-            }
-            
+        if let goal = goalListVM.goals.first(where: {$0.uuid == id}) {
+            return goal.color
         }
         else {
             return Color.white
@@ -155,9 +114,9 @@ struct MiniBarChartWidgetView: View {
             }
             //MARK: - DATA INPUT
             HStack(alignment: .bottom, spacing: Constants.barChartColumnSpacing) {
-                ForEach(filteredGoalRecords){ record in
+                ForEach(self.goalRecordListVM.filterGoalRecords()){ record in
                     ForEach(0..<maxColumnIndex) { i in
-                        MiniBarChartBarView(height: record.goalUpdates![i] ?? Double(0), startColor: self.getGoalColor(id: record.id!), endColor: self.getGoalColor(id: record.id!))
+                        MiniBarChartBarView(height: record.goalUpdates![i] ?? Double(0), startColor: Color(record.goal!.color), endColor: Color(record.goal!.color))
                     }
                 }
 

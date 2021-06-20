@@ -9,27 +9,17 @@ import SwiftUI
 
 struct ChangeGoalsView: View {
     @Environment(\.presentationMode) var presentationMode
-    @Environment(\.managedObjectContext) var managedObjectContext
-    @FetchRequest(
-        entity: GoalRecord.entity(),
-        sortDescriptors: [
-            NSSortDescriptor(keyPath: \GoalRecord.name, ascending: true)
-        ]
-    ) var goalRecords: FetchedResults<GoalRecord>
     
-    var goalRecordsArray: [GoalRecord] {
-        return goalRecords.sorted(by: {$0.date! > $1.date!})
-    }
+    @StateObject private var goalRecordListVM = GoalRecordListViewModel()
     
-    
-    var goal: Goal
+    var goal: GoalViewModel
     @Binding var isPresented: Bool
     @State private var newMinutes: Double = 0.0
     var body: some View {
         NavigationView {
             VStack{
-                Text(goal.name!).font(Font.system(size: 25, weight: .semibold, design: .rounded))
-                    .kerning(0.25).foregroundColor(Color(goal.color!))
+                Text(goal.name).font(Font.system(size: 25, weight: .semibold, design: .rounded))
+                    .kerning(0.25).foregroundColor(goal.color)
                 Spacer()
                 HStack{
                     Button(action: {
@@ -42,7 +32,7 @@ struct ChangeGoalsView: View {
                         
                     }
                     Text(String(Int(newMinutes))).font(Font.system(size: 25, weight: .semibold, design: .rounded))
-                        .kerning(0.25).foregroundColor(Color(goal.color!))
+                        .kerning(0.25).foregroundColor(goal.color)
                     Button(action: {
                         newMinutes += 1.0
                         WKInterfaceDevice.current().play(.click)
@@ -53,12 +43,8 @@ struct ChangeGoalsView: View {
                 }
                 Spacer()
                 Button(action: {
-                    goal.goalTime = newMinutes
+                    goal.updateGoalTime(time: newMinutes)
                     //UPDATE PROGRESS IN GOAL RECORD
-                    if let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalID: goal.id!) {
-                        record.progress = record.dayTime/(self.goal.goalTime*60.0)
-                    }
-                    saveContext()
                     WKInterfaceDevice.current().play(.success)
                     isPresented = false
                 }
@@ -66,7 +52,7 @@ struct ChangeGoalsView: View {
                     Text("Save").font(Font.system(size: 25, weight: .semibold, design: .rounded))
                         .kerning(0.25)
                     //play around with foreground color
-                }.background(Capsule().foregroundColor(Color(goal.color!)))
+                }.background(Capsule().foregroundColor(goal.color))
                 //Button
             }
         }.onAppear{
@@ -75,15 +61,6 @@ struct ChangeGoalsView: View {
         
     }
     
-    private func saveContext() {
-        if managedObjectContext.hasChanges {
-            do {
-                try managedObjectContext.save()
-            } catch {
-                fatalError("Error saving managed object context")
-            }
-        }
-    }
 }
 
 //struct ChangeGoalsView_Previews: PreviewProvider {

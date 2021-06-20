@@ -58,12 +58,8 @@ struct MinutesWidgetEntryView : View {
     @Environment(\.managedObjectContext) var managedObjectContext
     @Environment(\.widgetFamily) var widgetFamily
     
-    @FetchRequest(
-      entity: Goal.entity(),
-      sortDescriptors: [
-        NSSortDescriptor(keyPath: \Goal.priority, ascending: true)
-      ]
-    ) var goals: FetchedResults<Goal>
+    @StateObject private var goalListVM = GoalListViewModel()
+    @StateObject private var goalRecordListVM = GoalRecordListViewModel()
     
     var entry: Provider.Entry
     
@@ -154,7 +150,7 @@ struct MinutesWidgetEntryView : View {
             MiniBarChartWidgetView().environment(\.managedObjectContext, managedObjectContext)
             Spacer()
             HStack{
-                DailyStatsView(goalList: self.goals, type: "V").padding(.leading, 5).padding(.bottom, 20)
+                DailyStatsView(goalList: goalListVM.goals, type: "V").padding(.leading, 5).padding(.bottom, 20)
             }
         }
 
@@ -162,7 +158,7 @@ struct MinutesWidgetEntryView : View {
     
     func createHStackInfo() -> some View {
         HStack{
-            DailyStatsView(goalList: self.goals).padding().padding(.leading, 10)
+            DailyStatsView(goalList: goalListVM.goals).padding().padding(.leading, 10)
             Spacer()
             ProgressRingsStatic(dateProvided: entry.date, maxWidth:120, maxLineWidth: 15, maxRingLimit: 3, animate: false).frame(width: 150, height: 150)
                 .aspectRatio(contentMode: .fit).environment(\.managedObjectContext, managedObjectContext).padding(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 10))

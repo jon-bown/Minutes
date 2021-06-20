@@ -156,8 +156,8 @@ struct RootView: View {
     ) var goalRecords: FetchedResults<GoalRecord>
     
     private var year: DateInterval {
-        if let minDate = goalRecords.min(by: { $0.date! < $1.date! })?.date! {
-            let maxDate = goalRecords.max(by: { $0.date! < $1.date! })?.date!
+        if let minDate = goalRecords.min(by: { $0.date < $1.date })?.date {
+            let maxDate = goalRecords.max(by: { $0.date < $1.date })?.date
             let thirtyDays = 24.0 * 3600.0 * 7
             return DateInterval(start: minDate, end: maxDate!.addingTimeInterval(thirtyDays))
         }

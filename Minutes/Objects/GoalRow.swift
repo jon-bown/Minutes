@@ -8,11 +8,10 @@
 import SwiftUI
 
 struct GoalRow: View {
-    @ObservedObject var goal: Goal
+    var goal: GoalViewModel
     var body: some View {
-        if let name = goal.name {
             HStack{
-                Text(name).font(.system(.title2, design: .rounded)).foregroundColor(Color.white)
+                Text(goal.name).font(.system(.title2, design: .rounded)).foregroundColor(Color.white)
                 Spacer()
                 Image(systemName: "chevron.right").foregroundColor(Color.gray)
             }.font(.system(size: 24, design: .rounded)).padding(4).cornerRadius(8)
@@ -20,4 +19,3 @@ struct GoalRow: View {
         
 
     }
-}

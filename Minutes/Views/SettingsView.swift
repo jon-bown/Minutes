@@ -8,17 +8,12 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @Environment(\.managedObjectContext) var managedObjectContext
+    
     @Environment(\.presentationMode) var presentationMode
-    @FetchRequest(
-      entity: Goal.entity(),
-      sortDescriptors: [
-        NSSortDescriptor(keyPath: \Goal.priority, ascending: true)
-      ]
-    ) var goals: FetchedResults<Goal>
+    @StateObject private var goalListVM = GoalListViewModel()
     
     var buttonDisabled: Bool {
-        return goals.count == 0
+        return goalListVM.getGoalsArray().count == 0
     }
     
     @State private var completionNotifications: Bool = UserDefaults.standard.bool(forKey: Constants.generalCompletionReminder)

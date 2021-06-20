@@ -2,7 +2,7 @@
 //  GoalRecord+CoreDataProperties.swift
 //  Minutes
 //
-//  Created by Jonathan Bown on 3/8/21.
+//  Created by Jonathan Bown on 6/6/21.
 //
 //
 
@@ -16,14 +16,13 @@ extension GoalRecord {
         return NSFetchRequest<GoalRecord>(entityName: "GoalRecord")
     }
 
-    @NSManaged public var date: Date?
-    //Number of seconds completed in the day
+    @NSManaged public var date: Date
     @NSManaged public var dayTime: Double
-    @NSManaged public var goalUpdates: [Int:Double]?
-    @NSManaged public var id: UUID?
-    @NSManaged public var name: String?
-    @NSManaged public var progress: Double
     @NSManaged public var goalSaves: [Date:Double]?
+    @NSManaged public var goalUpdates: [Int:Double]?
+    @NSManaged public var name: String
+    @NSManaged public var progress: Double
+    @NSManaged public var goal: Goal
 
 }
 

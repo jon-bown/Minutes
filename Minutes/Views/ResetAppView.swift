@@ -9,7 +9,6 @@ import SwiftUI
 import CoreData
 
 struct ResetAppView: View {
-    @Environment(\.managedObjectContext) var managedObjectContext
     @Environment(\.presentationMode) var presentationMode
     
     @State var simpleAlertMessageWithButtons = false
@@ -35,8 +34,8 @@ struct ResetAppView: View {
                 }.alert(isPresented: $simpleAlertMessageWithButtons, content: {
                     self.simpleWarning()
                     let firstButton = Alert.Button.default(Text("Erase")){
-                        self.deleteAllGoals()
-                        self.deleteAllGoalRecords()
+                        CoreDataManager.shared.deleteAllGoals()
+                        CoreDataManager.shared.deleteAllGoalRecords()
                         self.deleteAllNotifications()
                         self.presentationMode.wrappedValue.dismiss()
                     }
@@ -56,43 +55,7 @@ struct ResetAppView: View {
         generator.notificationOccurred(.warning)
     }
     
-    func deleteAllGoals() {
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Goal")
-        
-        fetchRequest.includesPropertyValues = false
-        
-        do {
-            let items = try managedObjectContext.fetch(fetchRequest) as! [Goal]
-            
-            for item in items {
-                managedObjectContext.delete(item)
-            }
-            
-            try managedObjectContext.save()
-            
-        } catch {
-            // Error Handling
-            // ...
-        }
-    }
-    
-    func deleteAllGoalRecords() {
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "GoalRecord")
-        fetchRequest.includesPropertyValues = false
-        
-        do {
-            let items = try managedObjectContext.fetch(fetchRequest) as! [GoalRecord]
-            
-            for item in items {
-                managedObjectContext.delete(item)
-            }
-            try managedObjectContext.save()
-            
-        } catch {
-            // Error Handling
-            // ...
-        }
-    }
+
     
     func deleteAllNotifications() {
         UNUserNotificationCenter.current().getPendingNotificationRequests { (notificationRequests) in

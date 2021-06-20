@@ -10,45 +10,27 @@ import SwiftUI
 struct DailyStatsView: View {
     
     // MARK: - Variables
-    @Environment(\.managedObjectContext) var managedObjectContext
-    
-    
-    @FetchRequest(
-        entity: GoalRecord.entity(),
-        sortDescriptors: [
-            NSSortDescriptor(keyPath: \GoalRecord.name, ascending: true)
-        ]
-    ) var goalRecords: FetchedResults<GoalRecord>
+    @StateObject private var goalListVM = GoalListViewModel()
+    @StateObject private var goalRecordListVM = GoalRecordListViewModel()
     
     var dateProvided: Date = Date()
-    var goals: FetchedResults<Goal>
+    var goals: [GoalViewModel]
     var type: String = "Horizontal"
     var maxStatLimit: Int = 3
     private var cal = Calendar.current
     
-    
-    var filteredGoals: [Goal] {
-        return AppUtil.filterCurrentGoals(goals: self.goalsArray, date: Date())
+    var filteredGoals: [GoalViewModel] {
+        return self.goalListVM.filterCurrentGoalsByDate(date: dateProvided)
     }
     
-    var goalsArray: [Goal] {
-        return goals.sorted(by: {$0.priority > $1.priority})
+    var filteredGoalRecords: [GoalRecordViewModel] {
+        return self.goalRecordListVM.filterGoalRecordsByDate(date: self.dateProvided)
+
     }
-    
-    var filteredGoalRecords: [GoalRecord] {
-        return self.goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs:$0.date!)})
-    }
-    
-    var goalRecordsArray: [GoalRecord] {
-        return self.goalRecords.sorted(by: {$0.date! > $1.date!})
-    }
-    
-    
-    
-    
+        
     // MARK: - INIT
     
-    init(goalList: FetchedResults<Goal>, type: String = "Horizontal", maxStatLimit: Int = 3){
+    init(goalList: [GoalViewModel], type: String = "Horizontal", maxStatLimit: Int = 3){
         self.dateProvided = Date()
         self.goals = goalList
         self.type = type
@@ -72,11 +54,11 @@ struct DailyStatsView: View {
         else if (filteredGoals.isEmpty) {
             if(type == "Horizontal"){
                 VStack(alignment: .leading){
-                    ForEach(AppUtil.sortGoalRecordsByPriority(goalRecords: self.filteredGoalRecords, goals: self.goalsArray), id: \.self){ goalRecord in
-                        if let index = AppUtil.sortGoalRecordsByPriority(goalRecords: self.filteredGoalRecords, goals: self.goalsArray).firstIndex(of: goalRecord){
+                    ForEach(self.goalRecordListVM.sortGoalRecordsByPriority(), id: \.id){ goalRecord in
+                        if let index = goalRecordListVM.sortGoalRecordsByPriority().firstIndex(where: {$0.goal.id = goalRecord.goal.id}){
                             if(index < maxStatLimit){
-                                Text("\(AppUtil.getGoalNameFromRecord(goals: self.goalsArray, id: goalRecord.id!))").bold().foregroundColor(Color.white)
-                                Text("\(fetchGoalDayTimeFromRecord(goalRec: goalRecord))/\(Int(AppUtil.getGoalTimeFromRecord(goals: self.goalsArray, id: goalRecord.id!))) MIN").foregroundColor(Color(AppUtil.getGoalColorFromRecord(goals: self.goalsArray, id: goalRecord.id!))).bold().padding(.bottom, 4)
+                                Text("\(goalRecord.name)").bold().foregroundColor(Color.white)
+                                Text("\(goalRecord.dayTime)/\(Int(goalRecord.goal.goalTime)) MIN").foregroundColor(Color(goalRecord.goal.color)).bold().padding(.bottom, 4)
                             }
                             
                         }
@@ -108,18 +90,18 @@ struct DailyStatsView: View {
                             if(index < maxStatLimit){
                                 //numerical limit here
                                 VStack(alignment: .leading, spacing: 1){
-                                    Text("\(goal.name!)").foregroundColor(Color.white).font(Font.system(size: 15, weight: .semibold, design: .rounded))
-                                    Text("\(Int(fetchGoalDayTime(goal: goal)))/\(Int(goal.goalTime)) MIN").foregroundColor(Color(goal.color!)).font(Font.system(size: 15, weight: .semibold, design: .rounded))
-                                        .foregroundColor(Color(goal.color!))
-                                    Text(String(AppUtil.calculateGoalCurrentStreak(records: filteredGoalRecords, goalID: goal.id!)))
+                                    Text("\(goal.name)").foregroundColor(Color.white).font(Font.system(size: 15, weight: .semibold, design: .rounded))
+                                    Text("\(Int(fetchGoalDayTime(goal: goal)))/\(Int(goal.goalTime)) MIN").foregroundColor(goal.color).font(Font.system(size: 15, weight: .semibold, design: .rounded))
+                                        .foregroundColor(goal.color)
+                                    Text(String(AppUtil.calculateGoalCurrentStreak(records: goalRecordListVM.getAllGoalRecords(), goalID: goal.uuid)))
                                         .font(Constants.globalBodyTextFont)
-                                        .foregroundColor(Color(goal.color!))
-                                    Text(String(AppUtil.calculateGoalBestStreak(goalID: goal.id!)))
+                                        .foregroundColor(goal.color)
+                                    Text(String(AppUtil.calculateGoalBestStreak(goalID: goal.uuid)))
                                         .font(Font.system(size: 15, weight: .semibold, design: .rounded))
-                                        .foregroundColor(Color(goal.color!))
-                                    Text(String(AppUtil.calculateTimeThisWeek(goalRecords: AppUtil.filterGoalRecordsByGoalID(goalRecords: self.goalRecordsArray, goalID: goal.id!))))
+                                        .foregroundColor(goal.color)
+                                    Text(String(AppUtil.calculateTimeThisWeek(goalRecords: AppUtil.filterGoalRecordsByGoalID(goalRecords: self.goalRecordsArray, goalID: goal.uuid))))
                                         .font(Font.system(size: 15, weight: .semibold, design: .rounded))
-                                        .foregroundColor(Color(goal.color!))
+                                        .foregroundColor(goal.color)
                                     //                                    Text(String(AppUtil.getTotalTimeString(seconds: Double(0.0))))
                                     //                                                                            .font(Font.system(size: 15, weight: .semibold, design: .rounded))
                                     //                                                                            .foregroundColor(Color(goal.color!))
@@ -149,8 +131,8 @@ struct DailyStatsView: View {
                         if let index = filteredGoals.firstIndex(of: goal){
                             if(index < maxStatLimit){
                                 //numerical limit here
-                                Text("\(goal.name!)").bold().foregroundColor(Color.white)
-                                Text("\(Int(fetchGoalDayTime(goal: goal)))/\(Int(goal.goalTime)) MIN").foregroundColor(Color(goal.color!)).bold().padding(.bottom, 4)
+                                Text("\(goal.name)").bold().foregroundColor(Color.white)
+                                Text("\(Int(fetchGoalDayTime(goal: goal)))/\(Int(goal.goalTime)) MIN").foregroundColor(goal.color).bold().padding(.bottom, 4)
                             }
                         }
                         
@@ -162,8 +144,8 @@ struct DailyStatsView: View {
     
     // MARK: - HELPERS
     
-    private func fetchGoalDayTime(goal: Goal) -> Int {
-        if let goalRecord = filteredGoalRecords.first(where: {goal.name == $0.name}) {
+    private func fetchGoalDayTime(goal: GoalViewModel) -> Int {
+        if let goalRecord = goal.filterGoalRecordToday() {
             return Int(goalRecord.dayTime/60)
         }
         else {

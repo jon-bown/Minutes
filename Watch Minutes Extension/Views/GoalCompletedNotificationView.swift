@@ -9,11 +9,11 @@ import SwiftUI
 
 struct GoalCompletedNotificationView: View {
     @Environment(\.presentationMode) var presentationMode
-    var goal: Goal
+    var goal: GoalViewModel
     var body: some View {
         HStack {
             VStack(alignment: .leading){
-                Text(goal.name!).font(.system(size: 20)).foregroundColor(Color(goal.color!)).bold()
+                Text(goal.name).font(.system(size: 20)).foregroundColor(goal.color).bold()
                 Text("Goal").font(.system(size: 20))
                 Text("Complete").font(.system(size: 20))
             }
@@ -21,7 +21,7 @@ struct GoalCompletedNotificationView: View {
 //                ProgressRingView(progress: 1.0, startColor: Color(goal.color!), endColor: Color(goal.color!))
                 
                 Spacer()
-                ProgressRingViewStatic(progress: 1.0, thickness: 4, startColor: Color(goal.color!), endColor: Color(goal.color!), backgroundColor: goal.color!).frame(width: 50, height: 50).aspectRatio(contentMode: .fit)
+                ProgressRingViewStatic(progress: 1.0, thickness: 4, startColor: goal.color, endColor: goal.color, backgroundColor: goal.color).frame(width: 50, height: 50).aspectRatio(contentMode: .fit)
 //                ProgressRings(dateProvided: Date(), maxWidth: 30, maxLineWidth: Constants.weekdayRingThickness, maxRingLimit: 3).padding(2).clipShape(Circle()).padding(.vertical, 4)
                 Spacer()
             }

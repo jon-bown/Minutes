@@ -20,7 +20,7 @@ struct ProgressRingView: View {
     var startColor: Color
     var endColor: Color
     var startAngle = -90.0
-    var backgroundColor = UIColor.red
+    var backgroundColor = Color.red
     var animate: Bool = true
     var empty: Bool = false
     
@@ -37,16 +37,16 @@ struct ProgressRingView: View {
         return GeometryReader{ geometry in
             ZStack {
                 RingBackgroundShape(thickness: thickness)
-                    .fill(Color(backgroundColor).opacity(0.3))
+                    .fill(backgroundColor).opacity(0.3)
                 //            Circle()
                 //                .stroke(Color(backgroundColor).opacity(0.2), lineWidth: thickness)
                 if(self.progress == 0.0 && !empty){
                     RingShape(currentPercentage: 0.005, thickness: thickness)
-                        .fill(Color(backgroundColor)).rotationEffect(Angle(degrees: -90))
+                        .fill(backgroundColor).rotationEffect(Angle(degrees: -90))
                 }
                 else{
                     RingShape(currentPercentage: 0.0, thickness: thickness)
-                        .fill(Color(backgroundColor)).rotationEffect(Angle(degrees: -90))
+                        .fill(backgroundColor).rotationEffect(Angle(degrees: -90))
                 }
                 RingShape(currentPercentage: currentPercentage, thickness: thickness)
                     .fill(gradient)

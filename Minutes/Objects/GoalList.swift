@@ -11,23 +11,16 @@ import SwiftUI
 //Fetches all stored goals and displays them as a list
 struct GoalList: View {
     
-    @Environment(\.managedObjectContext) var managedObjectContext
-    
-    @FetchRequest(
-        entity: Goal.entity(),
-        sortDescriptors: [
-            NSSortDescriptor(keyPath: \Goal.priority, ascending: true)
-        ]
-    ) var goals: FetchedResults<Goal>
+    @StateObject private var goalListVM = GoalListViewModel()
 
     
     var body: some View {
 
-        if(goals.isEmpty){
+        if(goalListVM.getGoalsArray().isEmpty){
             Text("Tap '+' to create a new minute goal!")
         }else {
             
-            List{ ForEach(goals, id: \.id) { goal in
+            List{ ForEach(goalListVM.getGoalsArray(), id: \.id) { goal in
                 GoalRow(goal: goal)
             }
             }

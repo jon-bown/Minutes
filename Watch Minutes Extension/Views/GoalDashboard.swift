@@ -36,7 +36,7 @@ struct GoalDashboard: View {
     
     var filteredGoalsToday: [Goal] {
         //return AppUtil.filterCurrentGoals(goals: self.goalsArray, date: Date())
-        let filteredArray = goals.filter({(Date() > $0.startDate! || cal.isDate(Date(), inSameDayAs:$0.startDate!)) && ($0.endDate == nil || Date() <= $0.endDate!) && (($0.frequency == "Weekly" && $0.weekDay!.contains(Date().dayOfTheWeek)) || ($0.frequency == "Monthly" && $0.monthDay == Date().dayOfTheMonth) || $0.frequency == "Daily")}).sorted(by: {$0.priority < $1.priority})
+        let filteredArray = goals.filter({(Date() > $0.startDate || cal.isDate(Date(), inSameDayAs:$0.startDate)) && ($0.endDate == nil || Date() <= $0.endDate!) && (($0.frequency == "Weekly" && $0.weekDay!.contains(Date().dayOfTheWeek)) || ($0.frequency == "Monthly" && $0.monthDay == Date().dayOfTheMonth) || $0.frequency == "Daily")}).sorted(by: {$0.priority < $1.priority})
         
  
         return filteredArray

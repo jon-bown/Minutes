@@ -8,38 +8,25 @@
 import SwiftUI
 
 struct OverallProgressView: View {
-    @Environment(\.managedObjectContext) var managedObjectContext
     @Environment(\.calendar) var calendar
     
-    @FetchRequest(
-      entity: Goal.entity(),
-      sortDescriptors: [
-        NSSortDescriptor(keyPath: \Goal.priority, ascending: true)
-      ]
-    ) var goals: FetchedResults<Goal>
+    @StateObject private var goalListVM = GoalListViewModel()
+    @StateObject private var goalRecordListVM = GoalRecordListViewModel()
     
-    @FetchRequest(
-        entity: GoalRecord.entity(),
-        sortDescriptors: [
-            NSSortDescriptor(keyPath: \GoalRecord.name, ascending: true)
-        ]
-    ) var goalRecords: FetchedResults<GoalRecord>
     
+    var dateProvided: Date
+    @State private var selectedDate: Date
     private var cal = Calendar.current
     
-    var filteredGoals: [Goal] {
-        return AppUtil.filterCurrentGoals(goals: self.goalsArray, date: dateProvided)
+    var filteredGoals: [GoalViewModel] {
+        return self.goalListVM.filterCurrentGoalsByDate(date: dateProvided)
     }
-    
-    var goalsArray: [Goal] {
-        return goals.sorted(by: {$0.priority > $1.priority})
-    }
-    
+
     //goalRecords created today
-    var filteredGoalRecords: [GoalRecord] {
-        return self.goalRecords.filter({Calendar.current.isDate(self.selectedDate, inSameDayAs:$0.date!)})
+    var filteredGoalRecords: [GoalRecordViewModel] {
+        return self.goalRecordListVM.filterGoalRecordsByDate(date: self.dateProvided)
+
     }
-    
     private var days: [Date] {
         guard
             let weekInterval = calendar.dateInterval(of: .weekOfYear, for: self.selectedDate)
@@ -49,10 +36,7 @@ struct OverallProgressView: View {
             matching: DateComponents(hour: 0, minute: 0, second: 0)
         )
     }
-    
-    var dateProvided: Date
-    @State private var selectedDate: Date
-    
+
     init(dateProvided: Date){
         self.dateProvided = dateProvided
         _selectedDate = State(initialValue: dateProvided)
@@ -82,18 +66,18 @@ struct OverallProgressView: View {
     func createCharts() -> some View {
             Group {
                 // Move Chart
-                ForEach(filteredGoals, id: \.self){ goal in
+                ForEach(filteredGoals, id: \.id){ goal in
                     BarChartView(
-                        title: goal.name!, //goalRecord.name
-                        progress: "\(round(Double(filteredGoalRecords.first(where: {$0.name == goal.name}) == nil ? 0:filteredGoalRecords.first(where: {$0.name == goal.name})!.dayTime/Double(60.0))*100)/100)", //goalRecord.progress
+                        title: goal.name, //goalRecord.name
+                        progress: "\(round(Double(filteredGoalRecords.first(where: {$0.name == goal.name}) == nil ? 0: filteredGoalRecords.first(where: {$0.name == goal.name})!.dayTime/Double(60.0))*100)/100)", //goalRecord.progress
                         goal: "\(Int(goal.goalTime))",
                         total: "",
                         average: "",
                         unit: "MIN",
                         data: filteredGoalRecords.first(where: {$0.name == goal.name}) == nil ? ActivityData.timeReduced:filteredGoalRecords.first(where: {$0.name == goal.name})!.goalUpdates!,
-                        textColor: Color(goal.color!),
-                        barStartColor: Color(goal.color!.lighter(by: 30)!),
-                        barEndColor: Color(goal.color!.darker(by: 30)!)
+                        textColor: goal.color,
+                        barStartColor: goal.color.lighter(by: 30),
+                        barEndColor: goal.color.darker(by: 30)
                     )
                         .padding([.bottom], 25)
                 }

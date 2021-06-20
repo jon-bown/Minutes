@@ -2,7 +2,7 @@
 //  Goal+CoreDataClass.swift
 //  Minutes
 //
-//  Created by Jonathan Bown on 3/24/21.
+//  Created by Jonathan Bown on 6/18/21.
 //
 //
 

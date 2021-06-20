@@ -15,26 +15,12 @@ import CoreHaptics
 struct GoalForm: View {
     @Environment(\.managedObjectContext) private var managedObjectContext
     
-    @FetchRequest(
-        entity: Goal.entity(),
-        sortDescriptors: [
-            NSSortDescriptor(keyPath: \Goal.priority, ascending: true)
-        ]
-    ) var goals: FetchedResults<Goal>
-    
-    @FetchRequest(
-        entity: GoalRecord.entity(),
-        sortDescriptors: [
-            NSSortDescriptor(keyPath: \GoalRecord.name, ascending: true)
-        ]
-    ) var goalRecords: FetchedResults<GoalRecord>
-    
-    var goalRecordsArray: [GoalRecord] {
-        return goalRecords.sorted(by: {$0.date! > $1.date!})
-    }
-    
+    @StateObject private var addGoalVM = AddGoalViewModel()
+    @StateObject private var goalListVM = GoalListViewModel()
+    @StateObject private var goalRecordListVM = GoalRecordListViewModel()
+        
     var editing: Bool
-    var passedGoal: Goal?
+    var passedGoal: GoalViewModel?
     @Binding var isPresented: Bool
     @Binding var success: Bool
     
@@ -45,7 +31,7 @@ struct GoalForm: View {
     @State private var goalDay: String = ""
     @State private var goalCol: Color = Color(.sRGB, red: 0.98, green: 0.9, blue: 0.2)
     @State private var startDate: Date = Date()
-    @State private var priority: Int64 = 0
+    @State private var priority: Int = 0
     @State private var reminders: Bool = false
     @State private var setEndDate: Bool = false
     @State private var startTime: Date = Date()
@@ -223,16 +209,16 @@ struct GoalForm: View {
                 guard let goal = self.passedGoal else {
                     return
                 }
-                self.goalName = goal.name!
-                self.goalCol = Color(goal.color!)
+                self.goalName = goal.name
+                self.goalCol = goal.color
                 self.goalDailyTime = Int(goal.goalTime)
-                self.startDate = goal.startDate!
+                self.startDate = goal.startDate
                 self.priority = goal.priority
                 self.goalFrequency = goal.frequency!
                 if(self.goalFrequency == "Weekly"){
                     self.dayOTW.populateSelections(currentDays: goal.weekDay!)
                 }
-                self.checkNotificationsExist(id: goal.id!)
+                self.checkNotificationsExist(id: goal.uuid)
                 
                 
 
@@ -466,13 +452,7 @@ struct GoalForm: View {
         self.isPresented = false
     }
     
-    private func saveContext() {
-        do {
-            try managedObjectContext.save()
-        } catch {
-            self.showError = true
-        }
-    }
+
     //MARK: HAPTICS
     func prepareHaptics() {
         guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
@@ -515,56 +495,21 @@ struct GoalForm: View {
     
     //MARK: EDITING
     private func addGoal(){
-        let newGoal = Goal(context: managedObjectContext)
+        
+        
+        addGoalVM.name = self.goalName
+        addGoalVM.color = self.goalCol
+        addGoalVM.startDate = self.startDate
+        addGoalVM.endDate = self.endDate
+        addGoalVM.frequency = self.goalFrequency
+        addGoalVM.goalTime = Double(self.goalDailyTime)
+        addGoalVM.save(dotw: self.dayOTW)
 
-        newGoal.name = goalName
-        newGoal.color = UIColor(goalCol)
-        newGoal.totalTime = 0.0
-        
-        newGoal.goalTime = Double(self.goalDailyTime)
-        newGoal.frequency = self.goalFrequency
-        newGoal.id = UUID()
-        newGoal.startDate = self.startDate
-        newGoal.frequency = self.goalFrequency
-        switch self.goalFrequency {
-        case "Daily":
-            newGoal.monthDay = 0
-            newGoal.weekDay = [String]()
-            break
-        case "Weekly":
-            newGoal.weekDay = [String]()
-            for index in 0...6 {
-                if(self.dayOTW.weekDays[index].isSelected) {
-                    
-                    newGoal.weekDay!.append(self.dayOTW.weekDays[index].weekDayString)
-                    //print(self.dayOTW.weekDays[index].weekDayString)
-                }
-            }
-            newGoal.monthDay = 0
-            break
-        case "Monthly":
-            newGoal.weekDay = [String]()
-            newGoal.monthDay = self.startDate.dayOfTheMonth
-            break
-        default:
-            break
-        }
-        
-        if goals.isEmpty {
-            newGoal.priority = 1
-        }
-        else {
-            newGoal.priority = goals.map { $0.priority }.max()! + 1
-        }
-        if(self.setEndDate){
-            newGoal.endDate = self.endDate
-        }
         //save notifications
         if(self.reminders){
-            self.submitUserNotificationTrigger(id: newGoal.id!)
+            self.submitUserNotificationTrigger(id: addGoalVM.id)
         }
         
-        self.saveContext()
         
         self.simpleSuccess()
         
@@ -573,49 +518,27 @@ struct GoalForm: View {
     }
     
     func updateGoal() {
-        guard let goal = self.passedGoal else {
-            return
+        addGoalVM.name = self.goalName
+        addGoalVM.color = self.goalCol
+        addGoalVM.startDate = self.startDate
+        addGoalVM.endDate = self.endDate
+        addGoalVM.frequency = self.goalFrequency
+        addGoalVM.goalTime = Double(self.goalDailyTime)
+        addGoalVM.save(dotw: self.dayOTW)
+
+        //save notifications
+        if(self.reminders){
+            self.submitUserNotificationTrigger(id: addGoalVM.id)
         }
-        goal.color = UIColor(self.goalCol)
-        goal.name = self.goalName
-        goal.goalTime = Double(self.goalDailyTime)
-        if let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalID: goal.id) {
-            record.progress = record.dayTime/(goal.goalTime*60.0)
-        }
-        goal.startDate = self.startDate
-        goal.frequency = self.goalFrequency
-        switch self.goalFrequency {
-        case "Daily":
-            goal.monthDay = 0
-            goal.weekDay = [String]()
-            break
-        case "Weekly":
-            goal.weekDay = [String]()
-            for weekday in self.dayOTW.weekDays {
-                if(weekday.isSelected) {
-                    
-                    goal.weekDay!.append(weekday.weekDayString)
-                }
-            }
-            goal.monthDay = 0
-            break
-        case "Monthly":
-            goal.weekDay = [String]()
-            goal.monthDay = self.startDate.dayOfTheMonth
-            break
-        default:
-            break
-        }
-        if managedObjectContext.hasChanges {
-            self.saveContext()
-        }
+
+
         
         if(self.reminders){
-            self.removeNotificationsForGoal(id: goal.id!)
-            self.submitUserNotificationTrigger(id: goal.id!)
+            self.removeNotificationsForGoal(id: self.passedGoal!.uuid)
+            self.submitUserNotificationTrigger(id: self.passedGoal!.uuid)
         }
         else {
-            self.removeNotificationsForGoal(id: goal.id!)
+            self.removeNotificationsForGoal(id: self.passedGoal!.uuid)
         }
         
         self.simpleSuccess()

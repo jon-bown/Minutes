@@ -9,30 +9,18 @@ import SwiftUI
 import CoreData
 
 struct MainProgressView: View {
-    
-    @Environment(\.managedObjectContext) var managedObjectContext
     @Environment(\.presentationMode) var presentationMode
     
-    @FetchRequest(
-      entity: Goal.entity(),
-      sortDescriptors: [
-        NSSortDescriptor(keyPath: \Goal.priority, ascending: true)
-      ]
-    ) var goals: FetchedResults<Goal>
-    
-    @FetchRequest(
-        entity: GoalRecord.entity(),
-        sortDescriptors: [
-            NSSortDescriptor(keyPath: \GoalRecord.name, ascending: true)
-        ]
-    ) var goalRecords: FetchedResults<GoalRecord>
-    
-    var filteredGoals: [Goal] {
-        return AppUtil.filterCurrentGoals(goals: self.goalsArray, date: Date())
+    @StateObject private var goalListVM = GoalListViewModel()
+    @StateObject private var goalRecordListVM = GoalRecordListViewModel()
+        
+    var filteredGoals: [GoalViewModel] {
+        return self.goalListVM.filterCurrentGoals()
     }
     
-    var goalsArray: [Goal] {
-        return goals.sorted(by: {$0.priority < $1.priority})
+    var filteredGoalRecords: [GoalRecordViewModel] {
+        return self.goalRecordListVM.filterGoalRecords()
+
     }
     
     @State private var showNewGoalForm: Bool = false
@@ -60,11 +48,11 @@ struct MainProgressView: View {
                         Spacer()
                         
                     }
-                    if(!goals.isEmpty){
+                    if(!goalListVM.goals.isEmpty){
                         NavigationLink(destination: OverallProgressView(dateProvided: Date())){
                             GroupBox{
                                 HStack{
-                                    DailyStatsView(goalList: self.goals)
+                                    DailyStatsView(goalList: self.goalListVM.goals)
                                     Spacer()
                                     ProgressRings(dateProvided: Date(), maxWidth: 120,
                                                   maxLineWidth: Constants.progressRingViewThicknessStandard, maxRingLimit: Constants.progressRingViewMaxRingLimitStandard, showClear: false).frame(width: Constants.progressRingViewFrameWidthStandard, height: Constants.progressRingViewFrameHeightStandard).aspectRatio(contentMode: .fit)
@@ -75,7 +63,7 @@ struct MainProgressView: View {
 
                     }
                     VStack(alignment: .center){
-                        if(goals.isEmpty){
+                        if(goalListVM.goals.isEmpty){
                             
                                 Text("Tap '+' to create a new minute goal!").font(.system(.title2, design: .rounded)).padding(.top, 10)
                             
@@ -90,7 +78,7 @@ struct MainProgressView: View {
                             if(self.goalFilterCriteria == "Today"){
                                 List(filteredGoals) { goal in
                                     GroupBox{
-                                        NavigationLink(destination: GoalDetailView(goal: goal), tag: "\(goal.id!)", selection: $selectedItem) {
+                                        NavigationLink(destination: GoalDetailView(goal: goal), tag: "\(goal.id)", selection: $selectedItem) {
                                             
                                             GoalRow(goal: goal)
                                         }
@@ -101,9 +89,9 @@ struct MainProgressView: View {
        
                             }
                             else {
-                                List(goalsArray) { goal in
+                                List(goalListVM.goals) { goal in
                                     GroupBox{
-                                        NavigationLink(destination: GoalDetailView(goal: goal), tag: "\(goal.id!)", selection: $selectedItem) {
+                                        NavigationLink(destination: GoalDetailView(goal: goal), tag: "\(goal.id)", selection: $selectedItem) {
                                             
                                             GoalRow(goal: goal)
                                         }
@@ -140,7 +128,7 @@ struct MainProgressView: View {
                 isPresented: self.$showNewGoalForm
             ) {
                 
-                GoalForm(editing: false, isPresented: self.$showNewGoalForm, success: self.$goalAddSuccess ).environment(\.managedObjectContext, self.managedObjectContext)
+                GoalForm(editing: false, isPresented: self.$showNewGoalForm, success: self.$goalAddSuccess )
                 
             }.navigationTitle("Summary").navigationBarTitleDisplayMode(.large)
 
@@ -150,7 +138,6 @@ struct MainProgressView: View {
     
     func createNavigationBar(_ geometrySize: CGSize) -> some View {
         ZStack(alignment: .top) {
-            //BlurView(style: .dark).edgesIgnoringSafeArea(.top)
             
                     HStack(alignment: .firstTextBaseline) {
                         
@@ -171,7 +158,7 @@ struct MainProgressView: View {
                             isPresented: self.$showNewGoalForm
                         ) {
                             
-                            GoalForm(editing: false, isPresented: self.$showNewGoalForm, success: self.$goalAddSuccess ).environment(\.managedObjectContext, self.managedObjectContext)
+                            GoalForm(editing: false, isPresented: self.$showNewGoalForm, success: self.$goalAddSuccess )
                             
                         }.padding()
 

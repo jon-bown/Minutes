@@ -8,15 +8,11 @@
 import SwiftUI
 
 struct WKGoalDetailViewR: View {
-    @Environment(\.managedObjectContext) var managedObjectContext
     @Environment(\.scenePhase) private var scenePhase
-    @FetchRequest(
-        entity: GoalRecord.entity(),
-        sortDescriptors: [
-            NSSortDescriptor(keyPath: \GoalRecord.name, ascending: true)
-        ]
-    ) var goalRecords: FetchedResults<GoalRecord>
-    @ObservedObject var goal: Goal
+
+    @StateObject private var goalRecordListVM = GoalRecordListViewModel()
+    
+    var goal: GoalViewModel
     @State private var progress: Double = 0.0
     @State private var selectedTab = 0
     @State private var showModal: Bool = false
@@ -25,8 +21,9 @@ struct WKGoalDetailViewR: View {
     @State private var backgroundDate: Date = Date()
     @State var totalTimeText: String = "00:00:00"
     
-    var filteredGoalRecordsToday: [GoalRecord] {
-        return self.goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs:$0.date!) && goal.id == $0.id})
+    var filteredGoalRecord: GoalRecordViewModel? {
+        return self.goalRecordListVM.getRecordTodayForGoal(goal: self.goal)
+
     }
     
     let timer = Timer.publish(every: 0.01, on: .main, in: .common).autoconnect()
@@ -39,12 +36,12 @@ struct WKGoalDetailViewR: View {
     var body: some View {
 
         TabView(selection: $selectedTab) {
-            StopwatchButtonWatchView(watchRunning: self.$watchState, watchTotalTime: self.$totalTime, goal: self.goal, progress: self.$progress, selectedTab: self.$selectedTab, showedNotification: self.$showedCompleted, actions: [self.reset, self.start, self.stop]).environment(\.managedObjectContext, managedObjectContext).tag(0)
-            StopwatchTimeWatchView(goal: self.goal, progress: self.$progress, selectedTab: self.$selectedTab, totalTime: self.$totalTime).environment(\.managedObjectContext, managedObjectContext).onReceive(timer) { _ in
+            StopwatchButtonWatchView(watchRunning: self.$watchState, watchTotalTime: self.$totalTime, goal: self.goal, progress: self.$progress, selectedTab: self.$selectedTab, showedNotification: self.$showedCompleted, actions: [self.reset, self.start, self.stop]).tag(0)
+            StopwatchTimeWatchView(goal: self.goal, progress: self.$progress, selectedTab: self.$selectedTab, totalTime: self.$totalTime).onReceive(timer) { _ in
                     
                     if self.watchState {
-                        if(!filteredGoalRecordsToday.isEmpty){
-                            self.progress = (Double(self.totalTime) + self.filteredGoalRecordsToday[0].dayTime)/(self.goal.goalTime*60)
+                        if(filteredGoalRecord != nil){
+                            self.progress = (Double(self.totalTime) + self.filteredGoalRecord.dayTime)/(self.goal.goalTime*60)
 
                         }
                         else{

@@ -12,31 +12,10 @@ import SwiftUI
 struct GoalPriorityView: View {
     
     // MARK: - Properties
-    @Environment(\.managedObjectContext) var managedObjectContext
     
-    @FetchRequest(
-        entity: Goal.entity(),
-        sortDescriptors: [
-            NSSortDescriptor(keyPath: \Goal.priority, ascending: true)
-        ]
-    ) var goals: FetchedResults<Goal>
+    @StateObject private var goalListVM = GoalListViewModel()
+    @StateObject private var goalRecordListVM = GoalRecordListViewModel()
     
-    @FetchRequest(
-        entity: GoalRecord.entity(),
-        sortDescriptors: [
-            NSSortDescriptor(keyPath: \GoalRecord.name, ascending: true)
-        ]
-    ) var goalRecords: FetchedResults<GoalRecord>
-    
-    var filteredGoals: [Goal] {
-        if(!goals.isEmpty){
-            return goals.sorted(by: {$0.priority < $1.priority})
-        }
-        else{
-            return []
-        }
-        
-    }
     @State private var showError: Bool = false
     @State private var isEditable = false
     @State private var refreshingID = UUID()
@@ -44,10 +23,10 @@ struct GoalPriorityView: View {
     var body: some View {
             
             List {
-                ForEach(filteredGoals, id: \.priority) { goal in
+                ForEach(goalListVM.getGoalsArray(), id: \.priority) { goal in
                     GroupBox{
                         HStack{
-                            Text(goal.name!)
+                            Text(goal.name)
                             Spacer()
                             Text("\(goal.priority)")
                         }
@@ -77,10 +56,10 @@ struct GoalPriorityView: View {
             if(index == destination){
                 return
             }
-            let sourceGoal = goals.first(where: {$0.priority == (index+1)})!
+            let sourceGoal = goalListVM.getGoalsArray().first(where: {$0.priority == (index+1)})!
             
             
-            var goalsArray = filteredGoals
+            var goalsArray = goalListVM.getGoalsArray()
             goalsArray.remove(at: index)
             if(goalsArray.count == (destination-1)){
                 goalsArray.append(sourceGoal)
@@ -95,16 +74,16 @@ struct GoalPriorityView: View {
                 
             }
             
-            for goal in filteredGoals {
-                let marker = goalsArray.firstIndex(of: goalsArray.first(where: {$0.id == goal.id!})!)
-                goal.priority = Int64(Int(marker!)+1)
+            for goal in goalListVM.getGoalsArray() {
+                let marker = goalListVM.goals.firstIndex(of: goalListVM.goals.first(where: {$0.id == goal.id})!)
+                goal.updatePriority(new: Int(marker!)+1) 
             }
             
             
         }
         
         DispatchQueue.main.async {
-            saveContext()
+            CoreDataManager.shared.saveContext()
         }
         
         //        withAnimation {
@@ -115,44 +94,32 @@ struct GoalPriorityView: View {
     func onDelete(at offsets: IndexSet) {
         
         for index in offsets {
-            let goal = self.goals.first(where: {$0.id == goals[index].id})!
+            let goal = self.goalListVM.getGoalsArray().first(where: {$0.id == goalListVM.goals[index].id})!
             
-            if(!goalRecords.isEmpty){
-                let goalRecords = self.goalRecords.filter({$0.id == goals[index].id})
+            if(!self.goalRecordListVM.goalRecords.isEmpty){
+                let goalRecords = self.goalRecordListVM.goalRecords.filter({$0.id == goalListVM.goals[index].id})
                 for record in goalRecords {
-                    managedObjectContext.delete(record)
-                    //managedObjectContext.reset()
+                    goalRecordListVM.deleteGoalRecord(record: record)
                     
                 }
             }
             let priorityMark = goal.priority
-            managedObjectContext.delete(goal)
+            goalListVM.deleteGoal(goal: goal)
             //managedObjectContext.reset()
-            for goal in goals {
+            for goal in goalListVM.getGoalsArray() {
                 if(goal.priority > priorityMark){
-                    goal.priority = goal.priority - 1
+                    goalListVM.goals[goalListVM.goals.firstIndex(where: {goal.id == $0.id})!].priority = goal.priority - 1
                 }
             }
             
             
             
         }
-        saveContext()
+        CoreDataManager.shared.saveContext()
         
         
         
     }
-    
-    private func saveContext() {
-        do {
-            try managedObjectContext.save()
-            
-            self.refreshingID = UUID()
-        } catch {
-            self.showError = true
-        }
-    }
-    
     
 }
 
