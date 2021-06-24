@@ -10,7 +10,6 @@ import ClockKit
 
 struct ProgressComplicationView: View {
     //Grab goal records
-    @Environment(\.managedObjectContext) var managedObjectContext
     @Environment(\.complicationRenderingMode) var renderingMode
     var dateProvided: Date
     
@@ -44,15 +43,15 @@ struct ProgressComplicationView: View {
 
         if(compFamily == .graphicCircular){
             ProgressRingsStatic(dateProvided: dateProvided, maxWidth: 37.0, maxLineWidth: 5, maxRingLimit: 3, animate: false, tinted: self.renderingMode == .tinted).frame(width: 50, height: 50)
-                .aspectRatio(contentMode: .fill).environment(\.managedObjectContext, managedObjectContext)
+                .aspectRatio(contentMode: .fill)
         }
         else if(compFamily == .graphicCorner) {
             ProgressRingsStatic(dateProvided: dateProvided, maxWidth: 25.0, maxLineWidth: 3, maxRingLimit: 3, animate: false, tinted: self.renderingMode == .tinted).frame(width: 50, height: 50)
-                .aspectRatio(contentMode: .fill).environment(\.managedObjectContext, managedObjectContext)
+                .aspectRatio(contentMode: .fill)
         }
         else {
             ProgressRingsStatic(dateProvided: dateProvided, maxWidth: 25.0, maxLineWidth: 3, maxRingLimit: 3, animate: false, tinted: self.renderingMode == .tinted).frame(width: 50, height: 50)
-                .aspectRatio(contentMode: .fill).environment(\.managedObjectContext, managedObjectContext)
+                .aspectRatio(contentMode: .fill)
         }
         
 

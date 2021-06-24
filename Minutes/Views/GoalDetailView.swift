@@ -33,6 +33,7 @@ struct GoalDetailView: View {
         
     var goal: GoalViewModel
     
+    @StateObject private var addGoalRecordVM = AddGoalRecordViewModel()
     @StateObject private var goalListVM = GoalListViewModel()
     @StateObject private var goalRecordListVM = GoalRecordListViewModel()
     
@@ -55,31 +56,6 @@ struct GoalDetailView: View {
     @State private var engine: CHHapticEngine?
     @State private var showError: Bool = false
     @State private var showedCompleted: Bool = false
-    
-//    //Just check the list view model if the goal record exists
-//    var goalRecordsArray: [GoalRecord] {
-//
-//        //return DataServer().goalRecords.sorted(by: {$0.date! > $1.date!})
-//
-//        return goalRecords.sorted(by: {$0.date! > $1.date!})
-//    }
-//
-//
-//    var filteredCurrentGoalRecordToday: GoalRecord? {
-//        return AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalID: self.goal.id)
-//
-//    }
-//
-//    var filteredGoalRecordsCurrentGoal: [GoalRecord] {
-//        return AppUtil.filterGoalRecordsByGoalID(goalRecords: self.goalRecordsArray, goalID: self.goal.id == nil ? nil:self.goal.id!)
-//    }
-//
-//    //Extract dictionary used to display todays sessions
-//    var filteredGoalRecordsSavesToday: [Date: Double] {
-//        return AppUtil.filterGoalRecordSavesTodayByID(goalRecords: self.goalRecordsArray, goalID: self.goal.id!)
-//
-//    }
-    
     
     
     var body: some View {
@@ -128,12 +104,12 @@ struct GoalDetailView: View {
                 
                 
                 
-                GroupBox(label: GroupBoxLabelButton(label: "Sessions", isEditable: self.$isSessionsEditable, action: self.makeListEditable)){
-                    
+                GroupBox(label: GroupBoxLabelButton(label: "Sessions", isEditable: self.$isSessionsEditable, action: self.makeListEditable)) {
+
                     //list of all goal updates today
                     
                     
-                    ForEach(self.goalRecordListVM.filteredGoalRecordsSavesToday().sorted(by: >), id: \.key){
+                    ForEach(self.goalRecordListVM.filterGoalRecordSavesTodayForGoal(goal: goal).sorted(by: > ), id: \.key){
                         key, value in
                         
                         //Divider()
@@ -234,7 +210,7 @@ struct GoalDetailView: View {
         //        }
         .onChange(of: self.showGoalEditForm) { newValue in
             if(!newValue) {
-                self.checkNotificationsExist(id: self.goal.id!)
+                self.checkNotificationsExist(id: self.goal.uuid)
                 self.recalculateProgressFromTimer()
                 
             }
@@ -244,20 +220,21 @@ struct GoalDetailView: View {
         }.onChange(of: self.stopWatch.isRunning){ newValue in
             //Removes pending notifications for goal
             if(newValue == false){
-                UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [AppUtil.getGoalNotificationSpecificIdString(id: self.goal.id!)])
+                UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [AppUtil.getGoalNotificationSpecificIdString(id: self.goal.uuid)])
             }
             
-        }.onAppear {
-            
+        }.onChange(of: self.goalRecordListVM.goalRecords){ newValue in
             if(self.stopWatch.isRunning){
                 self.recalculateProgressFromTimer()
             }
             else{
                 self.updateProgress()
             }
+        }
+        
+        .onAppear {
             
-            
-            self.checkNotificationsExist(id: self.goal.id!)
+            self.checkNotificationsExist(id: self.goal.uuid)
             self.prepareHaptics()
         }.toast(isShowing: self.$goalUpdatedSuccess, text: Text("Saved")).textFieldAlert(isShowing: self.$showCustomMinuteSheet, text: self.$newSessionText, title: "Add Minutes", saveAction: self.saveCustomMinuteSession)
         
@@ -418,7 +395,7 @@ struct GoalDetailView: View {
                 VStack(alignment: .leading, spacing: 0) {
                     Text("This Week").font(Font.system(size: 18, weight: .regular, design: .default)).kerning(0.05).foregroundColor(Color.white)
                     (
-                        Text(self.goalRecordListVM.calculateTimeThisWeek())
+                        Text(self.goalRecordListVM.calculateTimeThisWeekForGoal(goalID: goal.uuid))
                             .font(Font.system(size: 25, weight: .semibold, design: .rounded))
                             .kerning(0.25)
                             .foregroundColor(goal.color).lineLimit(1)
@@ -499,7 +476,7 @@ struct GoalDetailView: View {
                     Spacer()
                     
                     ZStack(alignment: .center){
-                        ProgressRingView(progress: self.progress, thickness: Constants.progressRingViewThicknessStandard, startColor: self.goal.color.darker(by: 10.0), endColor: self.goal.color.lighter(by: 15), backgroundColor: self.goal.color).frame(width: 175, height: 175).aspectRatio(contentMode: .fit).animatableProgressText(progress: progress)
+                        ProgressRingView(progress: self.progress, thickness: Constants.progressRingViewThicknessStandard, startColor: self.goal.color, endColor: self.goal.color, backgroundColor: self.goal.color).frame(width: 175, height: 175).aspectRatio(contentMode: .fit).animatableProgressText(progress: progress)
                     }
                     
                     
@@ -644,10 +621,10 @@ struct GoalDetailView: View {
     }
     
     private func saveCustomMinuteSession(){
-        var newRecord = false
+        var newRecord = true
         let record = self.goalRecordListVM.getRecordTodayForGoal(goal: self.goal)
-        if(record == nil){
-            newRecord = true
+        if(record != nil){
+            newRecord = false
         }
         guard let customMinutes = Int(self.newSessionText)
         else {
@@ -658,21 +635,31 @@ struct GoalDetailView: View {
         }
         let customSeconds = Double(customMinutes) * 60.0
         //Add date to array of records for the goal record
-        self.goal.updateTotalTime(time: customSeconds, add: true)
         if(newRecord){
 
             self.progress = customSeconds/(self.goal.goalTime*60)
 
             
             //TODO: Add method to add goalrecord
-            self.goalRecordListVM.addNewGoalRecord(name: self.goal.name, date: Date(), progress: self.progress, seconds: customSeconds, id: self.goal.id)
+            addGoalRecordVM.goal = self.goal
+            addGoalRecordVM.dayTime = customSeconds
+            addGoalRecordVM.progress = self.progress
+            
+            addGoalRecordVM.save()
+            
+            self.goal.updateTotalTime(time: Double(self.stopWatch.totalAccumulatedTime.seconds()), add: true)
+
+
 
         }
         
         else {
             
-            self.goalRecordListVM.updateGoalRecord(goalRecordID: record!.id, seconds: customSeconds)
-            self.updateProgress()
+            addGoalRecordVM.goal = self.goal
+            addGoalRecordVM.dayTime = customSeconds
+            addGoalRecordVM.progress = self.progress
+            let record = goalRecordListVM.getRecordTodayForGoal(goal: self.goal)
+            addGoalRecordVM.update(id: record!.id)
             
         }
         self.updateProgress()
@@ -737,98 +724,58 @@ struct GoalDetailView: View {
     //MARK: UPDATES
     
     func updateGoalRecord() {
-        var newRecord = false
-        guard let record = self.goalRecordListVM.getRecordTodayForGoal(goal: self.goal) else {
-            newRecord = true
+        var newRecord = true
+        if(self.goalRecordListVM.getRecordTodayForGoal(goal: self.goal) != nil) {
+            newRecord = false
         }
-        
-        //Add date to array of records for the goal record
         
         if(newRecord){
             
+            addGoalRecordVM.goal = self.goal
+            addGoalRecordVM.dayTime = Double(self.stopWatch.totalAccumulatedTime.seconds())
+            addGoalRecordVM.progress = self.progress
+            
+            addGoalRecordVM.save()
+            
             self.goal.updateTotalTime(time: Double(self.stopWatch.totalAccumulatedTime.seconds()), add: true)
-            self.goalRecordListVM.addNewGoalRecord(name: self.goal.name, date: Date(), progress: self.progress, seconds: Double(self.stopWatch.totalAccumulatedTime.seconds()), id: self.goal.id)
-            
-            
-//            let newGoalRecord = GoalRecord(context: managedObjectContext)
-//            newGoalRecord.name = self.goal.name
-//            newGoalRecord.date = Date()
-//            newGoalRecord.progress = self.progress
-//            
-//            newGoalRecord.dayTime = Double(self.stopWatch.totalAccumulatedTime.seconds())
-//            self.goal.totalTime += Double(self.stopWatch.totalAccumulatedTime.seconds())
-//            //divide hours into four quadrants
-//            var hour = Calendar.current.component(.hour, from: Date())*4
-//            let minutes = (newGoalRecord.progress * 59.0).truncatingRemainder(dividingBy: 60)
-//            var entry = [Int:Double]()
-//            hour = hour + Date().minuteQuadrant
-//            entry[hour] = Double(minutes)
-//            newGoalRecord.goalUpdates = entry
-//            //SAVES
-//            var save = [Date:Double]()
-//            save[Date()] = Double(self.stopWatch.totalAccumulatedTime.seconds())
-//            newGoalRecord.goalSaves = save
+
+
         }
         
         else {
             
-            self.goalRecordListVM.updateGoalRecord(goalRecordID: record.id, seconds: Double(self.stopWatch.totalAccumulatedTime.seconds()))
-            self.updateProgress()
-            
-            
-            
-//            if let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalID: self.goal.id) {
-//                record.progress = self.progress
-//                record.dayTime += Double(self.stopWatch.totalAccumulatedTime.seconds())
-//
-//
-//                var hour = Calendar.current.component(.hour, from: Date())*4
-//                let minutes = (record.progress * 59.0).truncatingRemainder(dividingBy: 60)
-//                hour = hour + Date().minuteQuadrant
-//                let keyExists = record.goalUpdates![hour] != nil
-//                if(keyExists){
-//                    record.goalUpdates![hour] = (record.goalUpdates![hour]! + Double(minutes)).truncatingRemainder(dividingBy: 60)
-//                }
-//                else{
-//                    record.goalUpdates![hour] = Double(minutes)
-//                }
-//                //Goal Saves
-//                let dateKey = Date()
-//                let saveKeyExists = record.goalSaves![dateKey] != nil
-//                if(saveKeyExists){
-//                    record.goalSaves![dateKey] = (record.goalSaves![dateKey]! + Double(self.stopWatch.totalAccumulatedTime.seconds()))
-//                }
-//                else{
-//                    record.goalSaves![dateKey] = Double(self.stopWatch.totalAccumulatedTime.seconds())
-//                }
-//
-//                self.goal.totalTime += Double(self.stopWatch.totalAccumulatedTime.seconds())
-//
-//            }
-            
+            addGoalRecordVM.goal = self.goal
+            addGoalRecordVM.dayTime = Double(self.stopWatch.totalAccumulatedTime.seconds())
+            addGoalRecordVM.progress = self.progress
+            let record = goalRecordListVM.getRecordTodayForGoal(goal: self.goal)
+            addGoalRecordVM.update(id: record!.id)
             
         }
         //TODO Update this to check if active widget
         //WidgetCenter.shared.reloadTimelines(ofKind: AppGroup.facts.rawValue)
-        
+        self.updateProgress()
         
     }
     
     func updateProgress() {
-        guard let record = self.goalRecordListVM.getRecordTodayForGoal(goal: self.goal) else {
+        if let record = self.goalRecordListVM.getRecordTodayForGoal(goal: self.goal) {
+            self.dayTime = record.dayTime
+            self.progress = record.progress
+            print("updated")
+        }
+            else {
             self.dayTime = 0.0
             self.progress = 0.0
             return
         }
-        self.dayTime = record.dayTime
-        self.progress = record.progress
+
         
         
     }
     
     func recalculateDayTime() {
         
-        guard let record = goal.records?.first(where: {Calendar.current.isDate(Date(), inSameDayAs: $0.date)}) else {
+        guard let record = goalRecordListVM.getRecordTodayForGoal(goal: self.goal) else {
             self.dayTime = 0.0
             return
         }

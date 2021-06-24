@@ -13,8 +13,7 @@ import CoreHaptics
  Form for adding or editing a goal
  */
 struct GoalForm: View {
-    @Environment(\.managedObjectContext) private var managedObjectContext
-    
+ 
     @StateObject private var addGoalVM = AddGoalViewModel()
     @StateObject private var goalListVM = GoalListViewModel()
     @StateObject private var goalRecordListVM = GoalRecordListViewModel()

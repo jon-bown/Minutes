@@ -139,25 +139,14 @@ struct CalendarView<DateView>: View where DateView: View {
 
 struct RootView: View {
     @Environment(\.calendar) var calendar
-    @Environment(\.managedObjectContext) var managedObjectContext
     
-    @FetchRequest(
-        entity: Goal.entity(),
-        sortDescriptors: [
-            NSSortDescriptor(keyPath: \Goal.priority, ascending: true)
-        ]
-    ) var goals: FetchedResults<Goal>
+    @StateObject private var goalListVM = GoalListViewModel()
+    @StateObject private var goalRecordListVM = GoalRecordListViewModel()
     
-    @FetchRequest(
-        entity: GoalRecord.entity(),
-        sortDescriptors: [
-            NSSortDescriptor(keyPath: \GoalRecord.name, ascending: true)
-        ]
-    ) var goalRecords: FetchedResults<GoalRecord>
     
     private var year: DateInterval {
-        if let minDate = goalRecords.min(by: { $0.date < $1.date })?.date {
-            let maxDate = goalRecords.max(by: { $0.date < $1.date })?.date
+        if let minDate = goalRecordListVM.goalRecords.min(by: { $0.date < $1.date })?.date {
+            let maxDate = goalRecordListVM.goalRecords.max(by: { $0.date < $1.date })?.date
             let thirtyDays = 24.0 * 3600.0 * 7
             return DateInterval(start: minDate, end: maxDate!.addingTimeInterval(thirtyDays))
         }
@@ -193,7 +182,6 @@ struct RootView: View {
 
 struct SmallCalendarView: View {
     @Environment(\.calendar) var calendar
-    @Environment(\.managedObjectContext) var managedObjectContext
     
     @FetchRequest(
         entity: Goal.entity(),

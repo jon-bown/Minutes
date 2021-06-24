@@ -25,8 +25,8 @@ struct SettingsView: View {
                 VStack(spacing: 20){
                     // MARK: - SECTION 1
                     GroupBox(label: Text("GOAL SETTINGS").bold()){
-                        SettingsRowNavLinkView(navView: AnyView(GoalPriorityView()), label: "Edit Goals", enabled: buttonDisabled).disabled(buttonDisabled)
-                        SettingsRowNavLinkView(navView: AnyView(ResetAppView()), label: "Reset", enabled: buttonDisabled).disabled(buttonDisabled)
+                        SettingsRowNavLinkView(navView: AnyView(GoalPriorityView()), label: "Edit Goals", disabled: buttonDisabled).disabled(buttonDisabled)
+                        SettingsRowNavLinkView(navView: AnyView(ResetAppView()), label: "Reset", disabled: buttonDisabled).disabled(buttonDisabled)
                     }
                     // MARK: - SECTION 2
                     

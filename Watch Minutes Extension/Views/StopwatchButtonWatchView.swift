@@ -8,23 +8,16 @@
 import SwiftUI
 
 struct StopwatchButtonWatchView: View {
-    @Environment(\.managedObjectContext) var managedObjectContext
-    @FetchRequest(
-        entity: GoalRecord.entity(),
-        sortDescriptors: [
-            NSSortDescriptor(keyPath: \GoalRecord.name, ascending: true)
-        ]
-    ) var goalRecords: FetchedResults<GoalRecord>
+
+    @StateObject private var goalListVM = GoalListViewModel()
+    @StateObject private var goalRecordListVM = GoalRecordListViewModel()
+    @StateObject private var addGoalRecordVM = AddGoalRecordViewModel()
     
-    
-    var goalRecordsArray: [GoalRecord] {
-        return goalRecords.sorted(by: {$0.date! > $1.date!})
-    }
     
     
     @Binding var watchRunning: Bool
     @Binding var watchTotalTime: Double
-    @ObservedObject var goal: Goal
+    var goal: GoalViewModel
     @State var timer: Timer?
     @Binding var progress: Double
     @Binding var selectedTab: Int
@@ -115,10 +108,10 @@ struct StopwatchButtonWatchView: View {
     }
     
     
+    
     func updateGoalRecord() {
         var newRecord = false
-        let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalID: self.goal.id!)
-        if(record == nil){
+        if(self.goalRecordListVM.getRecordTodayForGoal(goal: self.goal) == nil) {
             newRecord = true
         }
         
@@ -126,79 +119,83 @@ struct StopwatchButtonWatchView: View {
         
         if(newRecord){
             
-            let newGoalRecord = GoalRecord(context: managedObjectContext)
-            newGoalRecord.name = self.goal.name!
-            newGoalRecord.date = Date()
-            newGoalRecord.progress = self.progress
-            newGoalRecord.id = self.goal.id!
+            //TODO: Add method to add goalrecord
+            addGoalRecordVM.goal = self.goal
+            addGoalRecordVM.dayTime = Double(Double(self.watchTotalTime))
+            addGoalRecordVM.progress = self.progress
             
-            newGoalRecord.dayTime = Double(self.watchTotalTime)
-            self.goal.totalTime += Double(self.watchTotalTime)
-            //divide hours into four quadrants
-            var hour = Calendar.current.component(.hour, from: Date())*4
-            let minutes = (newGoalRecord.progress * 60.0).truncatingRemainder(dividingBy: 60)
-            var entry = [Int:Double]()
-            hour = hour + Date().minuteQuadrant
-            entry[hour] = Double(minutes)
-            newGoalRecord.goalUpdates = entry
-            //SAVES
-            var save = [Date:Double]()
-            save[Date()] = Double(self.watchTotalTime)
-            newGoalRecord.goalSaves = save
-            //add entry with hour: minutes
-            //newGoal.color = UIColor(goalCol)
-            //newGoal.cumTime = 0.0
-            //newGoal.dayTime = 0.0
-            //newGoal.goalTime = Double(self.goalDailyTime)
-            //newGoal.frequency = ""
-            //newGoal.id = UUID()
-            saveContext()
+            addGoalRecordVM.save()
+            
+            self.goal.updateTotalTime(time: Double(Double(self.watchTotalTime)), add: true)
+
+
+            
+//            let newGoalRecord = GoalRecord(context: managedObjectContext)
+//            newGoalRecord.name = self.goal.name
+//            newGoalRecord.date = Date()
+//            newGoalRecord.progress = self.progress
+//
+//            newGoalRecord.dayTime = Double(self.stopWatch.totalAccumulatedTime.seconds())
+//            self.goal.totalTime += Double(self.stopWatch.totalAccumulatedTime.seconds())
+//            //divide hours into four quadrants
+//            var hour = Calendar.current.component(.hour, from: Date())*4
+//            let minutes = (newGoalRecord.progress * 59.0).truncatingRemainder(dividingBy: 60)
+//            var entry = [Int:Double]()
+//            hour = hour + Date().minuteQuadrant
+//            entry[hour] = Double(minutes)
+//            newGoalRecord.goalUpdates = entry
+//            //SAVES
+//            var save = [Date:Double]()
+//            save[Date()] = Double(self.stopWatch.totalAccumulatedTime.seconds())
+//            newGoalRecord.goalSaves = save
         }
         
         else {
-            if let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalID: self.goal.id!) {
-                record.progress = self.progress
-                record.dayTime += Double(self.watchTotalTime)
-                
-                
-                var hour = Calendar.current.component(.hour, from: Date())*4
-                let minutes = (record.progress * 59.0).truncatingRemainder(dividingBy: 60)
-                hour = hour + Date().minuteQuadrant
-                let keyExists = record.goalUpdates![hour] != nil
-                if(keyExists){
-                    record.goalUpdates![hour] = (record.goalUpdates![hour]! + Double(minutes)).truncatingRemainder(dividingBy: 60)
-                }
-                else{
-                    record.goalUpdates![hour] = Double(minutes)
-                }
-                //Goal Saves
-                let dateKey = Date()
-                let saveKeyExists = record.goalSaves![dateKey] != nil
-                if(saveKeyExists){
-                    record.goalSaves![dateKey] = (record.goalSaves![dateKey]! + Double(self.watchTotalTime))
-                }
-                else{
-                    record.goalSaves![dateKey] = Double(self.watchTotalTime)
-                }
-                
-                self.goal.totalTime += Double(self.watchTotalTime)
-                saveContext()
-                
-            }
+            
+            addGoalRecordVM.goal = self.goal
+            addGoalRecordVM.dayTime = Double(Double(Double(self.watchTotalTime)))
+            addGoalRecordVM.progress = self.progress
+            let record = goalRecordListVM.getRecordTodayForGoal(goal: self.goal)
+            addGoalRecordVM.update(id: record!.id)
+            
+            
+//            if let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalID: self.goal.id) {
+//                record.progress = self.progress
+//                record.dayTime += Double(self.stopWatch.totalAccumulatedTime.seconds())
+//
+//
+//                var hour = Calendar.current.component(.hour, from: Date())*4
+//                let minutes = (record.progress * 59.0).truncatingRemainder(dividingBy: 60)
+//                hour = hour + Date().minuteQuadrant
+//                let keyExists = record.goalUpdates![hour] != nil
+//                if(keyExists){
+//                    record.goalUpdates![hour] = (record.goalUpdates![hour]! + Double(minutes)).truncatingRemainder(dividingBy: 60)
+//                }
+//                else{
+//                    record.goalUpdates![hour] = Double(minutes)
+//                }
+//                //Goal Saves
+//                let dateKey = Date()
+//                let saveKeyExists = record.goalSaves![dateKey] != nil
+//                if(saveKeyExists){
+//                    record.goalSaves![dateKey] = (record.goalSaves![dateKey]! + Double(self.stopWatch.totalAccumulatedTime.seconds()))
+//                }
+//                else{
+//                    record.goalSaves![dateKey] = Double(self.stopWatch.totalAccumulatedTime.seconds())
+//                }
+//
+//                self.goal.totalTime += Double(self.stopWatch.totalAccumulatedTime.seconds())
+//
+//            }
             
             
         }
-        self.watchTotalTime = 0.0
+        //TODO Update this to check if active widget
+        //WidgetCenter.shared.reloadTimelines(ofKind: AppGroup.facts.rawValue)
+        
         
     }
     
-    private func saveContext() {
-        if managedObjectContext.hasChanges {
-            do {
-                try managedObjectContext.save()
-            } catch {
-                
-            }
-        }
-    }
+    
+    
 }

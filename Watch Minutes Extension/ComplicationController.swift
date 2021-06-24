@@ -12,7 +12,7 @@ import UIKit
 
 class ComplicationController: NSObject, CLKComplicationDataSource {
     
-    let moc = PersistenceController.persistentContainer.viewContext
+    let moc = CoreDataManager.shared.persistentContainer.viewContext
     
     
     
@@ -147,7 +147,7 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
             handler(template)
             break
         default:
-            let template = CLKComplicationTemplateGraphicCircularView(ProgressComplicationView(dateProvided: Date(), compFamily: complication.family).environment(\.managedObjectContext, moc))
+            let template = CLKComplicationTemplateGraphicCircularView(ProgressComplicationView(dateProvided: Date(), compFamily: complication.family))
             handler(template)
             break
         }
@@ -194,16 +194,16 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
     CLKComplicationTemplate {
         switch family {
         case .graphicCorner:
-            let template = CLKComplicationTemplateGraphicCornerCircularView(ProgressComplicationView(dateProvided: date, compFamily: family).environment(\.managedObjectContext, moc))
+            let template = CLKComplicationTemplateGraphicCornerCircularView(ProgressComplicationView(dateProvided: date, compFamily: family))
             return template
         case .graphicCircular:
-            let template = CLKComplicationTemplateGraphicCircularView(ProgressComplicationView(dateProvided: date, compFamily: family).environment(\.managedObjectContext, moc))
+            let template = CLKComplicationTemplateGraphicCircularView(ProgressComplicationView(dateProvided: date, compFamily: family))
             return template
         case .graphicExtraLarge:
-            let template = CLKComplicationTemplateGraphicCircularView(ProgressComplicationView(dateProvided: date, compFamily: family).environment(\.managedObjectContext, moc))
+            let template = CLKComplicationTemplateGraphicCircularView(ProgressComplicationView(dateProvided: date, compFamily: family))
             return template
         default:
-            let template = CLKComplicationTemplateGraphicCircularView(ProgressComplicationView(dateProvided: date, compFamily: family).environment(\.managedObjectContext, moc))
+            let template = CLKComplicationTemplateGraphicCircularView(ProgressComplicationView(dateProvided: date, compFamily: family))
             
 //            preconditionFailure("Complication family not supported")
             return template

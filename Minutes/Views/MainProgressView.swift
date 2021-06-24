@@ -14,15 +14,6 @@ struct MainProgressView: View {
     @StateObject private var goalListVM = GoalListViewModel()
     @StateObject private var goalRecordListVM = GoalRecordListViewModel()
         
-    var filteredGoals: [GoalViewModel] {
-        return self.goalListVM.filterCurrentGoals()
-    }
-    
-    var filteredGoalRecords: [GoalRecordViewModel] {
-        return self.goalRecordListVM.filterGoalRecords()
-
-    }
-    
     @State private var showNewGoalForm: Bool = false
     @State private var goalFilterCriteria: String = "Today"
     @State private var goalAddSuccess: Bool = false
@@ -76,7 +67,7 @@ struct MainProgressView: View {
                         }
                         //ScrollView{
                             if(self.goalFilterCriteria == "Today"){
-                                List(filteredGoals) { goal in
+                                List(self.goalListVM.filterCurrentGoals()) { goal in
                                     GroupBox{
                                         NavigationLink(destination: GoalDetailView(goal: goal), tag: "\(goal.id)", selection: $selectedItem) {
                                             
@@ -115,24 +106,41 @@ struct MainProgressView: View {
             }
             .navigationBarItems(trailing:
                                     Button(action: {
-                                        self.showNewGoalForm.toggle()
+                                        
+                                        self.showNewGoalForm = true
+                                        
                                     }){
                                         Image(systemName: "plus.circle").resizable().font(Font.system(.title))
                                             .frame(width: 35, height: 35)
                                             .foregroundColor(Color.white)
                                             //.font(Font.system(size: 50, weight: .bold))
                                     }
-            
+
             )
         .sheet(
-                isPresented: self.$showNewGoalForm
+            isPresented: self.$showNewGoalForm
             ) {
                 
                 GoalForm(editing: false, isPresented: self.$showNewGoalForm, success: self.$goalAddSuccess )
                 
-            }.navigationTitle("Summary").navigationBarTitleDisplayMode(.large)
+        }
+            .navigationTitle("Summary").navigationBarTitleDisplayMode(.large)
+            
+//            .toolbar(content: {
+//                ToolbarItem(placement: .navigationBarTrailing){
+//                    Button(action: {
+//                        self.showNewGoalForm = true
+//                        print("FU")
+//                    }){
+//                        Image(systemName: "plus.circle").resizable().font(Font.system(.title))
+//                            .frame(width: 45, height: 45)
+//                            .foregroundColor(Color.white)
+//                            //.font(Font.system(size: 50, weight: .bold))
+//                    }.disabled(false)
+//                }
+//            }).navigationTitle("Summary").navigationBarTitleDisplayMode(.large)
 
-        }.navigationViewStyle(StackNavigationViewStyle())
+        }.navigationViewStyle(DefaultNavigationViewStyle())
         
     }
     

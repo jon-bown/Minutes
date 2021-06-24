@@ -9,13 +9,12 @@ import SwiftUI
 
 @main
 struct MinutesApp: App {
-    let persistenceController = PersistenceController.self
     @WKExtensionDelegateAdaptor(ExtensionDelegate.self) var delegate
     
     @SceneBuilder var body: some Scene {
         WindowGroup {
             NavigationView {
-                ContentView().environment(\.managedObjectContext, persistenceController.persistentContainer.viewContext).environment(\.appDelegate, delegate)
+                ContentView().environment(\.appDelegate, delegate)
             }
         }
 

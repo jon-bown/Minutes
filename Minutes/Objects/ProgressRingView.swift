@@ -26,7 +26,7 @@ struct ProgressRingView: View {
     
     
     var animation: Animation {
-        Animation.easeOut(duration: 2)
+        Animation.easeOut(duration: 1.5)
     }
     
     
@@ -108,27 +108,7 @@ struct ProgressRingView: View {
         
         return CGPoint(x: xPos, y: yPos)
     }
-//    
-//    private func ringTipShadowOffset(progress: Double, radius: Double, thickness: CGFloat) -> CGPoint {
-//        let shadowPosition = ringTipPosition(progress: progress + 0.02, radius: radius, thickness: thickness)
-//        let circlePosition = ringTipPosition(progress: progress, radius: radius, thickness: thickness)
-//        let angle = (progress + startAngle)/360
-//        //print("(\(shadowPosition.x),\(shadowPosition.y)")
-//        //print(self.currentPercentage)
-//        //if(angle < 180){
-//        //            return CGPoint(x: -(circlePosition.y - shadowPosition.y), y: (circlePosition.x - shadowPosition.x))
-//        
-//        //ORIGINAL
-//        //        return CGPoint(x: shadowPosition.x - circlePosition.x, y: shadowPosition.y - circlePosition.y)
-//        return CGPoint(x: shadowPosition.x, y: shadowPosition.y)
-//        //            return CGPoint(x: -(circlePosition.x - shadowPosition.x), y: -(shadowPosition.y - circlePosition.y))
-//        //}
-//        //        else {
-//        //            return CGPoint(x: (shadowPosition.y - circlePosition.y), y: (circlePosition.y - shadowPosition.y))
-//        //        }
-//        
-//        //        return CGPoint(x: (shadowPosition.y - circlePosition.y), y: (shadowPosition.x - circlePosition.x))
-//    }
+
 }
 
 

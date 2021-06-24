@@ -8,12 +8,11 @@
 import SwiftUI
 
 struct ContentView: View {
-    @Environment(\.managedObjectContext) var managedObjectContext
     @Environment(\.appDelegate) var delegate
 
 
     var body: some View {
-        GoalDashboard().environment(\.managedObjectContext, managedObjectContext).environment(\.appDelegate, delegate)
+        GoalDashboard().environment(\.appDelegate, delegate)
     }
 }
 

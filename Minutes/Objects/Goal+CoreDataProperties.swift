@@ -18,13 +18,13 @@ extension Goal {
     }
 
     @NSManaged public var id: UUID
-    @NSManaged public var color: UIColor
+    @NSManaged public var color: UIColor?
     @NSManaged public var endDate: Date?
     @NSManaged public var frequency: String?
     @NSManaged public var goalTime: Double
-    @NSManaged public var monthDay: Int
+    @NSManaged public var monthDay: Int16
     @NSManaged public var name: String?
-    @NSManaged public var priority: Int
+    @NSManaged public var priority: Int16
     @NSManaged public var startDate: Date
     @NSManaged public var totalTime: Double
     @NSManaged public var weekDay: [String]?

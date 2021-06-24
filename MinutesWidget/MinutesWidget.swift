@@ -55,7 +55,6 @@ struct SimpleEntry: TimelineEntry {
 }
 
 struct MinutesWidgetEntryView : View {
-    @Environment(\.managedObjectContext) var managedObjectContext
     @Environment(\.widgetFamily) var widgetFamily
     
     @StateObject private var goalListVM = GoalListViewModel()
@@ -99,7 +98,7 @@ struct MinutesWidgetEntryView : View {
     
     func createSystemSmall() -> some View {
         ProgressRingsStatic(dateProvided: entry.date, maxWidth:120, maxLineWidth: 15, maxRingLimit: 3, animate: false).frame(width: 150, height: 150)
-        .aspectRatio(contentMode: .fit).environment(\.managedObjectContext, managedObjectContext)
+        .aspectRatio(contentMode: .fit)
     }
     
     
@@ -147,7 +146,7 @@ struct MinutesWidgetEntryView : View {
                 SmallCalendarView().padding(EdgeInsets(top: 8, leading: 0, bottom: 5, trailing: 0))
             }
             Spacer()
-            MiniBarChartWidgetView().environment(\.managedObjectContext, managedObjectContext)
+            MiniBarChartWidgetView()
             Spacer()
             HStack{
                 DailyStatsView(goalList: goalListVM.goals, type: "V").padding(.leading, 5).padding(.bottom, 20)
@@ -161,7 +160,7 @@ struct MinutesWidgetEntryView : View {
             DailyStatsView(goalList: goalListVM.goals).padding().padding(.leading, 10)
             Spacer()
             ProgressRingsStatic(dateProvided: entry.date, maxWidth:120, maxLineWidth: 15, maxRingLimit: 3, animate: false).frame(width: 150, height: 150)
-                .aspectRatio(contentMode: .fit).environment(\.managedObjectContext, managedObjectContext).padding(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 10))
+                .aspectRatio(contentMode: .fit).padding(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 10))
         }.padding(.vertical, 5)
     }
 }
@@ -173,7 +172,7 @@ struct MinutesWidget: Widget {
 
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: Provider(context: persistentContainer.viewContext)) { entry in
-            MinutesWidgetEntryView(entry: entry).environment(\.managedObjectContext, persistentContainer.viewContext)
+            MinutesWidgetEntryView(entry: entry)
         }
         .configurationDisplayName("Minute Progress")
         .description("Show overviews of progress throughout the day")
@@ -189,7 +188,7 @@ struct MinutesWidget: Widget {
 //        container.loadPersistentStores {
 //            handle,error  in
 //        }
-        return PersistenceController.persistentContainer
+        return CoreDataManager.shared.persistentContainer
     }()
 }
 

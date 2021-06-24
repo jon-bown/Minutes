@@ -90,6 +90,9 @@
 		FCB6D6EA260AEE9B00933F95 /* WeekDay.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCB6D6E9260AEE9B00933F95 /* WeekDay.swift */; };
 		FCBD9C3E2630E320007B3D66 /* StopwatchTimeWatchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCBD9C3D2630E320007B3D66 /* StopwatchTimeWatchView.swift */; };
 		FCBD9C442630E619007B3D66 /* StopwatchButtonWatchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCBD9C432630E619007B3D66 /* StopwatchButtonWatchView.swift */; };
+		FCBFAAA72682C91300B4F46E /* AddGoalRecordViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCBFAAA62682C91300B4F46E /* AddGoalRecordViewModel.swift */; };
+		FCBFAAA82682C91300B4F46E /* AddGoalRecordViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCBFAAA62682C91300B4F46E /* AddGoalRecordViewModel.swift */; };
+		FCBFAAA92682C91300B4F46E /* AddGoalRecordViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCBFAAA62682C91300B4F46E /* AddGoalRecordViewModel.swift */; };
 		FCC8501625B1080B009678AB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FCC8501525B1080B009678AB /* Assets.xcassets */; };
 		FCC8501D25B1080B009678AB /* Watch Minutes Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = FCC8501C25B1080B009678AB /* Watch Minutes Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		FCC8502425B1080B009678AB /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCC8502325B1080B009678AB /* ContentView.swift */; };
@@ -208,7 +211,7 @@
 		FC202E3E25AA966B007D928D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FC202E4125AA966B007D928D /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		FC202E4325AA966B007D928D /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
-		FC202E4625AA966B007D928D /* Minutes.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Minutes.xcdatamodel; sourceTree = "<group>"; };
+		FC202E4625AA966B007D928D /* Minutes.xcdatamodel */ = {isa = PBXFileReference; explicitFileType = wrapper.xcdatamodel; path = Minutes.xcdatamodel; sourceTree = "<group>"; };
 		FC202E4825AA966B007D928D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FC202E7625AA9EE8007D928D /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ContentView.swift; path = Objects/ContentView.swift; sourceTree = "<group>"; };
 		FC202E7725AA9EE8007D928D /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
@@ -243,6 +246,7 @@
 		FCB6D6E9260AEE9B00933F95 /* WeekDay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekDay.swift; sourceTree = "<group>"; };
 		FCBD9C3D2630E320007B3D66 /* StopwatchTimeWatchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StopwatchTimeWatchView.swift; sourceTree = "<group>"; };
 		FCBD9C432630E619007B3D66 /* StopwatchButtonWatchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StopwatchButtonWatchView.swift; sourceTree = "<group>"; };
+		FCBFAAA62682C91300B4F46E /* AddGoalRecordViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddGoalRecordViewModel.swift; sourceTree = "<group>"; };
 		FCC8501325B1080A009678AB /* Watch Minutes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Watch Minutes.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FCC8501525B1080B009678AB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FCC8501725B1080B009678AB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -449,6 +453,7 @@
 				FC8B5729266BB602005D1631 /* GoalListViewModel.swift */,
 				FC8B572D266D5D90005D1631 /* GoalRecordListViewModel.swift */,
 				FC8B5751266F2113005D1631 /* AddGoalViewModel.swift */,
+				FCBFAAA62682C91300B4F46E /* AddGoalRecordViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -693,6 +698,7 @@
 				FC917692267CF32700DC6A69 /* Goal+CoreDataProperties.swift in Sources */,
 				FC034C662623BDEF0054405B /* ProgressRings.swift in Sources */,
 				FC034C572623BBBB0054405B /* MinutesWidget.swift in Sources */,
+				FCBFAAA92682C91300B4F46E /* AddGoalRecordViewModel.swift in Sources */,
 				FC034CA526268EA30054405B /* DailyStatsView.swift in Sources */,
 				FC034C912623CCB80054405B /* Minutes.xcdatamodeld in Sources */,
 				FC034C9B26265DA40054405B /* Constants.swift in Sources */,
@@ -715,6 +721,7 @@
 			files = (
 				FC202E9325AA9F44007D928D /* CompletionView.swift in Sources */,
 				FCB6D6AD25FAC41B00933F95 /* StopWatch.swift in Sources */,
+				FCBFAAA72682C91300B4F46E /* AddGoalRecordViewModel.swift in Sources */,
 				FC202E9C25AA9F5E007D928D /* StopWatchButton.swift in Sources */,
 				FCC8507425B39722009678AB /* SettingsRowView.swift in Sources */,
 				FC202E9625AA9F44007D928D /* SettingsView.swift in Sources */,
@@ -800,6 +807,7 @@
 				FC8B5726266BB4E9005D1631 /* CoreDataManager.swift in Sources */,
 				FCE7F2C025C9C016000B82A5 /* HalfCapsuleShape.swift in Sources */,
 				FC76CC8B25D5B34100FFF37A /* AppDelegate.swift in Sources */,
+				FCBFAAA82682C91300B4F46E /* AddGoalRecordViewModel.swift in Sources */,
 				FC8B574F266D6E93005D1631 /* GoalRecord+CoreDataProperties.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

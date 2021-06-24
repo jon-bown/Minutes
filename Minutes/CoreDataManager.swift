@@ -11,7 +11,7 @@ import SwiftUI
 
 
 class CoreDataManager {
-    let persistentContainer: NSPersistentContainer
+    let persistentContainer: NSPersistentCloudKitContainer
     
     static let shared = CoreDataManager()
     
@@ -200,8 +200,9 @@ class CoreDataManager {
     
     func addGoal(name: String, color: Color, goalTime: Double, frequency: String, startDate: Date, dotw: WeekDays, endDate: Date?, id: UUID) {
         
+        print("Adding goal")
         let newGoal = Goal(context: persistentContainer.viewContext)
-        
+        newGoal.id = id
         newGoal.name = name
         newGoal.color = UIColor(color)
         newGoal.totalTime = 0.0
@@ -228,7 +229,7 @@ class CoreDataManager {
             break
         case "Monthly":
             newGoal.weekDay = [String]()
-            newGoal.monthDay = startDate.dayOfTheMonth
+            newGoal.monthDay = Int16(startDate.dayOfTheMonth)
             break
         default:
             break
@@ -237,10 +238,10 @@ class CoreDataManager {
         
         var priority = 1
         if !self.getAllGoals().isEmpty {
-            priority = self.getAllGoals().map { $0.priority }.max()! + 1
+            priority = self.getAllGoals().map { Int($0.priority) }.max()! + 1
         }
         
-        newGoal.priority = priority
+        newGoal.priority = Int16(priority)
         
         saveContext()
 
@@ -276,7 +277,7 @@ class CoreDataManager {
             break
         case "Monthly":
             goal.weekDay = [String]()
-            goal.monthDay = startDate.dayOfTheMonth
+            goal.monthDay = Int16(startDate.dayOfTheMonth)
             break
         default:
             break
@@ -293,22 +294,22 @@ class CoreDataManager {
         
         var priority = 1
         if !self.getAllGoals().isEmpty {
-            priority = self.getAllGoals().map { $0.priority }.max()! + 1
+            priority = self.getAllGoals().map { Int($0.priority) }.max()! + 1
         }
         
-        goal.priority = priority
+        goal.priority = Int16(priority)
         
         saveContext()
     }
     
-    func addGoalRecord(name: String, date: Date, progress: Double, seconds: Double, parentGoalID: NSManagedObjectID) {
+    func addGoalRecord(goal: GoalViewModel, date: Date, progress: Double, seconds: Double) {
         
         let newGoalRecord = GoalRecord(context: persistentContainer.viewContext)
-        newGoalRecord.name = name
+        newGoalRecord.name = goal.name
         newGoalRecord.date = date
         newGoalRecord.progress = progress
         newGoalRecord.dayTime = seconds
-        
+        newGoalRecord.goal = goal.goal
         var hour = Calendar.current.component(.hour, from: Date())*4
         let minutes = (newGoalRecord.progress * 59).truncatingRemainder(dividingBy: 60)
         var entry = [Int:Double]()
@@ -316,12 +317,14 @@ class CoreDataManager {
         entry[hour] = Double(minutes)
         newGoalRecord.goalUpdates = entry
         
+        
         var save = [Date:Double]()
         save[Date()] = seconds
         newGoalRecord.goalSaves = save
         
-        let parentGoal = self.getGoalByID(id: parentGoalID)!
+        let parentGoal = self.getGoalByID(id: goal.id)!
         parentGoal.addToRecords(newGoalRecord)
+        parentGoal.totalTime = newGoalRecord.dayTime
         
         saveContext()
     }
@@ -351,7 +354,8 @@ class CoreDataManager {
             else{
                 record.goalSaves![dateKey] = secondsToAdd
             }
-            
+            let parentGoal = self.getGoalByID(id: record.goal.objectID)!
+            parentGoal.totalTime = record.dayTime
         }
 
         
@@ -423,7 +427,7 @@ class CoreDataManager {
         do {
             let goal = try persistentContainer.viewContext.existingObject(with: id) as? Goal
             
-                goal?.priority = priority
+                goal?.priority = Int16(priority)
 
             
             saveContext()

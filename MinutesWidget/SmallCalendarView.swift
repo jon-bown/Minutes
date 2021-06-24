@@ -136,21 +136,9 @@ struct CalendarView<DateView>: View where DateView: View {
 
 struct SmallCalendarView: View {
     @Environment(\.calendar) var calendar
-    @Environment(\.managedObjectContext) var managedObjectContext
     
-    @FetchRequest(
-      entity: Goal.entity(),
-      sortDescriptors: [
-        NSSortDescriptor(keyPath: \Goal.priority, ascending: true)
-      ]
-    ) var goals: FetchedResults<Goal>
-    
-    @FetchRequest(
-        entity: GoalRecord.entity(),
-        sortDescriptors: [
-            NSSortDescriptor(keyPath: \GoalRecord.name, ascending: true)
-        ]
-    ) var goalRecords: FetchedResults<GoalRecord>
+    @StateObject private var goalListVM = GoalListViewModel()
+    @StateObject private var goalRecordListVM = GoalRecordListViewModel()
 
 //    private var week: DateInterval {
 //

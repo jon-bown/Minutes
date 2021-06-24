@@ -23,14 +23,14 @@ struct ProgressRings: View {
     var showClear: Bool = true
     var animate: Bool = true
     //var goalList: FetchedResults<Goal>
-    var filteredGoals: [GoalViewModel] {
-        return self.goalListVM.filterCurrentGoalsByDate(date: dateProvided)
-    }
-    
-    var filteredGoalRecords: [GoalRecordViewModel] {
-        return self.goalRecordListVM.filterGoalRecordsByDate(date: dateProvided)
-
-    }
+//    var filteredGoals: [GoalViewModel] {
+//        return self.goalListVM.filterCurrentGoalsByDate(date: dateProvided)
+//    }
+//
+//    var filteredGoalRecords: [GoalRecordViewModel] {
+//        return self.goalRecordListVM.filterGoalRecordsByDate(date: dateProvided)
+//
+//    }
 
     private var cal = Calendar.current
     
@@ -42,14 +42,14 @@ struct ProgressRings: View {
         self.animate = animate
         self.showClear = showClear
         //self.goalList = goalList
-        self.goalListVM.getAllGoals()
-        self.goalRecordListVM.getAllGoalRecords()
+//        self.goalListVM.getAllGoals()
+//        self.goalRecordListVM.getAllGoalRecords()
     }
     
     var body: some View {
         
         ZStack {
-            if(filteredGoals.isEmpty && filteredGoalRecords.isEmpty){
+            if(self.goalListVM.filterCurrentGoalsByDate(date: dateProvided).isEmpty && self.goalRecordListVM.filterGoalRecordsByDate(date: dateProvided).isEmpty){
                 if(showClear){
                     ProgressRingView(progress: 0.0, thickness: CGFloat(self.maxLineWidth), startColor: Color.clear, endColor: Color.clear, backgroundColor: Color.clear, empty: true).frame(width: calculateDim(index: 0), height: calculateDim(index: 0)).aspectRatio(contentMode: .fit)
                 }
@@ -60,13 +60,13 @@ struct ProgressRings: View {
                 }
                 
             }
-            else if(filteredGoals.isEmpty) {
+            else if(self.goalListVM.filterCurrentGoalsByDate(date: dateProvided).isEmpty) {
                 
-                ForEach(self.filteredGoalRecords, id:\.id){ goalRecord in
-                    if let index = goalRecordListVM.sortGoalRecordsByPriority().firstIndex(where: {$0.goal.id == goalRecord.goal.id})
+                ForEach(self.goalRecordListVM.filterGoalRecordsByDate(date: dateProvided), id:\.id){ goalRecord in
+                    if let index = goalRecordListVM.sortGoalRecordsByPriority().firstIndex{$0.id == goalRecord.id}
                     {
                         if(index < maxRingLimit){
-                            ProgressRingView(progress: goalRecord.progress, thickness: CGFloat(self.maxLineWidth), startColor: Color(goalRecord.goal.color).darker(by: 10.0), endColor: Color(goalRecord.goal.color).lighter(by: 15), backgroundColor: Color(goalRecord.goal.color), animate: animate).frame(width: calculateDim(index: index), height: calculateDim(index: index)).aspectRatio(contentMode: .fit)
+                            ProgressRingView(progress: goalRecord.progress, thickness: CGFloat(self.maxLineWidth), startColor: goalRecord.goal.color.darker(by: 10.0), endColor: goalRecord.goal.color.lighter(by: 15), backgroundColor: goalRecord.goal.color, animate: animate).frame(width: calculateDim(index: index), height: calculateDim(index: index)).aspectRatio(contentMode: .fit)
                         }
                         
                     }
@@ -75,17 +75,17 @@ struct ProgressRings: View {
             }
             
             else {
-                ForEach(filteredGoals, id: \.id){ goal in
+                ForEach(self.goalListVM.filterCurrentGoalsByDate(date: dateProvided), id: \.id){ goal in
                     
                     
                     //Main progress view
-                    if let index = filteredGoals.firstIndex(of: goal){
+                    if let index = goal.priority - 1 {
                         if(index < maxRingLimit){
-                            if(filteredGoalRecords.isEmpty){
-                                ProgressRingView(progress: 0.0, thickness: CGFloat(self.maxLineWidth), startColor: goal.color.darker(by: 10.0), endColor: goal.color.lighter(by: 15), backgroundColor: goal.color, animate: animate).frame(width: calculateDim(index: index), height: calculateDim(index: index)).aspectRatio(contentMode: .fit)
+                            if(self.goalRecordListVM.filterGoalRecordsByDate(date: dateProvided).isEmpty){
+                                ProgressRingView(progress: 0.0, thickness: CGFloat(self.maxLineWidth), startColor: goal.color, endColor: goal.color, backgroundColor: goal.color, animate: animate).frame(width: calculateDim(index: index), height: calculateDim(index: index)).aspectRatio(contentMode: .fit)
                             }
                             else {
-                                ProgressRingView(progress: filteredGoalRecords.first(where: { goal.id == $0.id }) == nil ? 0.0: filteredGoalRecords.first(where: { goal.id == $0.id})!.progress, thickness: CGFloat(self.maxLineWidth), startColor: goal.color.darker(by: 10.0), endColor: goal.color.lighter(by: 15), backgroundColor: goal.color, animate: animate).frame(width: calculateDim(index: index), height: calculateDim(index: index)).aspectRatio(contentMode: .fit)
+                                ProgressRingView(progress: self.goalRecordListVM.getRecordTodayForGoal(goal: goal) == nil ? 0.0: self.goalRecordListVM.getRecordTodayForGoal(goal: goal)!.progress, thickness: CGFloat(self.maxLineWidth), startColor: goal.color, endColor: goal.color, backgroundColor: goal.color, animate: animate).frame(width: calculateDim(index: index), height: calculateDim(index: index)).aspectRatio(contentMode: .fit)
                             }
                             
                         }
@@ -97,9 +97,12 @@ struct ProgressRings: View {
                     }
                 }
             }
-            
         }
-        
+//        }.onAppear{
+//                    self.goalListVM.getAllGoals()
+//                    self.goalRecordListVM.getAllGoalRecords()
+//        }
+//
         
         
         
@@ -114,8 +117,6 @@ struct ProgressRings: View {
 
 
 struct ProgressRingsStatic: View {
-    
-    @Environment(\.managedObjectContext) var managedObjectContext
     
     
     
@@ -167,10 +168,10 @@ struct ProgressRingsStatic: View {
                     if let index = filteredGoals.firstIndex(of: goal){
                         if(index < maxRingLimit){
                             if(filteredGoalRecords.isEmpty){
-                                ProgressRingViewStatic(progress: 0.0, thickness: self.maxLineWidth, startColor: tinted ? Color.white: goal.color.darker(by: 10.0), endColor: tinted ? Color.white: goal.color.lighter(by: 15), backgroundColor: tinted ? Color.gray:goal.color, animate: animate).frame(width: calculateDim(index: index), height: calculateDim(index: index)).aspectRatio(contentMode: .fit)
+                                ProgressRingViewStatic(progress: 0.0, thickness: self.maxLineWidth, startColor: tinted ? Color.white: goal.color, endColor: tinted ? Color.white: goal.color, backgroundColor: tinted ? Color.gray:goal.color, animate: animate).frame(width: calculateDim(index: index), height: calculateDim(index: index)).aspectRatio(contentMode: .fit)
                             }
                             else {
-                                ProgressRingViewStatic(progress: filteredGoalRecords.first(where: { goal.id == $0.id }) == nil ? 0.0: filteredGoalRecords.first(where: { goal.id == $0.id})!.progress, thickness: self.maxLineWidth, startColor: tinted ? Color.white: goal.color.darker(by: 10.0), endColor: tinted ? Color.white: goal.color.lighter(by: 15), backgroundColor: tinted ? Color.gray:goal.color, animate: animate).frame(width: calculateDim(index: index), height: calculateDim(index: index)).aspectRatio(contentMode: .fit)
+                                ProgressRingViewStatic(progress: filteredGoalRecords.first(where: { goal.id == $0.id }) == nil ? 0.0: filteredGoalRecords.first(where: { goal.id == $0.id})!.progress, thickness: self.maxLineWidth, startColor: tinted ? Color.white: goal.color, endColor: tinted ? Color.white: goal.color, backgroundColor: tinted ? Color.gray:goal.color, animate: animate).frame(width: calculateDim(index: index), height: calculateDim(index: index)).aspectRatio(contentMode: .fit)
                             }
                             
                         }

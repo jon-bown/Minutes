@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct MiniBarChartWidgetView: View {
-    @Environment(\.managedObjectContext) var managedObjectContext
     @Environment(\.calendar) var calendar
     
     @StateObject private var goalListVM = GoalListViewModel()
@@ -116,7 +115,7 @@ struct MiniBarChartWidgetView: View {
             HStack(alignment: .bottom, spacing: Constants.barChartColumnSpacing) {
                 ForEach(self.goalRecordListVM.filterGoalRecords()){ record in
                     ForEach(0..<maxColumnIndex) { i in
-                        MiniBarChartBarView(height: record.goalUpdates![i] ?? Double(0), startColor: Color(record.goal!.color), endColor: Color(record.goal!.color))
+                        MiniBarChartBarView(height: record.goalUpdates![i] ?? Double(0), startColor: record.goal.color, endColor: record.goal.color)
                     }
                 }
 

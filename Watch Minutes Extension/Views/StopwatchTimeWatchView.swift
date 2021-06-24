@@ -8,19 +8,15 @@
 import SwiftUI
 
 struct StopwatchTimeWatchView: View {
-    @Environment(\.managedObjectContext) var managedObjectContext
     
-    @FetchRequest(
-        entity: GoalRecord.entity(),
-        sortDescriptors: [
-            NSSortDescriptor(keyPath: \GoalRecord.name, ascending: true)
-        ]
-    ) var goalRecords: FetchedResults<GoalRecord>
+    @StateObject private var goalRecordListVM = GoalRecordListViewModel()
     
-    var filteredGoalRecords: [GoalRecord] {
-        return self.goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs:$0.date!) && goal.name == $0.name})
+    var filteredGoalRecords: [GoalRecordViewModel] {
+        return self.goalRecordListVM.filterGoalRecords()
+
     }
-    @ObservedObject var goal: Goal
+    
+    var goal: GoalViewModel
     @Binding var progress: Double
     @Binding var selectedTab: Int
     @Binding var totalTime: Double
@@ -28,10 +24,10 @@ struct StopwatchTimeWatchView: View {
     var body: some View {
         VStack{
             if(filteredGoalRecords.isEmpty){
-                ProgressView(value: 0.0).progressViewStyle(LinearProgressViewStyle(tint: Color(self.goal.color!))).padding()
+                ProgressView(value: 0.0).progressViewStyle(LinearProgressViewStyle(tint: self.goal.color)).padding()
             }
             else{
-                ProgressView(value: filteredGoalRecords[0].progress >= 1.0 ? 1.0:filteredGoalRecords[0].progress).progressViewStyle(LinearProgressViewStyle(tint: Color(self.goal.color!))).padding()
+                ProgressView(value: filteredGoalRecords[0].progress >= 1.0 ? 1.0:filteredGoalRecords[0].progress).progressViewStyle(LinearProgressViewStyle(tint: self.goal.color)).padding()
             }
             //Timer UI
             RoundedRectangle(cornerRadius: 10)

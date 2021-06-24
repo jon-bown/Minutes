@@ -9,50 +9,86 @@ import Foundation
 import CoreData
 import SwiftUI
 
-class GoalRecordListViewModel: ObservableObject {
+class GoalRecordListViewModel: ObservableObject, Equatable {
+    static func == (lhs: GoalRecordListViewModel, rhs: GoalRecordListViewModel) -> Bool {
+        return lhs.goalRecords == rhs.goalRecords
+    }
+    
     
     @Published var goalRecords = [GoalRecordViewModel]()
     let cal = Calendar.current
+    
+    
+    init() {
+        let didSaveNotification = NSManagedObjectContext.didSaveObjectsNotification
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(didSave(_:)), name: didSaveNotification, object: nil)
+        
+        
+        let didChangeNotification = NSManagedObjectContext.didChangeObjectsNotification
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(didSave(_:)), name: didChangeNotification, object: nil)
+        
+        self.getAllGoalRecords()
+    }
+    
+    @objc func didSave(_ notification: Notification){
+        self.getAllGoalRecords()
+    }
+    
     
     func deleteGoalRecord(record: GoalRecordViewModel) {
         let record = CoreDataManager.shared.getGoalRecordByID(id: record.id)
         if let record = record {
             CoreDataManager.shared.deleteGoalRecord(goalRecord: record)
         }
+        //self.getAllGoalRecords()
     }
     
     func getAllGoalRecords() {
         let goalRecords = CoreDataManager.shared.getAllGoalRecords()
         DispatchQueue.main.async {
-            self.goalRecords = goalRecords.map(GoalRecordViewModel.init)
+            if(!goalRecords.isEmpty){
+                self.goalRecords = goalRecords.map(GoalRecordViewModel.init)
+            }
+            
         }
     }
     
-    func filterGoalRecordsByGoal(goal: Goal) -> [GoalRecordViewModel]{
-        return goalRecords.filter({goal == $0.goal!})
+    func filterGoalRecordsByGoal(goal: GoalViewModel) -> [GoalRecordViewModel]{
+        //self.getAllGoalRecords()
+        return goalRecords.filter({goal == $0.goal})
     }
     
     func getRecordTodayForGoal(goal: GoalViewModel) -> GoalRecordViewModel? {
-        return goalRecords.first(where:({cal.isDate(Date(), inSameDayAs: $0.date)}))
+        //self.getAllGoalRecords()
+        return goalRecords.first(where:({cal.isDate(Date(), inSameDayAs: $0.date) && $0.goal.id == goal.id}))
     }
     
     func filterGoalRecordsByDate(date: Date) -> [GoalRecordViewModel] {
-        return goalRecords.filter({cal.isDate(Date(), inSameDayAs: $0.date)})
+        //self.getAllGoalRecords()
+        return goalRecords.filter({cal.isDate(date, inSameDayAs: $0.date)})
     }
     
     func filterGoalRecords() -> [GoalRecordViewModel] {
+        //self.getAllGoalRecords()
         return self.filterGoalRecordsByDate(date: Date())
     }
-    
-    static func getGoalColorFromRecord(goalRecord: GoalRecordViewModel) -> UIColor? {
-        return goalRecord.goal?.color
-    }
-    
-    func filterGoalRecordSavesToday() -> [Date: Double]? {
-        return goalRecords.first(where: {cal.isDate(Date(), inSameDayAs: $0.date)})?.goalSaves
+
+    func filterGoalRecordSavesTodayForGoal(goal: GoalViewModel) -> [Date: Double] {
+        //self.getAllGoalRecords()
+        if(self.getRecordTodayForGoal(goal: goal) == nil){
+            print("Its Nil")
+            return [:]
+        }
+        else {
+            return self.getRecordTodayForGoal(goal: goal)!.goalSaves!
+        }
+        
     }
     
     func sortGoalRecordsByPriority() -> [GoalRecordViewModel] {
+        //self.getAllGoalRecords()
         let goalRecords = CoreDataManager.shared.getAllGoalRecords()
         if(!goalRecords.isEmpty){
             let sorted = goalRecords.sorted(by: {$0.goal.priority < $1.goal.priority})
@@ -64,11 +100,11 @@ class GoalRecordListViewModel: ObservableObject {
         }
     }
     
-    func calculateTimeThisWeek() -> String {
+    func calculateTimeThisWeekForGoal(goalID: UUID) -> String {
         let goalRecords = CoreDataManager.shared.getAllGoalRecords()
         let goalRecordsThisWeek = goalRecords.filter({
             $0.date.isInSameWeek(as: Date())
-        })
+                && $0.goal.id == goalID})
         var totalTime: Double = 0.0
         for goalRecord in goalRecordsThisWeek {
             totalTime+=goalRecord.dayTime
@@ -144,23 +180,20 @@ class GoalRecordListViewModel: ObservableObject {
     }
     
     
-    func updateGoalRecord(goalRecordID: NSManagedObjectID, seconds: Double) {
-        CoreDataManager.shared.updateGoalRecord(id: goalRecordID, secondsToAdd: seconds)
-        self.getAllGoalRecords()
-    }
+//    func updateGoalRecord(goalRecordID: NSManagedObjectID, seconds: Double) {
+//        CoreDataManager.shared.updateGoalRecord(id: goalRecordID, secondsToAdd: seconds)
+//    }
     
-    func addNewGoalRecord(name: String, date: Date, progress: Double, seconds: Double, id: NSManagedObjectID) {
-        CoreDataManager.shared.addGoalRecord(name: name, date: date, progress: progress, seconds: seconds, parentGoalID: id)
-        self.getAllGoalRecords()
-    }
+//    func addNewGoalRecord(name: String, date: Date, progress: Double, seconds: Double, id: NSManagedObjectID) {
+//        CoreDataManager.shared.addGoalRecord(name: name, date: date, progress: progress, seconds: seconds, parentGoalID: id)
+//    }
     
     func removeTimeFromGoalRecord(id: NSManagedObjectID, datesToRemove: [Date]){
         CoreDataManager.shared.removeTimeFromGoalRecord(id: id, datesToRemove: datesToRemove)
-        self.getAllGoalRecords()
     }
 }
 
-struct GoalRecordViewModel: Identifiable {
+struct GoalRecordViewModel: Identifiable, Equatable {
     
     let record: GoalRecord
     
@@ -192,8 +225,8 @@ struct GoalRecordViewModel: Identifiable {
         return record.goalSaves
     }
     
-    var goal: Goal? {
-        return record.goal
+    var goal: GoalViewModel {
+        return GoalViewModel(goal: record.goal)
     }
 
 }

@@ -41,7 +41,7 @@ struct WKGoalDetailViewR: View {
                     
                     if self.watchState {
                         if(filteredGoalRecord != nil){
-                            self.progress = (Double(self.totalTime) + self.filteredGoalRecord.dayTime)/(self.goal.goalTime*60)
+                            self.progress = (Double(self.totalTime) + self.filteredGoalRecord!.dayTime)/(self.goal.goalTime*60)
 
                         }
                         else{

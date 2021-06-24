@@ -9,13 +9,11 @@ import SwiftUI
 
 @main
 struct MinutesApp: App {
-    let persistenceController = PersistenceController.self
     @Environment(\.scenePhase) private var scenePhase
     
     var body: some Scene {
         WindowGroup {
             ContentView().accentColor(.white)
-                .environment(\.managedObjectContext, persistenceController.persistentContainer.viewContext)
         }.onChange(of: scenePhase) { (newScenePhase) in
             switch newScenePhase {
             case .active:
