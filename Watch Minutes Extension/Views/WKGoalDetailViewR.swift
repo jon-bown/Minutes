@@ -10,7 +10,7 @@ import SwiftUI
 struct WKGoalDetailViewR: View {
     @Environment(\.scenePhase) private var scenePhase
 
-    @StateObject private var goalRecordListVM = GoalRecordListViewModel()
+    @StateObject private var goalRecordListVM = GoalRecordListViewModel.sharedInstance
     
     var goal: GoalViewModel
     @State private var progress: Double = 0.0
@@ -20,12 +20,7 @@ struct WKGoalDetailViewR: View {
     @State private var startDate: Date = Date()
     @State private var backgroundDate: Date = Date()
     @State var totalTimeText: String = "00:00:00"
-    
-    var filteredGoalRecord: GoalRecordViewModel? {
-        return self.goalRecordListVM.getRecordTodayForGoal(goal: self.goal)
 
-    }
-    
     let timer = Timer.publish(every: 0.01, on: .main, in: .common).autoconnect()
     
     @State private var watchState: Bool = false
@@ -40,8 +35,8 @@ struct WKGoalDetailViewR: View {
             StopwatchTimeWatchView(goal: self.goal, progress: self.$progress, selectedTab: self.$selectedTab, totalTime: self.$totalTime).onReceive(timer) { _ in
                     
                     if self.watchState {
-                        if(filteredGoalRecord != nil){
-                            self.progress = (Double(self.totalTime) + self.filteredGoalRecord!.dayTime)/(self.goal.goalTime*60)
+                        if(self.goalRecordListVM.getRecordTodayForGoal(goal: self.goal) != nil){
+                            self.progress = (Double(self.totalTime) + self.goalRecordListVM.getRecordTodayForGoal(goal: self.goal)!.dayTime)/(self.goal.goalTime*60)
 
                         }
                         else{

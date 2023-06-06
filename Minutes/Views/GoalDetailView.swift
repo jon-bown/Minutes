@@ -29,13 +29,12 @@ struct ProgressBar: View {
 }
 
 struct GoalDetailView: View {
-    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-        
+    @Binding var isDetailActive: Bool
     var goal: GoalViewModel
     
     @StateObject private var addGoalRecordVM = AddGoalRecordViewModel()
-    @StateObject private var goalListVM = GoalListViewModel()
-    @StateObject private var goalRecordListVM = GoalRecordListViewModel()
+    @StateObject private var goalListVM = GoalListViewModel.sharedInstance
+    @StateObject private var goalRecordListVM = GoalRecordListViewModel.sharedInstance
     
     @State private var hours: Int = 0
     @State private var minutes: Int = 0
@@ -47,6 +46,7 @@ struct GoalDetailView: View {
     @State private var showGoalEditForm: Bool = false
     @State private var showSaveButton: Bool = false
     @State private var goalUpdatedSuccess: Bool = false
+    @State private var goalCompleted: Bool = false
     @State private var showCustomMinuteSheet: Bool = false
     @State private var newSessionText: String = ""
     @State private var isSessionsEditable: Bool = false
@@ -60,7 +60,21 @@ struct GoalDetailView: View {
     
     var body: some View {
         
-        ScrollView(.vertical, showsIndicators: false){
+        if(self.goalListVM.goals.isEmpty){
+            EmptyView()
+        }
+        else{
+           self.goalDetailView()
+        }
+        
+        
+    }
+    
+    //MARK: - SUB VIEWS
+    
+    private func goalDetailView() -> some View {
+        
+       return ScrollView(.vertical, showsIndicators: false){
             
             self.createProgressBox()
             
@@ -78,8 +92,8 @@ struct GoalDetailView: View {
                 Spacer()
                 Button(action: {
                     if(!self.stopWatch.isRunning){
-                        self.resetTimer()
                         self.updateGoalRecord()
+                        self.resetTimer()
                         self.complexSuccess()
                     }
                 }){
@@ -107,8 +121,6 @@ struct GoalDetailView: View {
                 GroupBox(label: GroupBoxLabelButton(label: "Sessions", isEditable: self.$isSessionsEditable, action: self.makeListEditable)) {
 
                     //list of all goal updates today
-                    
-                    
                     ForEach(self.goalRecordListVM.filterGoalRecordSavesTodayForGoal(goal: goal).sorted(by: > ), id: \.key){
                         key, value in
                         
@@ -169,32 +181,33 @@ struct GoalDetailView: View {
             self.createStreakInfoTile().padding([.leading, .trailing], 15)
             self.createTotalTimeInfoTile().padding([.leading, .trailing], 15)
             self.createFrequencyInfoTile().padding([.leading, .trailing], 15)
-            //if(checkNotificationsExist(id: self.goal.id!)){
             self.createReminderInfoTile().padding([.leading, .trailing], 15)
-            //}
-            self.createDateInfoTile().padding([.leading], 15).navigationBarTitle(Text(goal.name), displayMode: .automatic).navigationBarBackButtonHidden(true).toolbar{
-                ToolbarItem(placement: .navigation) {
-                    Button(action: {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                            self.presentationMode.wrappedValue.dismiss()
-                        }
-                    }){
-                        HStack{
-                            Image(systemName: "chevron.left").foregroundColor(Color.white).font(Font.system(size: 20, weight: .light))
-                            Text("Back").font(Font.system(size: 20, weight: .regular)).foregroundColor(.white)
-                        }
-                        
-                    }
-                }
-                ToolbarItem(placement: .primaryAction) {
-                    
-                    Button(action: {
-                        self.showGoalEditForm.toggle()
-                    }){
-                        Text("Edit").font(Font.system(size: 20, weight: .regular)).foregroundColor(.white)
-                    }
-                }
-            }
+        self.createDateInfoTile().padding([.leading], 15).navigationBarTitle(Text(goal.name), displayMode: .automatic).navigationBarBackButtonHidden(true)
+            .navigationBarItems(leading:
+                                    Button(action: {
+                                        self.simpleSuccess()
+                                        DispatchQueue.main.async {
+                                            self.isDetailActive = false
+                                        }
+                                        
+                                        
+                                    }){
+                                        Image(systemName: "xmark.circle.fill").font(Font.system(size: 30, weight: .light))
+                                            .foregroundColor(Color.white)
+                                            //.font(Font.system(size: 50, weight: .bold))
+                                    },
+                                trailing:
+                                    Button(action: {
+                                        DispatchQueue.main.async {
+                                            self.showGoalEditForm.toggle()
+                                        }
+                                        
+                                        
+                                    }){
+                                        Text("Edit").font(Font.system(size: 20, weight: .regular)).foregroundColor(Color.white)
+                                            //.font(Font.system(size: 50, weight: .bold))
+                                    }
+            )
             .sheet(
                 isPresented: self.$showGoalEditForm
             ) {
@@ -203,7 +216,7 @@ struct GoalDetailView: View {
                 
             }
             
-        }
+       }.background(Color.black)
         //        .alert(isPresented: self.$showError) {
         //            return Alert(title: Text("Error Saving Goal"), message: Text("Try again!"), dismissButton: .default(Text("Ok")))
         //
@@ -231,17 +244,16 @@ struct GoalDetailView: View {
                 self.updateProgress()
             }
         }
-        
         .onAppear {
-            
+            self.updateProgress()
             self.checkNotificationsExist(id: self.goal.uuid)
             self.prepareHaptics()
-        }.toast(isShowing: self.$goalUpdatedSuccess, text: Text("Saved")).textFieldAlert(isShowing: self.$showCustomMinuteSheet, text: self.$newSessionText, title: "Add Minutes", saveAction: self.saveCustomMinuteSession)
-        
-        
+        }.toast(isShowing: self.$goalUpdatedSuccess, text: Text("Saved"))
+       .toast(isShowing: self.$goalCompleted, text: Text("Goal Completed"))
+       .textFieldAlert(isShowing: self.$showCustomMinuteSheet, text: self.$newSessionText, title: "Add Minutes", saveAction: self.saveCustomMinuteSession)
     }
     
-    //MARK: - SUB VIEWS
+    
     private func createDateInfoTile() -> some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 30) {
@@ -478,8 +490,6 @@ struct GoalDetailView: View {
                     ZStack(alignment: .center){
                         ProgressRingView(progress: self.progress, thickness: Constants.progressRingViewThicknessStandard, startColor: self.goal.color, endColor: self.goal.color, backgroundColor: self.goal.color).frame(width: 175, height: 175).aspectRatio(contentMode: .fit).animatableProgressText(progress: progress)
                     }
-                    
-                    
                 }.padding(2)
             }.cornerRadius(15).padding()
             
@@ -493,6 +503,10 @@ struct GoalDetailView: View {
     
     
     //MARK: - HELPER METHODS
+    func simpleSuccess() {
+        let generator = UINotificationFeedbackGenerator()
+        generator.notificationOccurred(.success)
+    }
     
     func checkNotificationsExist(id: UUID) {
         
@@ -623,16 +637,16 @@ struct GoalDetailView: View {
     private func saveCustomMinuteSession(){
         var newRecord = true
         let record = self.goalRecordListVM.getRecordTodayForGoal(goal: self.goal)
+
         if(record != nil){
             newRecord = false
         }
+        
         guard let customMinutes = Int(self.newSessionText)
         else {
-            //print("couldn't save")
             return
-            
-            //error
         }
+
         let customSeconds = Double(customMinutes) * 60.0
         //Add date to array of records for the goal record
         if(newRecord){
@@ -729,31 +743,33 @@ struct GoalDetailView: View {
             newRecord = false
         }
         
+        
+        addGoalRecordVM.goal = self.goal
+        addGoalRecordVM.dayTime = Double(self.stopWatch.totalAccumulatedTime.seconds())
+        addGoalRecordVM.progress = self.progress
+        
         if(newRecord){
             
-            addGoalRecordVM.goal = self.goal
-            addGoalRecordVM.dayTime = Double(self.stopWatch.totalAccumulatedTime.seconds())
-            addGoalRecordVM.progress = self.progress
+
             
             addGoalRecordVM.save()
             
-            self.goal.updateTotalTime(time: Double(self.stopWatch.totalAccumulatedTime.seconds()), add: true)
+            self.goal.updateTotalTime(time: Double(self.stopWatch.totalAccumulatedTime.seconds()), add: false)
 
 
         }
         
         else {
             
-            addGoalRecordVM.goal = self.goal
-            addGoalRecordVM.dayTime = Double(self.stopWatch.totalAccumulatedTime.seconds())
-            addGoalRecordVM.progress = self.progress
             let record = goalRecordListVM.getRecordTodayForGoal(goal: self.goal)
             addGoalRecordVM.update(id: record!.id)
+            
+//            self.goal.updateTotalTime(time: Double(self.stopWatch.totalAccumulatedTime.seconds()), add: true)
             
         }
         //TODO Update this to check if active widget
         //WidgetCenter.shared.reloadTimelines(ofKind: AppGroup.facts.rawValue)
-        self.updateProgress()
+        //self.updateProgress()
         
     }
     
@@ -761,7 +777,6 @@ struct GoalDetailView: View {
         if let record = self.goalRecordListVM.getRecordTodayForGoal(goal: self.goal) {
             self.dayTime = record.dayTime
             self.progress = record.progress
-            print("updated")
         }
             else {
             self.dayTime = 0.0
@@ -779,10 +794,6 @@ struct GoalDetailView: View {
             self.dayTime = 0.0
             return
         }
-//        guard let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalID: goal.id) else {
-//            self.dayTime = 0.0
-//            return
-//        }
         self.dayTime = record.dayTime
         
     }
@@ -793,8 +804,7 @@ struct GoalDetailView: View {
         //Schedule a notification when the user reaches a multiple of 100%
         
 
-        
-        if(self.progress > 1.0 && (self.progress*100.0).truncatingRemainder(dividingBy: 100.0) == 0.0 && !self.showedCompleted){
+        if(self.progress >= 1.0 && !self.showedCompleted){
             self.alertUserCompletedAfterFirst()
             self.complexSuccess()
         }
@@ -808,7 +818,7 @@ struct GoalDetailView: View {
         
 
         
-        if(self.progress > 1.0 && (self.progress*100.0).truncatingRemainder(dividingBy: 100.0) == 0.0 && !self.showedCompleted){
+        if(self.progress >= 1.0 && !self.showedCompleted){
             self.alertUserCompletedAfterFirst()
             self.complexSuccess()
         }
@@ -864,6 +874,7 @@ struct GoalDetailView: View {
     
     func alertUserCompletedAfterFirst() {
         //TODO: Check if app is in foreground and display alert instead
+        self.goalCompleted = true
         let center = UNUserNotificationCenter.current()
         let options: UNAuthorizationOptions = [.alert, .badge, .sound]
         
@@ -919,6 +930,7 @@ struct GoalDetailView: View {
         _ = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: false) { timer in
             withAnimation() {
                 recalculateDayTime()
+                self.stopWatch.reset()
                 //remove pending completion notifications
                 UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [AppUtil.getGoalNotificationSpecificIdString(id: goal.uuid)])
                 self.timer?.invalidate()
@@ -956,7 +968,7 @@ struct ProgressTextModifier: AnimatableModifier {
 }
 
 
-//Modifier for the progress text to look smooth in the goal detail view
+//Modifier for the stopwatch text to look smooth in the goal detail view
 struct StopWatchTextModifier: AnimatableModifier {
     var watchTime: String = ""
     var textColor: Color = .primary

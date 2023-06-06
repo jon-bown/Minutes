@@ -12,9 +12,9 @@ import SwiftUI
 struct GoalPriorityView: View {
     
     // MARK: - Properties
-    
-    @StateObject private var goalListVM = GoalListViewModel()
-    @StateObject private var goalRecordListVM = GoalRecordListViewModel()
+    @Environment(\.presentationMode) var presentationMode
+    @StateObject private var goalListVM = GoalListViewModel.sharedInstance
+    @StateObject private var goalRecordListVM = GoalRecordListViewModel.sharedInstance
     
     @State private var showError: Bool = false
     @State private var isEditable = false
@@ -23,7 +23,7 @@ struct GoalPriorityView: View {
     var body: some View {
             
             List {
-                ForEach(goalListVM.getGoalsArray(), id: \.priority) { goal in
+                ForEach(goalListVM.getGoalsArray(), id: \.id) { goal in
                     GroupBox{
                         HStack{
                             Text(goal.name)
@@ -74,48 +74,45 @@ struct GoalPriorityView: View {
                 
             }
             
-            for goal in goalListVM.getGoalsArray() {
-                let marker = goalListVM.goals.firstIndex(of: goalListVM.goals.first(where: {$0.id == goal.id})!)
+            for goal in goalsArray {
+                let marker = goalsArray.firstIndex(of: goalListVM.goals.first(where: {$0.id == goal.id})!)
                 goal.updatePriority(new: Int(marker!)+1) 
             }
             
             
         }
-        
-        DispatchQueue.main.async {
-            CoreDataManager.shared.saveContext()
-        }
-        
-        //        withAnimation {
-        //            isEditable = false
-        //        }
+
     }
     
     func onDelete(at offsets: IndexSet) {
         
         for index in offsets {
-            let goal = self.goalListVM.getGoalsArray().first(where: {$0.id == goalListVM.goals[index].id})!
-            
-            if(!self.goalRecordListVM.goalRecords.isEmpty){
-                let goalRecords = self.goalRecordListVM.goalRecords.filter({$0.id == goalListVM.goals[index].id})
-                for record in goalRecords {
-                    goalRecordListVM.deleteGoalRecord(record: record)
-                    
+            let goal = self.goalListVM.goals.sorted(by: {$0.priority < $1.priority})[index]
+            //self.goalListVM.deleteAllGoals()
+            //THESE WORK!!!
+            //goalListVM.deleteGoal(goal: goal)
+            DispatchQueue.main.async {
+                
+                var goalsArray = goalListVM.getGoalsArray()
+                goalsArray.remove(at: index)
+                goalListVM.deleteGoal(goal: goal)
+                for goal in goalsArray {
+                    let marker = goalsArray.firstIndex(of: goalListVM.goals.first(where: {$0.id == goal.id})!)
+                    goal.updatePriority(new: Int(marker!)+1)
                 }
+//                if(self.goalListVM.goals.count == 1){
+//                    presentationMode.wrappedValue.dismiss()
+//                }
+                
+                //goalRecordListVM.getAllGoalRecords()
             }
-            let priorityMark = goal.priority
-            goalListVM.deleteGoal(goal: goal)
-            //managedObjectContext.reset()
-            for goal in goalListVM.getGoalsArray() {
-                if(goal.priority > priorityMark){
-                    goalListVM.goals[goalListVM.goals.firstIndex(where: {goal.id == $0.id})!].priority = goal.priority - 1
-                }
-            }
-            
-            
+
+            //goalListVM.resetGoalsPriority()
+            //presentationMode.wrappedValue.dismiss()
             
         }
-        CoreDataManager.shared.saveContext()
+        //presentationMode.wrappedValue.dismiss()
+        UIApplication.shared.windows.first?.rootViewController?.dismiss(animated: true, completion: nil)
         
         
         

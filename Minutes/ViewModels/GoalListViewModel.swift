@@ -11,6 +11,8 @@ import SwiftUI
 
 class GoalListViewModel: ObservableObject, Equatable {
     
+    static let sharedInstance = GoalListViewModel()
+    
     static func == (lhs: GoalListViewModel, rhs: GoalListViewModel) -> Bool {
         return lhs.goals == rhs.goals
     }
@@ -20,46 +22,86 @@ class GoalListViewModel: ObservableObject, Equatable {
     let cal = Calendar.current
     
     
-    init() {
+    private init() {
         let didSaveNotification = NSManagedObjectContext.didSaveObjectsNotification
         
         NotificationCenter.default.addObserver(self, selector: #selector(didSave(_:)), name: didSaveNotification, object: nil)
         
         
-        let didChangeNotification = NSManagedObjectContext.didChangeObjectsNotification
         
-        NotificationCenter.default.addObserver(self, selector: #selector(didSave(_:)), name: didChangeNotification, object: nil)
+        
+//        let didChangeNotification = NSManagedObjectContext.didChangeObjectsNotification
+//
+//        NotificationCenter.default.addObserver(self, selector: #selector(didChange(_:)), name: didChangeNotification,  object: nil)
         
         self.getAllGoals()
     }
     
     @objc func didSave(_ notification: Notification){
-        self.getAllGoals()
+        DispatchQueue.main.async {
+            self.getAllGoals()
+        }
+        
+//        DispatchQueue.main.async {
+//            self.objectWillChange.send()
+//        }
+    }
+    
+    @objc func didChange(_ notification: Notification){
+        DispatchQueue.main.async {
+            self.getAllGoals()
+        }
+    }
+    
+    func getGoalByID(id: NSManagedObjectID) -> Goal? {
+        let goal = CoreDataManager.shared.getGoalByID(id: id)
+        return goal
     }
     
     func deleteGoal(goal: GoalViewModel) {
-        let goal = CoreDataManager.shared.getGoalByID(id: goal.id)
-        if let goal = goal {
-            CoreDataManager.shared.deleteGoal(goal: goal)
+        let goalObj = CoreDataManager.shared.getGoalByID(id: goal.id)
+        if let goalToDelete = goalObj {
+                CoreDataManager.shared.deleteGoal(goal: goalToDelete)
         }
     }
     
     func getAllGoals() {
         
         DispatchQueue.main.async {
-            let goals = CoreDataManager.shared.getAllGoals()
-            if(!goals.isEmpty){
-                self.goals = goals.map(GoalViewModel.init)
+            self.goals.removeAll()
+            let core_goals = CoreDataManager.shared.getAllGoals()
+            //print(core_goals)
+            if(!core_goals.isEmpty){
+                self.goals = core_goals.map(GoalViewModel.init).sorted(by: {$0.priority < $1.priority})
+            }
+            else {
+                self.goals.removeAll()
+                self.goals = []
             }
             
         }
+        
     }
     
+    func deleteAllGoals() {
+        DispatchQueue.main.async {
+            self.goals.removeAll()
+            CoreDataManager.shared.deleteAllGoals()
+        }
+    }
+    
+
     //MARK: FILTERING
     
     func filterCurrentGoalsByDate(date: Date) -> [GoalViewModel] {
         //self.getAllGoals()
-        return goals.filter({(date > $0.startDate || cal.isDate(date, inSameDayAs:$0.startDate)) && ($0.endDate == nil || date <= $0.endDate!) && (($0.frequency == "Weekly" && $0.weekDay!.contains(date.dayOfTheWeek)) || ($0.frequency == "Monthly" && $0.monthDay == date.dayOfTheMonth) || $0.frequency == "Daily")}).sorted(by: {$0.priority < $1.priority})
+        if(!self.goals.isEmpty){
+            return goals.filter({(date > $0.startDate || cal.isDate(date, inSameDayAs:$0.startDate)) && ($0.endDate == nil || date <= $0.endDate!) && (($0.frequency == "Weekly" && $0.weekDay!.contains(date.dayOfTheWeek)) || ($0.frequency == "Monthly" && $0.monthDay == date.dayOfTheMonth) || $0.frequency == "Daily")}).sorted(by: {$0.priority < $1.priority})
+        }
+        else{
+            return []
+        }
+
     }
     
     func filterCurrentGoals() -> [GoalViewModel] {
@@ -67,22 +109,32 @@ class GoalListViewModel: ObservableObject, Equatable {
         return filterCurrentGoalsByDate(date: Date())
     }
     
+    
+    func filteredGoalsNotToday() -> [GoalViewModel] {
+        //if no goals outside of today then return empty
+        let filteredArray = self.goals.filter({!filterCurrentGoals().contains($0)})
+        
+        if(!filteredArray.isEmpty){
+            return filteredArray
+        }
+        else {
+            return []
+        }
+
+    }
+    
     func getGoalsArray() -> [GoalViewModel] {
         //self.getAllGoals()
-        return self.goals
+        return self.goals.sorted(by: {$0.priority < $1.priority})
     }
-
-//    func addNewGoal(name: String, color: Color, goalTime: Double, frequency: String, startDate: Date, dotw: WeekDays, endDate: Date?) {
-//        
-//        var priority = 1
-//        if !goals.isEmpty {
-//            priority = goals.map { $0.priority }.max()! + 1
-//        }
-//        
-//        CoreDataManager.shared.addGoal(name: name, color: color, goalTime: goalTime, frequency: frequency, startDate: startDate, priority: priority, dotw: dotw, id: <#UUID#>, endDate: endDate)
-//        self.getAllGoals()
-//    }
     
+    func resetGoalsPriority() {
+        var start = 1
+        for goal in self.getGoalsArray() {
+            CoreDataManager.shared.changePriorityOfGoal(id: goal.id, priority: start)
+            start += 1
+        }
+    }
     
 }
 
@@ -95,11 +147,16 @@ struct GoalViewModel: Identifiable, Equatable {
     }
     
     var uuid: UUID {
-        return goal.id
+        if(goal.id == nil){
+            return UUID()
+        }
+        else{
+            return goal.id!
+        }
     }
     
     var name: String {
-        return goal.name ?? ""
+        return goal.name
     }
     
     var priority: Int {
@@ -113,7 +170,13 @@ struct GoalViewModel: Identifiable, Equatable {
     }
     
     var color: Color {
-        return Color(goal.color!)
+        if(goal.color == nil){
+            return Color.white
+        }
+        else{
+            return Color(goal.color!)
+        }
+        
     }
     
     var endDate: Date? {
@@ -158,15 +221,23 @@ struct GoalViewModel: Identifiable, Equatable {
     }
     
     func updateTotalTime(time: Double, add: Bool){
-        CoreDataManager.shared.changeTotalTimeOfGoal(id: self.id, time: time, add: add)
+        DispatchQueue.main.async {
+            CoreDataManager.shared.changeTotalTimeOfGoal(id: self.id, time: time, add: add)
+        }
+        
     }
     
     func updateGoalTime(time: Double){
+        DispatchQueue.main.async {
         CoreDataManager.shared.changeGoalTimeOfGoal(id: self.id, time: time)
+        }
     }
     
     func updatePriority(new: Int){
-        CoreDataManager.shared.changePriorityOfGoal(id: self.id, priority: new)
+        DispatchQueue.main.async {
+            CoreDataManager.shared.changePriorityOfGoal(id: self.id, priority: new)
+        }
+        
     }
     
     func filterGoalRecordToday() -> GoalRecordViewModel? {

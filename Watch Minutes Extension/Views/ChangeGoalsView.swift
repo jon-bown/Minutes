@@ -10,7 +10,7 @@ import SwiftUI
 struct ChangeGoalsView: View {
     @Environment(\.presentationMode) var presentationMode
     
-    @StateObject private var goalRecordListVM = GoalRecordListViewModel()
+    @StateObject private var goalRecordListVM = GoalRecordListViewModel.sharedInstance
     
     var goal: GoalViewModel
     @Binding var isPresented: Bool

@@ -12,7 +12,7 @@ struct Constants {
     
     static let navigationBarHeight: CGFloat = 65
     static let mainRingThickness: CGFloat = 30
-    static let weekdayRingThickness: CGFloat = 4
+    static let weekdayRingThickness: CGFloat = 3
     static let barChartColumns: Int = 96
     //static let barChartColumns: Int = 24
     static let barChartColumnWidth: CGFloat = 2.6
@@ -35,7 +35,7 @@ struct Constants {
     static let progressRingViewFrameHeightStandard: CGFloat = 150
     static let progressRingViewFrameWidthStandard: CGFloat = 150
     static let progressRingViewThicknessStandard: CGFloat = 15
-    static let progressRingViewMaxRingLimitStandard: Int = 3
+    static let progressRingViewMaxRingLimitStandard: Int = 4
     
     static let progressRingViewCalendarMaxWidth: CGFloat = 15
     

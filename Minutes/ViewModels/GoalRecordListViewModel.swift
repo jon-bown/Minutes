@@ -14,26 +14,29 @@ class GoalRecordListViewModel: ObservableObject, Equatable {
         return lhs.goalRecords == rhs.goalRecords
     }
     
+    static let sharedInstance = GoalRecordListViewModel()
     
     @Published var goalRecords = [GoalRecordViewModel]()
     let cal = Calendar.current
     
     
-    init() {
+    private init() {
         let didSaveNotification = NSManagedObjectContext.didSaveObjectsNotification
         
-        NotificationCenter.default.addObserver(self, selector: #selector(didSave(_:)), name: didSaveNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(didChangeRecords(_:)), name: didSaveNotification, object: nil)
         
         
         let didChangeNotification = NSManagedObjectContext.didChangeObjectsNotification
         
-        NotificationCenter.default.addObserver(self, selector: #selector(didSave(_:)), name: didChangeNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(didChangeRecords(_:)), name: didChangeNotification, object: nil)
         
         self.getAllGoalRecords()
     }
     
-    @objc func didSave(_ notification: Notification){
+    @objc func didChangeRecords(_ notification: Notification){
+        DispatchQueue.main.async {
         self.getAllGoalRecords()
+        }
     }
     
     
@@ -45,9 +48,30 @@ class GoalRecordListViewModel: ObservableObject, Equatable {
         //self.getAllGoalRecords()
     }
     
-    func getAllGoalRecords() {
-        let goalRecords = CoreDataManager.shared.getAllGoalRecords()
+
+    
+    func deleteGoal(goal: GoalViewModel) {
+        let goalObj = CoreDataManager.shared.getGoalByID(id: goal.id)
+        if let goalToDelete = goalObj {
+            DispatchQueue.main.async {
+                CoreDataManager.shared.deleteGoal(goal: goalToDelete)
+            }
+        }
+    }
+    
+    
+    func deleteAllGoalRecords() {
         DispatchQueue.main.async {
+            self.goalRecords.removeAll()
+            CoreDataManager.shared.deleteAllGoalRecords()
+        }
+    }
+    
+    func getAllGoalRecords() {
+        
+        DispatchQueue.main.async {
+            let goalRecords = CoreDataManager.shared.getAllGoalRecords()
+            self.goalRecords.removeAll()
             if(!goalRecords.isEmpty){
                 self.goalRecords = goalRecords.map(GoalRecordViewModel.init)
             }
@@ -62,12 +86,24 @@ class GoalRecordListViewModel: ObservableObject, Equatable {
     
     func getRecordTodayForGoal(goal: GoalViewModel) -> GoalRecordViewModel? {
         //self.getAllGoalRecords()
-        return goalRecords.first(where:({cal.isDate(Date(), inSameDayAs: $0.date) && $0.goal.id == goal.id}))
+        if(!goalRecords.isEmpty){
+            return goalRecords.first(where:({cal.isDate(Date(), inSameDayAs: $0.date) && $0.goal.id == goal.id}))
+        }
+        else{
+            return nil
+        }
+
     }
     
     func filterGoalRecordsByDate(date: Date) -> [GoalRecordViewModel] {
         //self.getAllGoalRecords()
-        return goalRecords.filter({cal.isDate(date, inSameDayAs: $0.date)})
+        if(!goalRecords.isEmpty){
+            return goalRecords.filter({cal.isDate(date, inSameDayAs: $0.date)})
+        }
+        else{
+            return []
+        }
+        
     }
     
     func filterGoalRecords() -> [GoalRecordViewModel] {
@@ -78,7 +114,6 @@ class GoalRecordListViewModel: ObservableObject, Equatable {
     func filterGoalRecordSavesTodayForGoal(goal: GoalViewModel) -> [Date: Double] {
         //self.getAllGoalRecords()
         if(self.getRecordTodayForGoal(goal: goal) == nil){
-            print("Its Nil")
             return [:]
         }
         else {
@@ -179,14 +214,17 @@ class GoalRecordListViewModel: ObservableObject, Equatable {
         return best
     }
     
-    
-//    func updateGoalRecord(goalRecordID: NSManagedObjectID, seconds: Double) {
-//        CoreDataManager.shared.updateGoalRecord(id: goalRecordID, secondsToAdd: seconds)
-//    }
-    
-//    func addNewGoalRecord(name: String, date: Date, progress: Double, seconds: Double, id: NSManagedObjectID) {
-//        CoreDataManager.shared.addGoalRecord(name: name, date: date, progress: progress, seconds: seconds, parentGoalID: id)
-//    }
+    func getDayTimeForGoal(goal: GoalViewModel) -> Int {
+        if let record = self.getRecordTodayForGoal(goal: goal) {
+            return Int(record.dayTime/60)
+        }
+        else {
+            return 0
+        }
+        
+        
+        
+    }
     
     func removeTimeFromGoalRecord(id: NSManagedObjectID, datesToRemove: [Date]){
         CoreDataManager.shared.removeTimeFromGoalRecord(id: id, datesToRemove: datesToRemove)
@@ -202,7 +240,7 @@ struct GoalRecordViewModel: Identifiable, Equatable {
     }
     
     var name: String {
-        return record.goal.name ?? ""
+        return record.goal.name
     }
     
     var date: Date {

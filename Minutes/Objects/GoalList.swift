@@ -11,7 +11,7 @@ import SwiftUI
 //Fetches all stored goals and displays them as a list
 struct GoalList: View {
     
-    @StateObject private var goalListVM = GoalListViewModel()
+    @StateObject private var goalListVM = GoalListViewModel.sharedInstance
 
     
     var body: some View {

@@ -18,11 +18,30 @@ extension GoalRecord {
 
     @NSManaged public var date: Date
     @NSManaged public var dayTime: Double
-    @NSManaged public var goalSaves: [Date:Double]?
-    @NSManaged public var goalUpdates: [Int:Double]?
     @NSManaged public var name: String
     @NSManaged public var progress: Double
     @NSManaged public var goal: Goal
+    @NSManaged private var goalSavesData: Data
+    @NSManaged private var goalUpdatesData: Data
+
+    public var goalSaves: [Date:Double]? {
+        get {
+            return try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(goalSavesData) as? [Date:Double]
+        }
+        set {
+            goalSavesData = try! NSKeyedArchiver.archivedData(withRootObject: newValue, requiringSecureCoding: false)
+        }
+    }
+
+    public var goalUpdates: [Int:Double]? {
+        get {
+            return try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(goalUpdatesData) as? [Int:Double]
+        }
+        set {
+            goalUpdatesData = try! NSKeyedArchiver.archivedData(withRootObject: newValue, requiringSecureCoding: false)
+        }
+    }
+
 
 }
 

@@ -10,8 +10,8 @@ import SwiftUI
 struct MiniBarChartWidgetView: View {
     @Environment(\.calendar) var calendar
     
-    @StateObject private var goalListVM = GoalListViewModel()
-    @StateObject private var goalRecordListVM = GoalRecordListViewModel()
+    @StateObject private var goalListVM = GoalListViewModel.sharedInstance
+    @StateObject private var goalRecordListVM = GoalRecordListViewModel.sharedInstance
         
 //    var title: String
 //    var progress: String

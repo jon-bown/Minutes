@@ -19,7 +19,6 @@
 		FC034C782623BE940054405B /* ProgressRingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCA3532225AEA509002EDA29 /* ProgressRingView.swift */; };
 		FC034C7D2623BEA00054405B /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC202E7725AA9EE8007D928D /* Extensions.swift */; };
 		FC034C822623BEF40054405B /* ProgressRingViewStatic.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCDF948125EF415A00787F5D /* ProgressRingViewStatic.swift */; };
-		FC034C912623CCB80054405B /* Minutes.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = FC202E4525AA966B007D928D /* Minutes.xcdatamodeld */; };
 		FC034C962623CDF30054405B /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC202E4325AA966B007D928D /* Persistence.swift */; };
 		FC034C9B26265DA40054405B /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0CF8DE25C08D9B00D1890D /* Constants.swift */; };
 		FC034CA026265DAA0054405B /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0CF8DE25C08D9B00D1890D /* Constants.swift */; };
@@ -83,6 +82,8 @@
 		FC917691267CF32700DC6A69 /* Goal+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC91768C267CF32700DC6A69 /* Goal+CoreDataProperties.swift */; };
 		FC917692267CF32700DC6A69 /* Goal+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC91768C267CF32700DC6A69 /* Goal+CoreDataProperties.swift */; };
 		FCA3532325AEA509002EDA29 /* ProgressRingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCA3532225AEA509002EDA29 /* ProgressRingView.swift */; };
+		FCAD86E327C884B3008E6CA6 /* Minutes.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = FC202E4525AA966B007D928D /* Minutes.xcdatamodeld */; };
+		FCAD86E427C884B3008E6CA6 /* Minutes.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = FC202E4525AA966B007D928D /* Minutes.xcdatamodeld */; };
 		FCAEA0B125B642A4001D421C /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC202E4325AA966B007D928D /* Persistence.swift */; };
 		FCAEA0D925B8FF01001D421C /* MinutesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCAEA0D825B8FF01001D421C /* MinutesApp.swift */; };
 		FCB6D6AD25FAC41B00933F95 /* StopWatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCB6D6AC25FAC41B00933F95 /* StopWatch.swift */; };
@@ -109,7 +110,6 @@
 		FCC850C325B4B776009678AB /* GoalDashboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCC850C225B4B776009678AB /* GoalDashboard.swift */; };
 		FCC850EA25B4BA99009678AB /* ProgressRingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCA3532225AEA509002EDA29 /* ProgressRingView.swift */; };
 		FCC850EE25B4BA9D009678AB /* ProgressRings.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC202E8325AA9F2B007D928D /* ProgressRings.swift */; };
-		FCC8512225B4BBC6009678AB /* Minutes.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = FC202E4525AA966B007D928D /* Minutes.xcdatamodeld */; };
 		FCC8513A25B4BC6E009678AB /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC202E7725AA9EE8007D928D /* Extensions.swift */; };
 		FCC8513F25B50A7B009678AB /* ProgressComplicationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCC8513E25B50A7B009678AB /* ProgressComplicationView.swift */; };
 		FCC91EE725F32B11003DD488 /* GroupBoxLabelButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCC91EE625F32B11003DD488 /* GroupBoxLabelButton.swift */; };
@@ -135,19 +135,19 @@
 			remoteGlobalIDString = FC034C4F2623BBBB0054405B;
 			remoteInfo = MinutesWidgetExtension;
 		};
+		FCAD86E527C884CF008E6CA6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FC202E2F25AA966B007D928D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FCC8501225B1080A009678AB;
+			remoteInfo = "Watch Minutes";
+		};
 		FCC8501E25B1080B009678AB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = FC202E2F25AA966B007D928D /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = FCC8501B25B1080B009678AB;
 			remoteInfo = "Watch Minutes Extension";
-		};
-		FCC8503225B1080C009678AB /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FC202E2F25AA966B007D928D /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = FCC8501225B1080A009678AB;
-			remoteInfo = "Watch Minutes";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -562,8 +562,8 @@
 			buildRules = (
 			);
 			dependencies = (
-				FCC8503325B1080C009678AB /* PBXTargetDependency */,
 				FC034C5C2623BBBC0054405B /* PBXTargetDependency */,
+				FCAD86E627C884CF008E6CA6 /* PBXTargetDependency */,
 			);
 			name = Minutes;
 			productName = Minutes;
@@ -700,7 +700,6 @@
 				FC034C572623BBBB0054405B /* MinutesWidget.swift in Sources */,
 				FCBFAAA92682C91300B4F46E /* AddGoalRecordViewModel.swift in Sources */,
 				FC034CA526268EA30054405B /* DailyStatsView.swift in Sources */,
-				FC034C912623CCB80054405B /* Minutes.xcdatamodeld in Sources */,
 				FC034C9B26265DA40054405B /* Constants.swift in Sources */,
 				FCEF5218262E3A34001CABA9 /* MiniBarChartWidgetView.swift in Sources */,
 				FC8B5754266F2113005D1631 /* AddGoalViewModel.swift in Sources */,
@@ -708,6 +707,7 @@
 				FC8B5730266D5D90005D1631 /* GoalRecordListViewModel.swift in Sources */,
 				FC034C732623BE870054405B /* AppUtils.swift in Sources */,
 				FC8B5750266D6E93005D1631 /* GoalRecord+CoreDataProperties.swift in Sources */,
+				FCAD86E427C884B3008E6CA6 /* Minutes.xcdatamodeld in Sources */,
 				FC034C962623CDF30054405B /* Persistence.swift in Sources */,
 				FC91768F267CF32700DC6A69 /* Goal+CoreDataClass.swift in Sources */,
 				FC8B574D266D6E93005D1631 /* GoalRecord+CoreDataClass.swift in Sources */,
@@ -786,6 +786,7 @@
 				FCDF948625EF422300787F5D /* ProgressRingViewStatic.swift in Sources */,
 				FCC850C325B4B776009678AB /* GoalDashboard.swift in Sources */,
 				FCC850EA25B4BA99009678AB /* ProgressRingView.swift in Sources */,
+				FCAD86E327C884B3008E6CA6 /* Minutes.xcdatamodeld in Sources */,
 				FC034CA026265DAA0054405B /* Constants.swift in Sources */,
 				FCC850EE25B4BA9D009678AB /* ProgressRings.swift in Sources */,
 				FC034C482623AEB80054405B /* ChangeGoalsView.swift in Sources */,
@@ -797,7 +798,6 @@
 				FC8B5753266F2113005D1631 /* AddGoalViewModel.swift in Sources */,
 				FCE19B6725F70FE500CA85CB /* AppUtils.swift in Sources */,
 				FCE7F2A025C4B247000B82A5 /* StopWatchButton.swift in Sources */,
-				FCC8512225B4BBC6009678AB /* Minutes.xcdatamodeld in Sources */,
 				FC034C432623AC5C0054405B /* GoalCompletedNotificationView.swift in Sources */,
 				FC8B574C266D6E93005D1631 /* GoalRecord+CoreDataClass.swift in Sources */,
 				FCC8502825B1080B009678AB /* NotificationView.swift in Sources */,
@@ -820,15 +820,15 @@
 			target = FC034C4F2623BBBB0054405B /* MinutesWidgetExtension */;
 			targetProxy = FC034C5B2623BBBC0054405B /* PBXContainerItemProxy */;
 		};
+		FCAD86E627C884CF008E6CA6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FCC8501225B1080A009678AB /* Watch Minutes */;
+			targetProxy = FCAD86E527C884CF008E6CA6 /* PBXContainerItemProxy */;
+		};
 		FCC8501F25B1080B009678AB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = FCC8501B25B1080B009678AB /* Watch Minutes Extension */;
 			targetProxy = FCC8501E25B1080B009678AB /* PBXContainerItemProxy */;
-		};
-		FCC8503325B1080C009678AB /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = FCC8501225B1080A009678AB /* Watch Minutes */;
-			targetProxy = FCC8503225B1080C009678AB /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 

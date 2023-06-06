@@ -21,11 +21,10 @@ class AddGoalViewModel: ObservableObject {
     var totalTime: Double = 0.0
     var weekDay: [String] = []
     var id: UUID = UUID()
-    //@Published var rating: Int? = nil
 
     
     func save(dotw: WeekDays) {
-        
+        print("Save")
         CoreDataManager.shared.addGoal(name: name, color: color, goalTime: goalTime, frequency: frequency, startDate: startDate, dotw: dotw, endDate: endDate, id: id)
         
     }

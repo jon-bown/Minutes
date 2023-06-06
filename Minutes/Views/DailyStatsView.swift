@@ -10,8 +10,8 @@ import SwiftUI
 struct DailyStatsView: View {
     
     // MARK: - Variables
-    @StateObject private var goalListVM = GoalListViewModel()
-    @StateObject private var goalRecordListVM = GoalRecordListViewModel()
+    @StateObject private var goalListVM = GoalListViewModel.sharedInstance
+    @StateObject private var goalRecordListVM = GoalRecordListViewModel.sharedInstance
     
     var dateProvided: Date = Date()
     var goals: [GoalViewModel]
@@ -19,15 +19,6 @@ struct DailyStatsView: View {
     var maxStatLimit: Int = 3
     private var cal = Calendar.current
     
-    var filteredGoals: [GoalViewModel] {
-        return self.goalListVM.filterCurrentGoalsByDate(date: dateProvided)
-    }
-    
-    var filteredGoalRecords: [GoalRecordViewModel] {
-        return self.goalRecordListVM.filterGoalRecordsByDate(date: self.dateProvided)
-
-    }
-        
     // MARK: - INIT
     
     init(goalList: [GoalViewModel], type: String = "Horizontal", maxStatLimit: Int = 3){
@@ -40,7 +31,7 @@ struct DailyStatsView: View {
     
     var body: some View {
         
-        if(filteredGoals.isEmpty && filteredGoalRecords.isEmpty){
+        if(goalListVM.filterCurrentGoals().isEmpty && goalRecordListVM.filterGoalRecordsByDate(date: self.dateProvided).isEmpty){
             VStack(alignment: .center){
                 HStack{
                     
@@ -51,10 +42,10 @@ struct DailyStatsView: View {
             }
             
         }
-        else if (filteredGoals.isEmpty) {
+        else if (goalListVM.filterCurrentGoals().isEmpty) {
             if(type == "Horizontal"){
                 VStack(alignment: .leading){
-                    ForEach(filteredGoalRecords, id: \.id){ goalRecord in
+                    ForEach(goalRecordListVM.filterGoalRecordsByDate(date: self.dateProvided), id: \.id){ goalRecord in
                         if let index = goalRecordListVM.sortGoalRecordsByPriority().firstIndex{$0.id == goalRecord.id}{
                             if(index < maxStatLimit){
                                 Text("\(goalRecord.name)").bold().foregroundColor(Color.white)
@@ -85,8 +76,8 @@ struct DailyStatsView: View {
                         Divider().frame(width: 2).background(Color.white)
                     }.frame(height: 100)
                     //Columns
-                    ForEach(filteredGoals){ goal in
-                        if let index = filteredGoals.firstIndex(of: goal){
+                    ForEach(goalListVM.filterCurrentGoals()){ goal in
+                        if let index = goalListVM.filterCurrentGoals().firstIndex(of: goal){
                             if(index < maxStatLimit){
                                 //numerical limit here
                                 VStack(alignment: .leading, spacing: 1){
@@ -127,12 +118,12 @@ struct DailyStatsView: View {
         else {
             if(type == "Horizontal"){
                 VStack(alignment: .leading){
-                    ForEach(filteredGoals){ goal in
-                        if let index = filteredGoals.firstIndex(of: goal){
+                    ForEach(goalListVM.filterCurrentGoals()){ goal in
+                        if let index = goalListVM.filterCurrentGoals().firstIndex(of: goal){
                             if(index < maxStatLimit){
                                 //numerical limit here
                                 Text("\(goal.name)").bold().foregroundColor(Color.white)
-                                Text("\(Int(0))/\(Int(goal.goalTime)) MIN").foregroundColor(goal.color).bold().padding(.bottom, 4)
+                                Text("\(goalRecordListVM.getDayTimeForGoal(goal: goal))/\(Int(goal.goalTime)) MIN").foregroundColor(goal.color).bold().padding(.bottom, 4)
                             }
                         }
                         

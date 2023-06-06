@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="18154" systemVersion="20E241" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21754" systemVersion="22F66" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" userDefinedModelVersionIdentifier="">
     <entity name="Goal" representedClassName="Goal" syncable="YES">
         <attribute name="color" optional="YES" attributeType="Transformable" valueTransformerName="UIColorValueTransformer" customClassName="UIColor"/>
         <attribute name="endDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
@@ -12,19 +12,15 @@
         <attribute name="startDate" attributeType="Date" defaultDateTimeInterval="634352880" usesScalarValueType="NO"/>
         <attribute name="totalTime" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="weekDay" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromDataTransformer" customClassName="[String]"/>
-        <relationship name="records" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="GoalRecord" inverseName="goal" inverseEntity="GoalRecord"/>
+        <relationship name="records" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="GoalRecord" inverseName="goal" inverseEntity="GoalRecord"/>
     </entity>
     <entity name="GoalRecord" representedClassName="GoalRecord" syncable="YES">
         <attribute name="date" attributeType="Date" defaultDateTimeInterval="634352940" usesScalarValueType="NO"/>
         <attribute name="dayTime" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
-        <attribute name="goalSaves" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromDataTransformer" customClassName="[Date:Double]"/>
-        <attribute name="goalUpdates" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromDataTransformer" customClassName="[Int:Double]"/>
+        <attribute name="goalSavesData" optional="YES" attributeType="Binary" valueTransformerName="NSSecureUnarchiveFromDataTransformer" customClassName="[Date:Double]"/>
+        <attribute name="goalUpdatesData" optional="YES" attributeType="Binary" valueTransformerName="NSSecureUnarchiveFromDataTransformer" customClassName="[Int:Double]"/>
         <attribute name="name" attributeType="String" defaultValueString=""/>
         <attribute name="progress" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <relationship name="goal" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Goal" inverseName="records" inverseEntity="Goal"/>
     </entity>
-    <elements>
-        <element name="Goal" positionX="-266.75390625" positionY="-14.53515625" width="128" height="209"/>
-        <element name="GoalRecord" positionX="-63" positionY="-9" width="128" height="134"/>
-    </elements>
 </model>

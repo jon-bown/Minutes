@@ -57,8 +57,8 @@ struct SimpleEntry: TimelineEntry {
 struct MinutesWidgetEntryView : View {
     @Environment(\.widgetFamily) var widgetFamily
     
-    @StateObject private var goalListVM = GoalListViewModel()
-    @StateObject private var goalRecordListVM = GoalRecordListViewModel()
+    @StateObject private var goalListVM = GoalListViewModel.sharedInstance
+    @StateObject private var goalRecordListVM = GoalRecordListViewModel.sharedInstance
     
     var entry: Provider.Entry
     

@@ -18,7 +18,6 @@ class AddGoalRecordViewModel: ObservableObject {
     var progress: Double = 0.0
 
     func save() {
-        
         CoreDataManager.shared.addGoalRecord(goal: self.goal!, date: date, progress: progress, seconds: dayTime)
         
     }

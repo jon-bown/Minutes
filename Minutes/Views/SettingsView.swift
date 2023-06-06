@@ -8,13 +8,11 @@
 import SwiftUI
 
 struct SettingsView: View {
+    @StateObject private var goalListVM = GoalListViewModel.sharedInstance
     
-    @Environment(\.presentationMode) var presentationMode
-    @StateObject private var goalListVM = GoalListViewModel()
-    
-    var buttonDisabled: Bool {
-        return goalListVM.getGoalsArray().count == 0
-    }
+//    var buttonDisabled: Bool {
+//        return goalListVM.getGoalsArray().count == 0
+//    }
     
     @State private var completionNotifications: Bool = UserDefaults.standard.bool(forKey: Constants.generalCompletionReminder)
     
@@ -25,8 +23,8 @@ struct SettingsView: View {
                 VStack(spacing: 20){
                     // MARK: - SECTION 1
                     GroupBox(label: Text("GOAL SETTINGS").bold()){
-                        SettingsRowNavLinkView(navView: AnyView(GoalPriorityView()), label: "Edit Goals", disabled: buttonDisabled).disabled(buttonDisabled)
-                        SettingsRowNavLinkView(navView: AnyView(ResetAppView()), label: "Reset", disabled: buttonDisabled).disabled(buttonDisabled)
+                        SettingsRowNavLinkView(navView: AnyView(GoalPriorityView()), label: "Edit Goals", disabled: goalListVM.getGoalsArray().count == 0).disabled(goalListVM.getGoalsArray().count == 0)
+                        SettingsRowNavLinkView(navView: AnyView(ResetAppView()), label: "Reset", disabled: goalListVM.getGoalsArray().count == 0).disabled(goalListVM.getGoalsArray().count == 0)
                     }
                     // MARK: - SECTION 2
                     
@@ -47,11 +45,7 @@ struct SettingsView: View {
                     
                             Toggle(isOn: self.$completionNotifications){
                                 Text("100% Completion Notifications")
-                            }
-                            
-                       
-                            
-                        
+                            }                        
                     }
                 }
             }.navigationTitle(Text("Settings")).navigationBarTitleDisplayMode(.large).padding()

@@ -140,8 +140,8 @@ struct CalendarView<DateView>: View where DateView: View {
 struct RootView: View {
     @Environment(\.calendar) var calendar
     
-    @StateObject private var goalListVM = GoalListViewModel()
-    @StateObject private var goalRecordListVM = GoalRecordListViewModel()
+    @StateObject private var goalListVM = GoalListViewModel.sharedInstance
+    @StateObject private var goalRecordListVM = GoalRecordListViewModel.sharedInstance
     
     
     private var year: DateInterval {
@@ -163,15 +163,13 @@ struct RootView: View {
     var body: some View {
         NavigationView{
             CalendarView(interval: year) { date in
-
-                
                 NavigationLink(destination: OverallProgressView(dateProvided: date)){
                     VStack {
                         Text(String(self.calendar.component(.day, from: date))).font(Font.system(size: 18, weight: .regular, design: .default)).kerning(0.05).foregroundColor(.white)
                         //Text(date.dayOfTheWeek)
-                        ProgressRings(dateProvided: date, maxWidth: 30, maxLineWidth: Constants.weekdayRingThickness, maxRingLimit: 3).padding(2).clipShape(Circle()).padding(.vertical, 4)
+                        ProgressRings(dateProvided: date, maxWidth: 35, maxLineWidth: Constants.weekdayRingThickness, maxRingLimit: Constants.progressRingViewMaxRingLimitStandard).padding(2).clipShape(Circle()).padding(.vertical, 2)
                         
-                    }
+                    }.frame(width: 45, height: 75)
                 }
                 
             }.frame(width: screenSize.width-80)
@@ -182,21 +180,7 @@ struct RootView: View {
 
 struct SmallCalendarView: View {
     @Environment(\.calendar) var calendar
-    
-    @FetchRequest(
-        entity: Goal.entity(),
-        sortDescriptors: [
-            NSSortDescriptor(keyPath: \Goal.priority, ascending: true)
-        ]
-    ) var goals: FetchedResults<Goal>
-    
-    @FetchRequest(
-        entity: GoalRecord.entity(),
-        sortDescriptors: [
-            NSSortDescriptor(keyPath: \GoalRecord.name, ascending: true)
-        ]
-    ) var goalRecords: FetchedResults<GoalRecord>
-    
+
     private var year: DateInterval {
         
         return calendar.dateInterval(of: .weekOfMonth, for: Date())!
@@ -216,10 +200,6 @@ struct SmallCalendarView: View {
                     ProgressRings(dateProvided: date, maxWidth: Constants.progressRingViewCalendarMaxWidth, maxLineWidth: Constants.weekdayRingThickness, maxRingLimit: 3).padding(2).clipShape(Circle()).padding(.vertical, 4)
                     
                 }
-                //.frame(width: 100, height: 200)
-//                .background(Color.black.lighter(by: 50)).clipShape(RoundedRectangle(cornerRadius: 25, style: .continuous))
-                
-                //.background(Rectangle().frame(width: Constants.progressRingViewCalendarMaxWidth, height: 200).cornerRadius(15).foregroundColor(Color.black.lighter(by: 15)))
             }.frame(width: screenSize.width-80)
             
         }

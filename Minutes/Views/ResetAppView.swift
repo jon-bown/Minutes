@@ -11,8 +11,8 @@ import CoreData
 struct ResetAppView: View {
     @Environment(\.presentationMode) var presentationMode
     
-    @StateObject private var goalListVM = GoalListViewModel()
-    @StateObject private var goalRecordListVM = GoalRecordListViewModel()
+    @StateObject private var goalListVM = GoalListViewModel.sharedInstance
+    @StateObject private var goalRecordListVM = GoalRecordListViewModel.sharedInstance
     @State var simpleAlertMessageWithButtons = false
     
     var body: some View {
@@ -36,10 +36,8 @@ struct ResetAppView: View {
                 }.alert(isPresented: $simpleAlertMessageWithButtons, content: {
                     self.simpleWarning()
                     let firstButton = Alert.Button.default(Text("Erase")){
-                        CoreDataManager.shared.deleteAllGoals()
-                        goalListVM.getAllGoals()
-                        CoreDataManager.shared.deleteAllGoalRecords()
-                        goalRecordListVM.getAllGoalRecords()
+                        self.goalListVM.deleteAllGoals()
+                        self.goalRecordListVM.deleteAllGoalRecords()
                         self.deleteAllNotifications()
                         self.presentationMode.wrappedValue.dismiss()
                     }

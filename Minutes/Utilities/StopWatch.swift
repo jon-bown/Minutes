@@ -54,7 +54,6 @@ class StopWatch: ObservableObject {
     var seconds: Float = 0.0
     
     
-    
     private func shutdownTimer() {
         // how long we've been in the .running state
         let accumulatedRunningTime = Date().timeIntervalSince(startDate!)

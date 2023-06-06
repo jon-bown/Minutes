@@ -161,81 +161,9 @@ class AppUtil {
         }
         
     }
+
     
-    //MARK: STREAKS
-    
-    //Calculates current streak of the user for the goal with name 'goalName'
-//    static func calculateGoalCurrentStreak(records: [GoalRecord], goalID: UUID?) -> Int {
-//        
-//        if(goalID == nil){
-//            return 0
-//        }
-//        let recordsByName = records.filter({$0.id == goalID})
-//        
-//        if(recordsByName.count == 0){
-//            //User can't have best streak if there are no records available
-//            UserDefaults.standard.set(0, forKey: "Best\(goalID!)")
-//            
-//            return 0
-//            
-//        }
-//        else {
-//            var count = 0
-//            //most recent goal record where progress of greater than 1 was achieved
-//            guard let first = recordsByName.sorted(by: {$0.date > $1.date}).first(where: {$0.progress >= 1}) else {
-//                //no streaks possible
-//                UserDefaults.standard.set(count, forKey: "Best\(goalID!)")
-//                return count
-//            }
-//            if(Calendar.current.isDate(Date(), inSameDayAs:first.date!)){
-//                //The users first goal completion was today for this particular goal
-//                let bestStreak = UserDefaults.standard.integer(forKey: "Best\(goalID!)")
-//                count+=1
-//                if(count > bestStreak){
-//                    UserDefaults.standard.set(count, forKey: "Best\(goalID!)")
-//                }
-//                //print("current count: \(count) current best: \(bestStreak)")
-//                return count
-//            }
-//            else if(Calendar.current.isDateInYesterday(first.date!)){
-//                let completedGoals = recordsByName.sorted(by: {$0.date > $1.date}).filter({$0.progress >= 1})
-//                var tempDate = first.date!
-//                for record in completedGoals {
-//                    let dayDiff = Calendar.current.numberOfDaysBetween(record.date, and: tempDate)
-//                    if(dayDiff <= 1){
-//                        count+=1
-//                    }
-//                    else {
-//                        let bestStreak = UserDefaults.standard.integer(forKey: "Best\(goalID!)")
-//                        if(count > bestStreak){
-//                            UserDefaults.standard.set(count, forKey: "Best\(goalID!)")
-//                        }
-//                        return count
-//                    }
-//                    tempDate = record.date!
-//                }
-//                let bestStreak = UserDefaults.standard.integer(forKey: "Best\(goalID!)")
-//                if(count > bestStreak){
-//                    UserDefaults.standard.set(count, forKey: "Best\(goalID!)")
-//                }
-//                return count
-//            }
-//            else {
-//                //user is not on a streak
-//                return 0
-//            }
-//            
-//        }
-//        
-//        
-//    }
-//    
-//    static func calculateGoalBestStreak(goalID: NSManagedObjectID) -> Int {
-//        let best = UserDefaults.standard.integer(forKey: "Best\(goalID)")
-//        return best
-//    }
-    
-    //NOTIFICATIONS
+    //MARK: - NOTIFICATIONS
     static func getNotificationTime(id: UUID) -> String {
         var finalString = ""
         //Check if any notifications exist, if they do set reminders to true

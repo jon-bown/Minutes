@@ -11,8 +11,8 @@ import CoreData
 struct MainProgressView: View {
     @Environment(\.presentationMode) var presentationMode
     
-    @StateObject private var goalListVM = GoalListViewModel()
-    @StateObject private var goalRecordListVM = GoalRecordListViewModel()
+    @ObservedObject private var goalListVM = GoalListViewModel.sharedInstance
+    @StateObject private var goalRecordListVM = GoalRecordListViewModel.sharedInstance
         
     @State private var showNewGoalForm: Bool = false
     @State private var goalFilterCriteria: String = "Today"
@@ -21,6 +21,7 @@ struct MainProgressView: View {
     //List variables
     @State private var selectedItem: String?
     @State private var listViewId = UUID()
+    @State private var isDetailActive = false
     
     
     
@@ -40,12 +41,15 @@ struct MainProgressView: View {
                         
                     }
                     if(!goalListVM.goals.isEmpty){
+                        NavigationLink(destination: EmptyView()){
+                            EmptyView()
+                        }
                         NavigationLink(destination: OverallProgressView(dateProvided: Date())){
                             GroupBox{
                                 HStack{
                                     DailyStatsView(goalList: self.goalListVM.goals)
                                     Spacer()
-                                    ProgressRings(dateProvided: Date(), maxWidth: 120,
+                                    ProgressRings(dateProvided: Date(), maxWidth: 135,
                                                   maxLineWidth: Constants.progressRingViewThicknessStandard, maxRingLimit: Constants.progressRingViewMaxRingLimitStandard, showClear: false).frame(width: Constants.progressRingViewFrameWidthStandard, height: Constants.progressRingViewFrameHeightStandard).aspectRatio(contentMode: .fit)
                                 }
 
@@ -68,26 +72,15 @@ struct MainProgressView: View {
                         //ScrollView{
                             if(self.goalFilterCriteria == "Today"){
                                 List(self.goalListVM.filterCurrentGoals()) { goal in
-                                    GroupBox{
-                                        NavigationLink(destination: GoalDetailView(goal: goal), tag: "\(goal.id)", selection: $selectedItem) {
-                                            
-                                            GoalRow(goal: goal)
-                                        }
-                                    }
-                                            
-                                        //Goal}
+                                        GoalRow(goal: goal)
                                 }.id(listViewId)
        
                             }
                             else {
-                                List(goalListVM.goals) { goal in
-                                    GroupBox{
-                                        NavigationLink(destination: GoalDetailView(goal: goal), tag: "\(goal.id)", selection: $selectedItem) {
-                                            
-                                            GoalRow(goal: goal)
-                                        }
-                                    }
-                                            
+                                List(goalListVM.getGoalsArray()) { goal in
+                                 
+                                        GoalRow(goal: goal)
+                                                                             
                                 }.id(listViewId)
                             }
                        
@@ -97,10 +90,11 @@ struct MainProgressView: View {
                     //}.padding()
                 }.onAppear {
                     if selectedItem != nil {
-                        selectedItem = nil
+                        
                         listViewId = UUID()
                     }
                 }
+                
                 //self.createNavigationBar(geometry.size)
             
             }
@@ -130,7 +124,6 @@ struct MainProgressView: View {
 //                ToolbarItem(placement: .navigationBarTrailing){
 //                    Button(action: {
 //                        self.showNewGoalForm = true
-//                        print("FU")
 //                    }){
 //                        Image(systemName: "plus.circle").resizable().font(Font.system(.title))
 //                            .frame(width: 45, height: 45)
@@ -143,6 +136,7 @@ struct MainProgressView: View {
         }.navigationViewStyle(DefaultNavigationViewStyle())
         
     }
+    
     
     func createNavigationBar(_ geometrySize: CGSize) -> some View {
         ZStack(alignment: .top) {

@@ -8,30 +8,22 @@
 import SwiftUI
 
 struct OverallProgressView: View {
-    @Environment(\.calendar) var calendar
     
-    @StateObject private var goalListVM = GoalListViewModel()
-    @StateObject private var goalRecordListVM = GoalRecordListViewModel()
+    @StateObject private var goalListVM = GoalListViewModel.sharedInstance
+    @StateObject private var goalRecordListVM = GoalRecordListViewModel.sharedInstance
     
     
     var dateProvided: Date
     @State private var selectedDate: Date
     private var cal = Calendar.current
     
-    var filteredGoals: [GoalViewModel] {
-        return self.goalListVM.filterCurrentGoalsByDate(date: dateProvided)
-    }
 
     //goalRecords created today
-    var filteredGoalRecords: [GoalRecordViewModel] {
-        return self.goalRecordListVM.filterGoalRecordsByDate(date: self.dateProvided)
-
-    }
     private var days: [Date] {
         guard
-            let weekInterval = calendar.dateInterval(of: .weekOfYear, for: self.selectedDate)
+            let weekInterval = cal.dateInterval(of: .weekOfYear, for: self.selectedDate)
             else { return [] }
-        return calendar.generateDates(
+        return cal.generateDates(
             inside: weekInterval,
             matching: DateComponents(hour: 0, minute: 0, second: 0)
         )
@@ -51,7 +43,8 @@ struct OverallProgressView: View {
                             VStack {
                                 Spacer(minLength: Constants.navigationBarHeight).frame(width: geometry.size.width, height: Constants.navigationBarHeight+20, alignment: .top)
                                 //self.createRings()
-                                ProgressRings(dateProvided: self.selectedDate, maxWidth: 200, maxLineWidth: Constants.mainRingThickness, maxRingLimit: 3).padding(10)
+                                ProgressRings(dateProvided: Date(), maxWidth: 150,
+                                              maxLineWidth: Constants.progressRingViewThicknessStandard, maxRingLimit: Constants.progressRingViewMaxRingLimitStandard, showClear: false).frame(width: Constants.progressRingViewFrameWidthStandard, height: Constants.progressRingViewFrameHeightStandard).aspectRatio(contentMode: .fit).padding(10)
                                 self.createCharts()
                                 //self.createFooter()
                             }
@@ -66,15 +59,15 @@ struct OverallProgressView: View {
     func createCharts() -> some View {
             Group {
                 // Move Chart
-                ForEach(filteredGoals, id: \.id){ goal in
+                ForEach(goalListVM.filterCurrentGoalsByDate(date: dateProvided), id: \.id){ goal in
                     BarChartView(
-                        title: goal.name, //goalRecord.name
-                        progress: "\(round(Double(filteredGoalRecords.first(where: {$0.name == goal.name}) == nil ? 0: filteredGoalRecords.first(where: {$0.name == goal.name})!.dayTime/Double(60.0))*100)/100)", //goalRecord.progress
+                        title: goal.name, 
+                        progress: "\(round(Double(goalRecordListVM.filterGoalRecordsByDate(date: self.dateProvided).first(where: {$0.name == goal.name}) == nil ? 0: goalRecordListVM.filterGoalRecordsByDate(date: self.dateProvided).first(where: {$0.name == goal.name})!.dayTime/Double(60.0))*100)/100)", //goalRecord.progress
                         goal: "\(Int(goal.goalTime))",
                         total: "",
                         average: "",
                         unit: "MIN",
-                        data: filteredGoalRecords.first(where: {$0.name == goal.name}) == nil ? ActivityData.timeReduced:filteredGoalRecords.first(where: {$0.name == goal.name})!.goalUpdates!,
+                        data: goalRecordListVM.filterGoalRecordsByDate(date: self.dateProvided).first(where: {$0.name == goal.name}) == nil ? ActivityData.timeReduced:goalRecordListVM.filterGoalRecordsByDate(date: self.dateProvided).first(where: {$0.name == goal.name})!.goalUpdates!,
                         textColor: goal.color,
                         barStartColor: goal.color.lighter(by: 30),
                         barEndColor: goal.color.darker(by: 30)

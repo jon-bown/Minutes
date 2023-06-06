@@ -16,24 +16,24 @@ class CoreDataManager {
     static let shared = CoreDataManager()
     
     private init() {
-        
+        //persistentContainer = PersistenceController.persistentContainer
         persistentContainer = NSPersistentCloudKitContainer(name: "Minutes")
         persistentContainer.loadPersistentStores { (description, error) in
             if let error = error {
                 fatalError("Failed to initialize Core Data \(error)")
             }
         }
-        
+
         let storeURL = URL.storeURL(for: "group.com.appfactorial.tempus.anulum", databaseName: "Minutes")
         let storeDescription = NSPersistentStoreDescription(url: storeURL)
         storeDescription.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(containerIdentifier: "iCloud.com.minutes.icloud")
         persistentContainer.persistentStoreDescriptions = [storeDescription]
-        
+        persistentContainer.viewContext.automaticallyMergesChangesFromParent = true
         persistentContainer.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {
                 // Replace this implementation with code to handle the error appropriately.
                 // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                 
+
                 /*
                  Typical reasons for an error here include:
                  * The parent directory does not exist, cannot be created, or disallows writing.
@@ -49,10 +49,9 @@ class CoreDataManager {
     }
     
     //TODO: Add Fetch Requests
-    
     func saveContext () {
-        let context = persistentContainer.viewContext
-        if context.hasChanges {
+        let context = CoreDataManager.shared.persistentContainer.viewContext
+        
             do {
                 try context.save()
             } catch {
@@ -60,7 +59,6 @@ class CoreDataManager {
                 let nserror = error as NSError
                 fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
             }
-        }
     }
     
     
@@ -68,10 +66,13 @@ class CoreDataManager {
     
     func getAllGoals() -> [Goal] {
         
+//        let fetchRequest: NSFetchRequest<Goal> = Goal.fetchRequest()
         let fetchRequest: NSFetchRequest<Goal> = Goal.fetchRequest()
         
         do {
-           return try persistentContainer.viewContext.fetch(fetchRequest)
+            let items = try persistentContainer.viewContext.fetch(fetchRequest)
+            print(items)
+           return items
         }
         catch {
             return []
@@ -128,7 +129,7 @@ class CoreDataManager {
     func saveGoal() {
         //create goal
         
-        saveContext()
+        self.saveContext()
     }
     
     func saveGoalRecord() {
@@ -136,7 +137,6 @@ class CoreDataManager {
         
         do {
             try persistentContainer.viewContext.save()
-            print("Saved movie")
         }
         catch {
             print("Failed to save movie \(error)")
@@ -146,24 +146,23 @@ class CoreDataManager {
     //MARK: - DELETING
     
     func deleteGoal(goal: Goal){
-        
         persistentContainer.viewContext.delete(goal)
+
         
         saveContext()
     }
     
     func deleteGoalRecord(goalRecord: GoalRecord){
-        
         persistentContainer.viewContext.delete(goalRecord)
         
         saveContext()
     }
     
+    
     func deleteAllGoals() {
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Goal")
         
         fetchRequest.includesPropertyValues = false
-        
         do {
             let items = try persistentContainer.viewContext.fetch(fetchRequest) as! [Goal]
             
@@ -172,6 +171,7 @@ class CoreDataManager {
             }
             
             saveContext()
+            //persistentContainer.viewContext.reset() // < reset context
             
         } catch {
             // Error Handling
@@ -200,13 +200,12 @@ class CoreDataManager {
     
     func addGoal(name: String, color: Color, goalTime: Double, frequency: String, startDate: Date, dotw: WeekDays, endDate: Date?, id: UUID) {
         
-        print("Adding goal")
         let newGoal = Goal(context: persistentContainer.viewContext)
-        newGoal.id = id
+
         newGoal.name = name
         newGoal.color = UIColor(color)
         newGoal.totalTime = 0.0
-        //newGoal.id = id
+        newGoal.id = id
         newGoal.goalTime = Double(goalTime)
         newGoal.frequency = frequency
         newGoal.startDate = startDate
@@ -222,7 +221,6 @@ class CoreDataManager {
                 if(dotw.weekDays[index].isSelected) {
                     
                     newGoal.weekDay!.append(dotw.weekDays[index].weekDayString)
-                    //print(self.dayOTW.weekDays[index].weekDayString)
                 }
             }
             newGoal.monthDay = 0
@@ -285,20 +283,10 @@ class CoreDataManager {
         
         if(goal.records != nil){
             if(!goal.records!.isEmpty) {
-                let record = getRecordTodayForGoal(id: goal.id)!
+                let record = getRecordTodayForGoal(id: goal.id!)!
                 record.progress = record.dayTime/(goal.goalTime*60.0)
             }
         }
-
-        
-        
-        var priority = 1
-        if !self.getAllGoals().isEmpty {
-            priority = self.getAllGoals().map { Int($0.priority) }.max()! + 1
-        }
-        
-        goal.priority = Int16(priority)
-        
         saveContext()
     }
     
@@ -322,9 +310,7 @@ class CoreDataManager {
         save[Date()] = seconds
         newGoalRecord.goalSaves = save
         
-        let parentGoal = self.getGoalByID(id: goal.id)!
-        parentGoal.addToRecords(newGoalRecord)
-        parentGoal.totalTime = newGoalRecord.dayTime
+        goal.goal.addToRecords(newGoalRecord)
         
         saveContext()
     }
@@ -434,6 +420,7 @@ class CoreDataManager {
             
         } catch {
             //TODO: Throw Error
+            print("error")
             print(error)
         }
     }

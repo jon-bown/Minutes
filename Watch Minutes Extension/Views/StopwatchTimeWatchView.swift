@@ -9,12 +9,8 @@ import SwiftUI
 
 struct StopwatchTimeWatchView: View {
     
-    @StateObject private var goalRecordListVM = GoalRecordListViewModel()
+    @StateObject private var goalRecordListVM = GoalRecordListViewModel.sharedInstance
     
-    var filteredGoalRecords: [GoalRecordViewModel] {
-        return self.goalRecordListVM.filterGoalRecords()
-
-    }
     
     var goal: GoalViewModel
     @Binding var progress: Double
@@ -23,11 +19,11 @@ struct StopwatchTimeWatchView: View {
     
     var body: some View {
         VStack{
-            if(filteredGoalRecords.isEmpty){
+            if(self.goalRecordListVM.filterGoalRecords().isEmpty){
                 ProgressView(value: 0.0).progressViewStyle(LinearProgressViewStyle(tint: self.goal.color)).padding()
             }
             else{
-                ProgressView(value: filteredGoalRecords[0].progress >= 1.0 ? 1.0:filteredGoalRecords[0].progress).progressViewStyle(LinearProgressViewStyle(tint: self.goal.color)).padding()
+                ProgressView(value: self.goalRecordListVM.filterGoalRecords()[0].progress >= 1.0 ? 1.0:self.goalRecordListVM.filterGoalRecords()[0].progress).progressViewStyle(LinearProgressViewStyle(tint: self.goal.color)).padding()
             }
             //Timer UI
             RoundedRectangle(cornerRadius: 10)

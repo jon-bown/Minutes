@@ -13,11 +13,7 @@ import CoreHaptics
  Form for adding or editing a goal
  */
 struct GoalForm: View {
- 
-    @StateObject private var addGoalVM = AddGoalViewModel()
-    @StateObject private var goalListVM = GoalListViewModel()
-    @StateObject private var goalRecordListVM = GoalRecordListViewModel()
-        
+            
     var editing: Bool
     var passedGoal: GoalViewModel?
     @Binding var isPresented: Bool
@@ -198,6 +194,18 @@ struct GoalForm: View {
             
             .navigationTitle(editing ? self.goalName:"New Goal")
             .navigationBarTitleDisplayMode(.large)
+            .navigationBarItems(leading:
+                                    Button(action: {
+                                        self.simpleSuccess()
+                                        DispatchQueue.main.async {
+                                            self.isPresented = false
+                                        }
+                                    }){
+                                        Image(systemName: "xmark.circle.fill").font(Font.system(size: 30, weight: .semibold))
+                                            .foregroundColor(Color.white)
+                                            //.font(Font.system(size: 50, weight: .bold))
+                                    }
+            )
         }
         //.frame(width: screenSize.width-20, height: screenSize.height-150)
         .navigationViewStyle(StackNavigationViewStyle())
@@ -447,8 +455,9 @@ struct GoalForm: View {
     }
     
     private func dismissView() {
-        print("dismiss")
+        DispatchQueue.main.async {
         self.isPresented = false
+        }
     }
     
 
@@ -495,7 +504,7 @@ struct GoalForm: View {
     //MARK: EDITING
     private func addGoal(){
         
-        
+        let addGoalVM = AddGoalViewModel()
         addGoalVM.name = self.goalName
         addGoalVM.color = self.goalCol
         addGoalVM.startDate = self.startDate
@@ -506,31 +515,28 @@ struct GoalForm: View {
 
         //save notifications
         if(self.reminders){
-            self.submitUserNotificationTrigger(id: addGoalVM.id)
+            self.removeNotificationsForGoal(id: self.passedGoal!.uuid)
+            self.submitUserNotificationTrigger(id: self.passedGoal!.uuid)
         }
         
         
         self.simpleSuccess()
         
         self.success = true
-        self.isPresented = false
+        self.dismissView()
     }
     
     func updateGoal() {
+        
+        
+        let addGoalVM = AddGoalViewModel()
         addGoalVM.name = self.goalName
         addGoalVM.color = self.goalCol
         addGoalVM.startDate = self.startDate
         addGoalVM.endDate = self.endDate
         addGoalVM.frequency = self.goalFrequency
         addGoalVM.goalTime = Double(self.goalDailyTime)
-        addGoalVM.save(dotw: self.dayOTW)
-
-        //save notifications
-        if(self.reminders){
-            self.submitUserNotificationTrigger(id: addGoalVM.id)
-        }
-
-
+        addGoalVM.update(id: self.passedGoal!.id, dotw: self.dayOTW)
         
         if(self.reminders){
             self.removeNotificationsForGoal(id: self.passedGoal!.uuid)
@@ -543,7 +549,7 @@ struct GoalForm: View {
         self.simpleSuccess()
         
         self.success = true
-        self.isPresented = false
+        self.dismissView()
         
         //MARK: TODO: UPDATE PROGRESS
         
