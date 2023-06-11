@@ -11,23 +11,25 @@ import CoreData
 
 struct Provider: TimelineProvider {
     
-    var managedObjectContext : NSManagedObjectContext
-    
-    init(context : NSManagedObjectContext) {
-        self.managedObjectContext = context
-    }
+    let dataManager = WCoreDataManager.shared
     
     func placeholder(in context: Context) -> SimpleEntry {
-        SimpleEntry(date: Date(), isDemo: "")
+        let placeholderGoalList: [Goal] = []
+        let placeholderGoalRecordList: [GoalRecord] = []
+        return SimpleEntry(date: Date(), isDemo: "", goalList: placeholderGoalList, goalRecordList: placeholderGoalRecordList)
     }
 
     func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> ()) {
         var entry: SimpleEntry
         if(context.isPreview){
-            entry = SimpleEntry(date: Date(), isDemo: "Y")
+            let demoGoalList: [Goal] = [] // Populate with demo data if needed
+            let demoGoalRecordList: [GoalRecord] = [] // Populate with demo data if needed
+            entry = SimpleEntry(date: Date(), isDemo: "Y", goalList: demoGoalList, goalRecordList: demoGoalRecordList)
         }
         else {
-            entry = SimpleEntry(date: Date(), isDemo: "")
+            let fetchedGoalList = dataManager.fetchGoals()
+            let fetchedGoalRecordList = dataManager.fetchGoalRecords()
+            entry = SimpleEntry(date: Date(), isDemo: "", goalList: fetchedGoalList, goalRecordList: fetchedGoalRecordList)
         }
         
         completion(entry)
@@ -38,9 +40,11 @@ struct Provider: TimelineProvider {
 
         // Generate a timeline consisting of five entries an hour apart, starting from the current date.
         let currentDate = Date()
+        let fetchedGoalList = dataManager.fetchGoals()
+        let fetchedGoalRecordList = dataManager.fetchGoalRecords()
         for hourOffset in 0 ..< 5 {
             let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
-            let entry = SimpleEntry(date: entryDate, isDemo: "")
+            let entry = SimpleEntry(date: entryDate, isDemo: "", goalList: fetchedGoalList, goalRecordList: fetchedGoalRecordList)
             entries.append(entry)
         }
 
@@ -52,14 +56,14 @@ struct Provider: TimelineProvider {
 struct SimpleEntry: TimelineEntry {
     let date: Date
     let isDemo: String
+    let goalList: [Goal]
+    let goalRecordList: [GoalRecord]
 }
+
 
 struct MinutesWidgetEntryView : View {
     @Environment(\.widgetFamily) var widgetFamily
-    
-    @StateObject private var goalListVM = GoalListViewModel.sharedInstance
-    @StateObject private var goalRecordListVM = GoalRecordListViewModel.sharedInstance
-    
+
     var entry: Provider.Entry
     
 
@@ -97,7 +101,7 @@ struct MinutesWidgetEntryView : View {
     }
     
     func createSystemSmall() -> some View {
-        ProgressRingsStatic(dateProvided: entry.date, maxWidth:120, maxLineWidth: 15, maxRingLimit: 3, animate: false).frame(width: 150, height: 150)
+        ProgressRingsStatic(goals: entry.goalList, goalRecords: entry.goalRecordList, dateProvided: entry.date, maxWidth:120, maxLineWidth: 15, maxRingLimit: 3, animate: false).frame(width: 150, height: 150)
         .aspectRatio(contentMode: .fit)
     }
     
@@ -122,7 +126,7 @@ struct MinutesWidgetEntryView : View {
         VStack(alignment: .center){
             SmallCalendarViewDemo().padding(EdgeInsets(top: 5, leading: 5, bottom: 5, trailing: 5))
             Spacer()
-            MiniBarChartWidgetView()
+            //MiniBarChartWidgetView(goalRecordList: entry.goalRecordList)
             Spacer()
             DailyStatsViewDemo(type: "V")
         }.frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -143,13 +147,13 @@ struct MinutesWidgetEntryView : View {
         VStack(alignment: .center){
   
             HStack{
-                SmallCalendarView().padding(EdgeInsets(top: 8, leading: 0, bottom: 5, trailing: 0))
+                SmallCalendarView(goalList: entry.goalList, goalRecordList: entry.goalRecordList).padding(EdgeInsets(top: 8, leading: 0, bottom: 5, trailing: 0))
             }
             Spacer()
-            MiniBarChartWidgetView()
+            //MiniBarChartWidgetView(goalRecordList: entry.goalRecordList)
             Spacer()
             HStack{
-                DailyStatsView(goalList: goalListVM.goals, type: "V").padding(.leading, 5).padding(.bottom, 20)
+                DailyStatsView(goalList: entry.goalList, goalRecordList: entry.goalRecordList, type: "V").padding(.leading, 5).padding(.bottom, 20)
             }
         }
 
@@ -157,9 +161,9 @@ struct MinutesWidgetEntryView : View {
     
     func createHStackInfo() -> some View {
         HStack{
-            DailyStatsView(goalList: goalListVM.goals).padding().padding(.leading, 10)
+            DailyStatsView(goalList: entry.goalList, goalRecordList: entry.goalRecordList).padding().padding(Edge.Set.leading, 10)
             Spacer()
-            ProgressRingsStatic(dateProvided: entry.date, maxWidth:120, maxLineWidth: 15, maxRingLimit: 3, animate: false).frame(width: 150, height: 150)
+            ProgressRingsStatic(goals: entry.goalList, goalRecords: entry.goalRecordList, dateProvided: entry.date, maxWidth:120, maxLineWidth: 15, maxRingLimit: 3, animate: false).frame(width: 150, height: 150)
                 .aspectRatio(contentMode: .fit).padding(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 10))
         }.padding(.vertical, 5)
     }
@@ -169,28 +173,17 @@ struct MinutesWidgetEntryView : View {
 struct MinutesWidget: Widget {
     
     let kind: String = "MinutesWidget"
-
+    
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: kind, provider: Provider(context: persistentContainer.viewContext)) { entry in
+        StaticConfiguration(kind: kind, provider: Provider()) { entry in
             MinutesWidgetEntryView(entry: entry)
         }
         .configurationDisplayName("Minute Progress")
         .description("Show overviews of progress throughout the day")
         .supportedFamilies([.systemSmall, .systemMedium])
     }
-    
-    var persistentContainer: NSPersistentContainer = {
-//        let storeURL = AppGroup.facts.containerURL.appendingPathComponent("Minutes.sqlite")
-//        let description = NSPersistentStoreDescription(url: storeURL)
-//
-//        let container = NSPersistentContainer(name: "Minutes")
-//        container.persistentStoreDescriptions = [description]
-//        container.loadPersistentStores {
-//            handle,error  in
-//        }
-        return CoreDataManager.shared.persistentContainer
-    }()
 }
+
 
 //struct MinutesWidget_Previews: PreviewProvider {
 //    static var previews: some View {

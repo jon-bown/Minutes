@@ -11,7 +11,7 @@ struct OverallProgressView: View {
     
     @StateObject private var goalListVM = GoalListViewModel.sharedInstance
     @StateObject private var goalRecordListVM = GoalRecordListViewModel.sharedInstance
-    
+    @State private var currentDate = Date()
     
     var dateProvided: Date
     @State private var selectedDate: Date
@@ -43,7 +43,7 @@ struct OverallProgressView: View {
                             VStack {
                                 Spacer(minLength: Constants.navigationBarHeight).frame(width: geometry.size.width, height: Constants.navigationBarHeight+20, alignment: .top)
                                 //self.createRings()
-                                ProgressRings(dateProvided: Date(), maxWidth: 150,
+                                ProgressRings(dateProvided: $currentDate, maxWidth: 150,
                                               maxLineWidth: Constants.progressRingViewThicknessStandard, maxRingLimit: Constants.progressRingViewMaxRingLimitStandard, showClear: false).frame(width: Constants.progressRingViewFrameWidthStandard, height: Constants.progressRingViewFrameHeightStandard).aspectRatio(contentMode: .fit).padding(10)
                                 self.createCharts()
                                 //self.createFooter()
@@ -189,7 +189,7 @@ struct OverallProgressView: View {
                                         .foregroundColor(Color.white)
                                 }
                                 ZStack {
-                                    ProgressRings(dateProvided: item, maxWidth: 30, maxLineWidth: Constants.weekdayRingThickness, maxRingLimit: 3).clipShape(Circle())
+                                    ProgressRingsStatic(dateProvided: item, maxWidth: 30, maxLineWidth: Constants.weekdayRingThickness, maxRingLimit: 3).clipShape(Circle())
                                         .frame(width: 45, height: 40)
                                         .aspectRatio(contentMode: .fit)
                                 }

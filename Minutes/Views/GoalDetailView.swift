@@ -33,8 +33,8 @@ struct GoalDetailView: View {
     var goal: GoalViewModel
     
     @StateObject private var addGoalRecordVM = AddGoalRecordViewModel()
-    @StateObject private var goalListVM = GoalListViewModel.sharedInstance
-    @StateObject private var goalRecordListVM = GoalRecordListViewModel.sharedInstance
+    @EnvironmentObject var goalListVM: GoalListViewModel
+    @EnvironmentObject var goalRecordListVM: GoalRecordListViewModel
     
     @State private var hours: Int = 0
     @State private var minutes: Int = 0
@@ -677,6 +677,7 @@ struct GoalDetailView: View {
             
         }
         self.updateProgress()
+        self.goalRecordListVM.getAllGoalRecords()
     }
     
     //Save the current time into the proper goal entity

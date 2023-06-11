@@ -11,8 +11,10 @@ import CoreData
 struct MainProgressView: View {
     @Environment(\.presentationMode) var presentationMode
     
-    @ObservedObject private var goalListVM = GoalListViewModel.sharedInstance
-    @StateObject private var goalRecordListVM = GoalRecordListViewModel.sharedInstance
+    //@StateObject private var goalListVM = GoalListViewModel.sharedInstance
+    //@StateObject private var goalRecordListVM = GoalRecordListViewModel.sharedInstance
+    private let goalListVM = GoalListViewModel()
+    private let goalRecordListVM = GoalRecordListViewModel()
         
     @State private var showNewGoalForm: Bool = false
     @State private var goalFilterCriteria: String = "Today"
@@ -22,7 +24,8 @@ struct MainProgressView: View {
     @State private var selectedItem: String?
     @State private var listViewId = UUID()
     @State private var isDetailActive = false
-    
+    @State private var currentDate = Date()
+    @State private var progressViewID = UUID()
     
     
     private var cal = Calendar.current
@@ -50,7 +53,7 @@ struct MainProgressView: View {
                                     DailyStatsView(goalList: self.goalListVM.goals)
                                     Spacer()
                                     ProgressRings(dateProvided: Date(), maxWidth: 135,
-                                                  maxLineWidth: Constants.progressRingViewThicknessStandard, maxRingLimit: Constants.progressRingViewMaxRingLimitStandard, showClear: false).frame(width: Constants.progressRingViewFrameWidthStandard, height: Constants.progressRingViewFrameHeightStandard).aspectRatio(contentMode: .fit)
+                                                  maxLineWidth: Constants.progressRingViewThicknessStandard, maxRingLimit: Constants.progressRingViewMaxRingLimitStandard, showClear: false).frame(width: Constants.progressRingViewFrameWidthStandard, height: Constants.progressRingViewFrameHeightStandard).aspectRatio(contentMode: .fit).environmentObject(goalListVM).environmentObject(goalRecordListVM)
                                 }
 
                             }.cornerRadius(15).padding()
@@ -90,9 +93,9 @@ struct MainProgressView: View {
                     //}.padding()
                 }.onAppear {
                     if selectedItem != nil {
-                        
                         listViewId = UUID()
                     }
+                    self.currentDate = Date()
                 }
                 
                 //self.createNavigationBar(geometry.size)

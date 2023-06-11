@@ -10,8 +10,8 @@ import SwiftUI
 struct DailyStatsView: View {
     
     // MARK: - Variables
-    @StateObject private var goalListVM = GoalListViewModel.sharedInstance
-    @StateObject private var goalRecordListVM = GoalRecordListViewModel.sharedInstance
+    @EnvironmentObject var goalListVM: GoalListViewModel
+    @EnvironmentObject var goalRecordListVM: GoalRecordListViewModel
     
     var dateProvided: Date = Date()
     var goals: [GoalViewModel]
@@ -20,7 +20,6 @@ struct DailyStatsView: View {
     private var cal = Calendar.current
     
     // MARK: - INIT
-    
     init(goalList: [GoalViewModel], type: String = "Horizontal", maxStatLimit: Int = 3){
         self.dateProvided = Date()
         self.goals = goalList

@@ -14,13 +14,13 @@ class GoalRecordListViewModel: ObservableObject, Equatable {
         return lhs.goalRecords == rhs.goalRecords
     }
     
-    static let sharedInstance = GoalRecordListViewModel()
+    //static let sharedInstance = GoalRecordListViewModel()
     
     @Published var goalRecords = [GoalRecordViewModel]()
     let cal = Calendar.current
     
     
-    private init() {
+    init() {
         let didSaveNotification = NSManagedObjectContext.didSaveObjectsNotification
         
         NotificationCenter.default.addObserver(self, selector: #selector(didChangeRecords(_:)), name: didSaveNotification, object: nil)

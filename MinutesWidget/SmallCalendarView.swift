@@ -137,8 +137,8 @@ struct CalendarView<DateView>: View where DateView: View {
 struct SmallCalendarView: View {
     @Environment(\.calendar) var calendar
     
-    @StateObject private var goalListVM = GoalListViewModel.sharedInstance
-    @StateObject private var goalRecordListVM = GoalRecordListViewModel.sharedInstance
+    var goalList: [Goal]
+    var goalRecordList: [GoalRecord]
 
 //    private var week: DateInterval {
 //
@@ -165,24 +165,16 @@ struct SmallCalendarView: View {
                 else {
                     Text(String(self.calendar.component(.day, from: date))).foregroundColor(.white).font(.system(size: 15))
                 }
-
-                //Text(date.dayOfTheWeek)
-                ProgressRingsStatic(dateProvided: date, maxWidth: 30, maxLineWidth: Constants.weekdayRingThickness, maxRingLimit: 3).clipShape(Circle()).padding(.top, 1)
+                ProgressRingsStatic(goals: goalList, goalRecords: goalRecordList, dateProvided: date, maxWidth: 30, maxLineWidth: Constants.weekdayRingThickness, maxRingLimit: 3).clipShape(Circle()).padding(.top, 1)
                 
             }.frame(width: 45.0, height: 70.0)
-            
         }
-            
-    
     }
 }
 
 
 struct SmallCalendarViewDemo: View {
     @Environment(\.calendar) var calendar
-
-    
-    //let screenSize = UIScreen.main.bounds.size
 
     var body: some View {
 
@@ -202,12 +194,8 @@ struct SmallCalendarViewDemo: View {
 
                 //Text(date.dayOfTheWeek)
                 Image("WidgetDemo").resizable().frame(width: 32.0, height: 32.0)
-                
             }
-            
         }.padding()
-            
-    
     }
 }
 

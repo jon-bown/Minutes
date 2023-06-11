@@ -321,7 +321,7 @@ class CoreDataManager {
                 record.goalUpdates![hour] = Double(minutes)
             }
             //Goal Saves
-            let dateKey = AppUtil.getSimplifiedDate()
+            let dateKey = Date()
             let saveKeyExists = record.goalSaves![dateKey] != nil
             if(saveKeyExists){
                 record.goalSaves![dateKey] = (record.goalSaves![dateKey]! + secondsToAdd)

@@ -10,17 +10,8 @@ import SwiftUI
 struct MiniBarChartWidgetView: View {
     @Environment(\.calendar) var calendar
     
-    @StateObject private var goalListVM = GoalListViewModel.sharedInstance
-    @StateObject private var goalRecordListVM = GoalRecordListViewModel.sharedInstance
+    var goalRecordList: [GoalRecord]
         
-//    var title: String
-//    var progress: String
-//    var goal: String
-//    var total: String
-//    var average: String
-//    var unit: String
-//    var data: [Int: Double]
-//    var textColor: Color
     private var barStartColor: Color = Color.red
 //   var barEndColor: Color
     
@@ -55,25 +46,6 @@ struct MiniBarChartWidgetView: View {
         }
     }
     //MARK: - HELPERS
-    private func getGoalName(id: UUID) -> String{
-        if let goal = goalListVM.goals.first(where: {$0.uuid == id}) {
-            return goal.name
-        }
-        else {
-            return ""
-        }
-        
-    }
-    
-    private func getGoalColor(id: UUID) -> Color{
-        if let goal = goalListVM.goals.first(where: {$0.uuid == id}) {
-            return goal.color
-        }
-        else {
-            return Color.white
-        }
-        
-    }
     
     
     
@@ -113,12 +85,11 @@ struct MiniBarChartWidgetView: View {
             }
             //MARK: - DATA INPUT
             HStack(alignment: .bottom, spacing: Constants.barChartColumnSpacing) {
-                ForEach(self.goalRecordListVM.filterGoalRecords()){ record in
-                    ForEach(0..<maxColumnIndex, id: \.self) { i in
-                        MiniBarChartBarView(height: record.goalUpdates![i] ?? Double(0), startColor: record.goal.color, endColor: record.goal.color)
+                ForEach(AppUtil.filterGoalRecords(goalRecords: self.goalRecordList), id: \.self){ (record: GoalRecord) in
+                    ForEach(Array(record.goalUpdates!.enumerated()), id: \.offset) { index, goalUpdate in
+                        MiniBarChartBarView(height: goalUpdate.value, startColor: Color(record.goal.color!), endColor: Color(record.goal.color!))
                     }
                 }
-
             }
             .drawingGroup()
         }

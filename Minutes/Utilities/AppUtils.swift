@@ -13,14 +13,99 @@ import UIKit
 //Contains functions that are used throughout the app to prevent repretition and to consolidate filtering logic for lists of goals and goal records
 class AppUtil {
 
+    
     //MARK: - FILTERING
-//    static func filterCurrentGoals(goals: [Goal], date: Date) -> [Goal] {
-//        if(goals.isEmpty){
-//            return []
-//        }
-//        let cal = Calendar.current
-//        return goals.filter({(date > $0.startDate! || cal.isDate(date, inSameDayAs:$0.startDate!)) && ($0.endDate == nil || date <= $0.endDate!) && (($0.frequency == "Weekly" && $0.weekDay!.contains(date.dayOfTheWeek)) || ($0.frequency == "Monthly" && $0.monthDay == date.dayOfTheMonth) || $0.frequency == "Daily")}).sorted(by: {$0.priority < $1.priority})
-//    }
+    static func filterCurrentGoalsByDate(goals: [Goal], date: Date) -> [Goal] {
+        //self.getAllGoals()
+        let cal = Calendar.current
+        if(!goals.isEmpty){
+            return goals.filter({(date > $0.startDate || cal.isDate(date, inSameDayAs:$0.startDate)) && ($0.endDate == nil || date <= $0.endDate!) && (($0.frequency == "Weekly" && $0.weekDay!.contains(date.dayOfTheWeek)) || ($0.frequency == "Monthly" && $0.monthDay == date.dayOfTheMonth) || $0.frequency == "Daily")}).sorted(by: {$0.priority < $1.priority})
+        }
+        else{
+            return []
+        }
+
+    }
+    
+    
+    static func filterGoalRecordsByDate(records: [GoalRecord], date: Date) -> [GoalRecord] {
+        let cal = Calendar.current
+        if(!records.isEmpty){
+            return records.filter({cal.isDate(date, inSameDayAs: $0.date)})
+        }
+        else{
+            return []
+        }
+        
+    }
+    
+    static func filterGoalRecords(goalRecords: [GoalRecord]) -> [GoalRecord] {
+        let cal = Calendar.current
+        if(!goalRecords.isEmpty){
+            return goalRecords.filter({cal.isDate(Date(), inSameDayAs: $0.date)})
+        }
+        else{
+            return []
+        }
+        
+    }
+    
+    static func sortGoalRecordsByPriority(goalRecords: [GoalRecord]) -> [GoalRecord] {
+        if(!goalRecords.isEmpty){
+                return goalRecords.sorted(by: {$0.goal.priority < $1.goal.priority})
+            
+        }
+        else{
+            return []
+        }
+    }
+    
+    static func filterCurrentGoals(goals: [Goal], date: Date) -> [Goal] {
+        if(goals.isEmpty){
+            return []
+        }
+        let cal = Calendar.current
+        return goals.filter({(date > $0.startDate || cal.isDate(date, inSameDayAs:$0.startDate)) && ($0.endDate == nil || date <= $0.endDate!) && (($0.frequency == "Weekly" && $0.weekDay!.contains(date.dayOfTheWeek)) || ($0.frequency == "Monthly" && $0.monthDay == date.dayOfTheMonth) || $0.frequency == "Daily")}).sorted(by: {$0.priority < $1.priority})
+    }
+    
+    static func fetchGoalDayTime(goal: Goal) -> Int {
+        let goalRecords = filterGoalRecordsByDate(records: goal.records ?? [], date: Date())
+        if(!goalRecords.isEmpty)
+        {
+            return Int(goalRecords.first!.dayTime/60)
+        }
+        else {
+            return 0
+        }
+    }
+    
+    static func getRecordTodayForGoal(goal: Goal) -> GoalRecord? {
+        let cal = Calendar.current
+        if let goalRecords = goal.records {
+            if(!goalRecords.isEmpty){
+                return goalRecords.first(where:({cal.isDate(Date(), inSameDayAs: $0.date) && $0.goal.id == goal.id}))
+            }
+            else{
+                return nil
+            }
+        }
+        else {
+            return nil
+        }
+
+    }
+    
+    static func getDayTimeForGoal(goal: Goal) -> Int {
+        if let record = self.getRecordTodayForGoal(goal: goal) {
+            return Int(record.dayTime/60)
+        }
+        else {
+            return 0
+        }
+        
+        
+        
+    }
 //
 //    static func filterGoalRecordsByGoalID(goalRecords: [GoalRecord], goalID: UUID?) -> [GoalRecord]{
 //        if(goalRecords.isEmpty || goalID == nil){
@@ -286,5 +371,8 @@ public enum AppGroup: String {
                 forSecurityApplicationGroupIdentifier: self.rawValue)!
         }
     }
+    
+    
+
     
 }

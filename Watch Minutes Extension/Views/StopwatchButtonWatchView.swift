@@ -9,8 +9,8 @@ import SwiftUI
 
 struct StopwatchButtonWatchView: View {
 
-    @StateObject private var goalListVM = GoalListViewModel.sharedInstance
-    @StateObject private var goalRecordListVM = GoalRecordListViewModel.sharedInstance
+    @EnvironmentObject var goalListVM: GoalListViewModel
+    @EnvironmentObject var goalRecordListVM: GoalRecordListViewModel
     @StateObject private var addGoalRecordVM = AddGoalRecordViewModel()
     
     

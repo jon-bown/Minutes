@@ -9,7 +9,7 @@ import SwiftUI
 
 struct StopwatchTimeWatchView: View {
     
-    @StateObject private var goalRecordListVM = GoalRecordListViewModel.sharedInstance
+    @EnvironmentObject var goalRecordListVM: GoalRecordListViewModel
     
     
     var goal: GoalViewModel

@@ -10,7 +10,7 @@ import SwiftUI
 struct WKGoalDetailViewR: View {
     @Environment(\.scenePhase) private var scenePhase
 
-    @StateObject private var goalRecordListVM = GoalRecordListViewModel.sharedInstance
+    @EnvironmentObject var goalRecordListVM: GoalRecordListViewModel
     
     var goal: GoalViewModel
     @State private var progress: Double = 0.0

@@ -14,7 +14,6 @@
 		FC034C572623BBBB0054405B /* MinutesWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC034C562623BBBB0054405B /* MinutesWidget.swift */; };
 		FC034C592623BBBC0054405B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FC034C582623BBBC0054405B /* Assets.xcassets */; };
 		FC034C5D2623BBBC0054405B /* MinutesWidgetExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = FC034C502623BBBB0054405B /* MinutesWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		FC034C662623BDEF0054405B /* ProgressRings.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC202E8325AA9F2B007D928D /* ProgressRings.swift */; };
 		FC034C732623BE870054405B /* AppUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCE19B6525F70FE500CA85CB /* AppUtils.swift */; };
 		FC034C782623BE940054405B /* ProgressRingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCA3532225AEA509002EDA29 /* ProgressRingView.swift */; };
 		FC034C7D2623BEA00054405B /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC202E7725AA9EE8007D928D /* Extensions.swift */; };
@@ -22,7 +21,6 @@
 		FC034C962623CDF30054405B /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC202E4325AA966B007D928D /* Persistence.swift */; };
 		FC034C9B26265DA40054405B /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0CF8DE25C08D9B00D1890D /* Constants.swift */; };
 		FC034CA026265DAA0054405B /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0CF8DE25C08D9B00D1890D /* Constants.swift */; };
-		FC034CA526268EA30054405B /* DailyStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCC8504B25B147B0009678AB /* DailyStatsView.swift */; };
 		FC034CBD26274BFE0054405B /* SmallCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC034CBC26274BFE0054405B /* SmallCalendarView.swift */; };
 		FC0CF8DA25BFCB1E00D1890D /* BarChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0CF8D925BFCB1E00D1890D /* BarChartView.swift */; };
 		FC0CF8DF25C08D9B00D1890D /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0CF8DE25C08D9B00D1890D /* Constants.swift */; };
@@ -31,6 +29,10 @@
 		FC0CF8F425C08F0500D1890D /* BlurView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0CF8F325C08F0500D1890D /* BlurView.swift */; };
 		FC0CF92A25C23BFB00D1890D /* DropDownMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0CF92925C23BFB00D1890D /* DropDownMenu.swift */; };
 		FC0E481625CF3FC700DE3F92 /* ResetAppView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0E481525CF3FC700DE3F92 /* ResetAppView.swift */; };
+		FC18F2AE2A361B0100252D36 /* WCoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC18F2AD2A361B0100252D36 /* WCoreDataManager.swift */; };
+		FC18F2AF2A3629D200252D36 /* GoalListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8B5729266BB602005D1631 /* GoalListViewModel.swift */; };
+		FC18F2B12A3629FE00252D36 /* ProgressRingsStatic.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC18F2B02A3629FE00252D36 /* ProgressRingsStatic.swift */; };
+		FC18F2B42A366E5F00252D36 /* DailyStatsViewStatic.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC18F2B32A366E5F00252D36 /* DailyStatsViewStatic.swift */; };
 		FC202E3B25AA966B007D928D /* MinutesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC202E3A25AA966B007D928D /* MinutesApp.swift */; };
 		FC202E3F25AA966B007D928D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FC202E3E25AA966B007D928D /* Assets.xcassets */; };
 		FC202E4225AA966B007D928D /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FC202E4125AA966B007D928D /* Preview Assets.xcassets */; };
@@ -56,14 +58,9 @@
 		FC76CC8B25D5B34100FFF37A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC76CC8A25D5B34100FFF37A /* AppDelegate.swift */; };
 		FC7D827D2630D3210049D722 /* WKGoalDetailViewR.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC7D827C2630D3210049D722 /* WKGoalDetailViewR.swift */; };
 		FC8B5725266BB4E9005D1631 /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8B5724266BB4E9005D1631 /* CoreDataManager.swift */; };
-		FC8B5726266BB4E9005D1631 /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8B5724266BB4E9005D1631 /* CoreDataManager.swift */; };
-		FC8B5727266BB4E9005D1631 /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8B5724266BB4E9005D1631 /* CoreDataManager.swift */; };
 		FC8B572A266BB602005D1631 /* GoalListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8B5729266BB602005D1631 /* GoalListViewModel.swift */; };
-		FC8B572B266BB602005D1631 /* GoalListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8B5729266BB602005D1631 /* GoalListViewModel.swift */; };
-		FC8B572C266BB602005D1631 /* GoalListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8B5729266BB602005D1631 /* GoalListViewModel.swift */; };
 		FC8B572E266D5D90005D1631 /* GoalRecordListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8B572D266D5D90005D1631 /* GoalRecordListViewModel.swift */; };
 		FC8B572F266D5D90005D1631 /* GoalRecordListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8B572D266D5D90005D1631 /* GoalRecordListViewModel.swift */; };
-		FC8B5730266D5D90005D1631 /* GoalRecordListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8B572D266D5D90005D1631 /* GoalRecordListViewModel.swift */; };
 		FC8B574B266D6E93005D1631 /* GoalRecord+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8B5743266D6E93005D1631 /* GoalRecord+CoreDataClass.swift */; };
 		FC8B574C266D6E93005D1631 /* GoalRecord+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8B5743266D6E93005D1631 /* GoalRecord+CoreDataClass.swift */; };
 		FC8B574D266D6E93005D1631 /* GoalRecord+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8B5743266D6E93005D1631 /* GoalRecord+CoreDataClass.swift */; };
@@ -72,7 +69,6 @@
 		FC8B5750266D6E93005D1631 /* GoalRecord+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8B5744266D6E93005D1631 /* GoalRecord+CoreDataProperties.swift */; };
 		FC8B5752266F2113005D1631 /* AddGoalViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8B5751266F2113005D1631 /* AddGoalViewModel.swift */; };
 		FC8B5753266F2113005D1631 /* AddGoalViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8B5751266F2113005D1631 /* AddGoalViewModel.swift */; };
-		FC8B5754266F2113005D1631 /* AddGoalViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8B5751266F2113005D1631 /* AddGoalViewModel.swift */; };
 		FC9176892678FB9400DC6A69 /* WeekDay.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCB6D6E9260AEE9B00933F95 /* WeekDay.swift */; };
 		FC91768A2678FB9500DC6A69 /* WeekDay.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCB6D6E9260AEE9B00933F95 /* WeekDay.swift */; };
 		FC91768D267CF32700DC6A69 /* Goal+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC91768B267CF32700DC6A69 /* Goal+CoreDataClass.swift */; };
@@ -93,7 +89,6 @@
 		FCBD9C442630E619007B3D66 /* StopwatchButtonWatchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCBD9C432630E619007B3D66 /* StopwatchButtonWatchView.swift */; };
 		FCBFAAA72682C91300B4F46E /* AddGoalRecordViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCBFAAA62682C91300B4F46E /* AddGoalRecordViewModel.swift */; };
 		FCBFAAA82682C91300B4F46E /* AddGoalRecordViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCBFAAA62682C91300B4F46E /* AddGoalRecordViewModel.swift */; };
-		FCBFAAA92682C91300B4F46E /* AddGoalRecordViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCBFAAA62682C91300B4F46E /* AddGoalRecordViewModel.swift */; };
 		FCC8501625B1080B009678AB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FCC8501525B1080B009678AB /* Assets.xcassets */; };
 		FCC8501D25B1080B009678AB /* Watch Minutes Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = FCC8501C25B1080B009678AB /* Watch Minutes Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		FCC8502425B1080B009678AB /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCC8502325B1080B009678AB /* ContentView.swift */; };
@@ -114,6 +109,7 @@
 		FCC8513F25B50A7B009678AB /* ProgressComplicationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCC8513E25B50A7B009678AB /* ProgressComplicationView.swift */; };
 		FCC91EE725F32B11003DD488 /* GroupBoxLabelButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCC91EE625F32B11003DD488 /* GroupBoxLabelButton.swift */; };
 		FCC91EEF25F34DE6003DD488 /* CustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCC91EEE25F34DE6003DD488 /* CustomTextField.swift */; };
+		FCC943232A367DB900D4CD66 /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8B5724266BB4E9005D1631 /* CoreDataManager.swift */; };
 		FCDF947525EF0CCD00787F5D /* SettingsRowNavLinkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCDF947425EF0CCD00787F5D /* SettingsRowNavLinkView.swift */; };
 		FCDF948225EF415A00787F5D /* ProgressRingViewStatic.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCDF948125EF415A00787F5D /* ProgressRingViewStatic.swift */; };
 		FCDF948625EF422300787F5D /* ProgressRingViewStatic.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCDF948125EF415A00787F5D /* ProgressRingViewStatic.swift */; };
@@ -207,6 +203,9 @@
 		FC0CF92925C23BFB00D1890D /* DropDownMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DropDownMenu.swift; sourceTree = "<group>"; };
 		FC0E481525CF3FC700DE3F92 /* ResetAppView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetAppView.swift; sourceTree = "<group>"; };
 		FC18F2AC2A3593FF00252D36 /* Minutes1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Minutes1.xcdatamodel; sourceTree = "<group>"; };
+		FC18F2AD2A361B0100252D36 /* WCoreDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WCoreDataManager.swift; sourceTree = "<group>"; };
+		FC18F2B02A3629FE00252D36 /* ProgressRingsStatic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressRingsStatic.swift; sourceTree = "<group>"; };
+		FC18F2B32A366E5F00252D36 /* DailyStatsViewStatic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyStatsViewStatic.swift; sourceTree = "<group>"; };
 		FC202E3725AA966B007D928D /* Minutes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Minutes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FC202E3A25AA966B007D928D /* MinutesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinutesApp.swift; sourceTree = "<group>"; };
 		FC202E3E25AA966B007D928D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -316,6 +315,9 @@
 				FC034C5A2623BBBC0054405B /* Info.plist */,
 				FC034CBC26274BFE0054405B /* SmallCalendarView.swift */,
 				FCEF5217262E3A34001CABA9 /* MiniBarChartWidgetView.swift */,
+				FC18F2AD2A361B0100252D36 /* WCoreDataManager.swift */,
+				FC18F2B02A3629FE00252D36 /* ProgressRingsStatic.swift */,
+				FC18F2B32A366E5F00252D36 /* DailyStatsViewStatic.swift */,
 			);
 			path = MinutesWidget;
 			sourceTree = "<group>";
@@ -691,21 +693,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FC18F2AE2A361B0100252D36 /* WCoreDataManager.swift in Sources */,
 				FC91768A2678FB9500DC6A69 /* WeekDay.swift in Sources */,
 				FC034C7D2623BEA00054405B /* Extensions.swift in Sources */,
 				FC034C782623BE940054405B /* ProgressRingView.swift in Sources */,
 				FC034CBD26274BFE0054405B /* SmallCalendarView.swift in Sources */,
-				FC8B5727266BB4E9005D1631 /* CoreDataManager.swift in Sources */,
 				FC917692267CF32700DC6A69 /* Goal+CoreDataProperties.swift in Sources */,
-				FC034C662623BDEF0054405B /* ProgressRings.swift in Sources */,
+				FC18F2B42A366E5F00252D36 /* DailyStatsViewStatic.swift in Sources */,
 				FC034C572623BBBB0054405B /* MinutesWidget.swift in Sources */,
-				FCBFAAA92682C91300B4F46E /* AddGoalRecordViewModel.swift in Sources */,
-				FC034CA526268EA30054405B /* DailyStatsView.swift in Sources */,
 				FC034C9B26265DA40054405B /* Constants.swift in Sources */,
 				FCEF5218262E3A34001CABA9 /* MiniBarChartWidgetView.swift in Sources */,
-				FC8B5754266F2113005D1631 /* AddGoalViewModel.swift in Sources */,
-				FC8B572C266BB602005D1631 /* GoalListViewModel.swift in Sources */,
-				FC8B5730266D5D90005D1631 /* GoalRecordListViewModel.swift in Sources */,
+				FC18F2B12A3629FE00252D36 /* ProgressRingsStatic.swift in Sources */,
 				FC034C732623BE870054405B /* AppUtils.swift in Sources */,
 				FC8B5750266D6E93005D1631 /* GoalRecord+CoreDataProperties.swift in Sources */,
 				FCAD86E427C884B3008E6CA6 /* Minutes.xcdatamodeld in Sources */,
@@ -780,6 +778,8 @@
 				FCAEA0B125B642A4001D421C /* Persistence.swift in Sources */,
 				FC9176892678FB9400DC6A69 /* WeekDay.swift in Sources */,
 				FC91768E267CF32700DC6A69 /* Goal+CoreDataClass.swift in Sources */,
+				FCC943232A367DB900D4CD66 /* CoreDataManager.swift in Sources */,
+				FC18F2AF2A3629D200252D36 /* GoalListViewModel.swift in Sources */,
 				FC917691267CF32700DC6A69 /* Goal+CoreDataProperties.swift in Sources */,
 				FCBD9C442630E619007B3D66 /* StopwatchButtonWatchView.swift in Sources */,
 				FCC8502425B1080B009678AB /* ContentView.swift in Sources */,
@@ -791,7 +791,6 @@
 				FC034CA026265DAA0054405B /* Constants.swift in Sources */,
 				FCC850EE25B4BA9D009678AB /* ProgressRings.swift in Sources */,
 				FC034C482623AEB80054405B /* ChangeGoalsView.swift in Sources */,
-				FC8B572B266BB602005D1631 /* GoalListViewModel.swift in Sources */,
 				FCB6D6B725FAC47800933F95 /* StopWatch.swift in Sources */,
 				FCC8513A25B4BC6E009678AB /* Extensions.swift in Sources */,
 				FC7D827D2630D3210049D722 /* WKGoalDetailViewR.swift in Sources */,
@@ -805,7 +804,6 @@
 				FCAEA0D925B8FF01001D421C /* MinutesApp.swift in Sources */,
 				FC8B572F266D5D90005D1631 /* GoalRecordListViewModel.swift in Sources */,
 				FCBD9C3E2630E320007B3D66 /* StopwatchTimeWatchView.swift in Sources */,
-				FC8B5726266BB4E9005D1631 /* CoreDataManager.swift in Sources */,
 				FCE7F2C025C9C016000B82A5 /* HalfCapsuleShape.swift in Sources */,
 				FC76CC8B25D5B34100FFF37A /* AppDelegate.swift in Sources */,
 				FCBFAAA82682C91300B4F46E /* AddGoalRecordViewModel.swift in Sources */,

@@ -120,8 +120,10 @@ struct GoalRingView: View {
  */
 struct ProgressRings: View {
 
-    @StateObject private var goalListVM = GoalListViewModel.sharedInstance
-    @StateObject private var goalRecordListVM = GoalRecordListViewModel.sharedInstance
+    //@StateObject private var goalListVM = GoalListViewModel.sharedInstance
+    //@StateObject private var goalRecordListVM = GoalRecordListViewModel.sharedInstance
+    @EnvironmentObject var goalListVM: GoalListViewModel
+    @EnvironmentObject var goalRecordListVM: GoalRecordListViewModel
     //Parameters for minimized Ring View
     var dateProvided: Date = Date()
     var maxWidth: CGFloat = 100
@@ -182,70 +184,5 @@ struct ProgressRings: View {
 }
 
 
-struct ProgressRingsStatic: View {
-    
-    
-    
-    @StateObject private var goalListVM = GoalListViewModel.sharedInstance
-    @StateObject private var goalRecordListVM = GoalRecordListViewModel.sharedInstance
-    
-    //Parameters for minimized Ring View
-    var dateProvided: Date = Date()
-    var maxWidth: CGFloat = 100
-    var maxLineWidth: CGFloat = 10
-    var maxRingLimit: Int = 4
-    var animate: Bool = false
-    var tinted: Bool = false
-    //var goalList: FetchedResults<Goal>
-        
-    
-    private var cal = Calendar.current
-    
-    init(dateProvided: Date, maxWidth: CGFloat, maxLineWidth: CGFloat, maxRingLimit: Int, animate: Bool = true, tinted: Bool = false){
-        self.dateProvided = dateProvided
-        self.maxWidth = maxWidth
-        self.maxLineWidth = maxLineWidth
-        self.maxRingLimit = maxRingLimit
-        self.animate = animate
-        self.tinted = tinted
-        //self.goalList = goalList
-    }
-    
-    var body: some View {
-        
-        ZStack {
-            if(self.goalListVM.filterCurrentGoalsByDate(date: self.dateProvided).isEmpty){
-                ProgressRingView(progress: 0.0, startColor: Color.clear, endColor: Color.clear, backgroundColor: Color.black)
-            }
-            else {
-                ForEach(self.goalListVM.filterCurrentGoalsByDate(date: self.dateProvided), id: \.id){ goal in
-                    
-                    
-                    //Main progress view
-                    if let index = self.goalListVM.filterCurrentGoalsByDate(date: self.dateProvided).firstIndex(of: goal){
-                        if(index < maxRingLimit){
-                            if(self.goalListVM.filterCurrentGoalsByDate(date: self.dateProvided).isEmpty){
-                                ProgressRingViewStatic(progress: 0.0, thickness: self.maxLineWidth, startColor: tinted ? Color.white: goal.color, endColor: tinted ? Color.white: goal.color, backgroundColor: tinted ? Color.gray:goal.color, animate: animate).frame(width: calculateDim(index: index), height: calculateDim(index: index)).aspectRatio(contentMode: .fit)
-                            }
-                            else {
-                                ProgressRingViewStatic(progress: self.goalRecordListVM.filterGoalRecordsByDate(date: self.dateProvided).first(where: { goal.id == $0.id }) == nil ? 0.0: self.goalRecordListVM.filterGoalRecordsByDate(date: self.dateProvided).first(where: { goal.id == $0.id})!.progress, thickness: self.maxLineWidth, startColor: tinted ? Color.white: goal.color, endColor: tinted ? Color.white: goal.color, backgroundColor: tinted ? Color.gray:goal.color, animate: animate).frame(width: calculateDim(index: index), height: calculateDim(index: index)).aspectRatio(contentMode: .fit)
-                            }
-                            
-                        }
-                    }
-                    
-                }
-            }
-            
-            
-        }
-        
-    }
-    
-    private func calculateDim(index: Int) -> CGFloat{
-        let differenceAmount = (self.maxLineWidth*2.0+4.0)*(CGFloat(index)-1.0)
-        return self.maxWidth - differenceAmount
-    }
-    
-}
+
 

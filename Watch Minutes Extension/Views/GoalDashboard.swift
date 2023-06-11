@@ -13,9 +13,8 @@ struct GoalDashboard: View {
     
     private var cal = Calendar.current
     
-    @StateObject private var goalListVM = GoalListViewModel.sharedInstance
-    @StateObject private var goalRecordListVM = GoalRecordListViewModel.sharedInstance
-    
+    @EnvironmentObject var goalListVM: GoalListViewModel
+    @EnvironmentObject var goalRecordListVM: GoalRecordListViewModel
 
     
     var body: some View {
