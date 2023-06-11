@@ -151,15 +151,13 @@ class AppUtil {
     }
     
     static func getSecondsFromSeconds(seconds: Double) -> String {
-        let sec = seconds.truncatingRemainder(dividingBy: 3600)
-        let remSec = Int(sec.truncatingRemainder(dividingBy: 60))
+        let remSec = Int(abs(seconds).truncatingRemainder(dividingBy: 60))
         if(String(remSec).count == 1){
             return "0\(remSec)"
         }
         else {
             return "\(remSec)"
         }
-        
     }
 
     

@@ -82,28 +82,28 @@ struct MiniBarChartWidgetView: View {
         return ZStack(alignment: .bottomLeading) {
             VStack(alignment: .center, spacing: 20) {
                 HStack(alignment: .center, spacing: Constants.barChartColumnWidth) {
-                    ForEach(0..<maxColumnIndex) { i in
+                    ForEach(0..<maxColumnIndex, id: \.self) { i in
                         Rectangle()
                             .fill(Color(red: 129 / 255, green: 129 / 255, blue: 129 / 255))
                             .frame(width: 1, height: 1)
                     }
                 }
                 HStack(alignment: .center, spacing: Constants.barChartColumnWidth) {
-                    ForEach(0..<maxColumnIndex) { i in
+                    ForEach(0..<maxColumnIndex, id: \.self) { i in
                         Rectangle()
                             .fill(Color(red: 71 / 255, green: 72 / 255, blue: 73 / 255))
                             .frame(width: 1, height: 1)
                     }
                 }
                 HStack(alignment: .center, spacing: Constants.barChartColumnWidth) {
-                    ForEach(0..<maxColumnIndex) { i in
+                    ForEach(0..<maxColumnIndex, id: \.self) { i in
                         Rectangle()
                             .fill(Color(red: 71 / 255, green: 72 / 255, blue: 73 / 255))
                             .frame(width: 1, height: 1)
                     }
                 }
                 HStack(alignment: .top, spacing: Constants.barChartColumnSpacing) {
-                    ForEach(0..<maxColumnIndex) { i in
+                    ForEach(0..<maxColumnIndex, id: \.self) { i in
                         Rectangle()
                             .fill(self.barStartColor)
                             .frame(width: Constants.barChartColumnWidth, height: Constants.barChartColumnWidth)
@@ -114,7 +114,7 @@ struct MiniBarChartWidgetView: View {
             //MARK: - DATA INPUT
             HStack(alignment: .bottom, spacing: Constants.barChartColumnSpacing) {
                 ForEach(self.goalRecordListVM.filterGoalRecords()){ record in
-                    ForEach(0..<maxColumnIndex) { i in
+                    ForEach(0..<maxColumnIndex, id: \.self) { i in
                         MiniBarChartBarView(height: record.goalUpdates![i] ?? Double(0), startColor: record.goal.color, endColor: record.goal.color)
                     }
                 }

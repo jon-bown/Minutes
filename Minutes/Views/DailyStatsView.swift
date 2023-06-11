@@ -46,7 +46,7 @@ struct DailyStatsView: View {
             if(type == "Horizontal"){
                 VStack(alignment: .leading){
                     ForEach(goalRecordListVM.filterGoalRecordsByDate(date: self.dateProvided), id: \.id){ goalRecord in
-                        if let index = goalRecordListVM.sortGoalRecordsByPriority().firstIndex{$0.id == goalRecord.id}{
+                        if let index = goalRecordListVM.sortGoalRecordsByPriority().firstIndex(where: {$0.id == goalRecord.id}){
                             if(index < maxStatLimit){
                                 Text("\(goalRecord.name)").bold().foregroundColor(Color.white)
                                 Text("\(goalRecord.dayTime)/\(Int(goalRecord.goal.goalTime)) MIN").foregroundColor(goalRecord.goal.color).bold().padding(.bottom, 4)

@@ -56,15 +56,15 @@ struct StandChartView: View {
         return ZStack(alignment: .bottom) {
             HStack(alignment: .center, spacing: 13.8) {
                 VStack(alignment: .center, spacing: Constants.standChartGridColumnSpacing) {
-                    ForEach(0..<maxGridColumnIndex) { i in
+                    ForEach(0..<maxGridColumnIndex, id: \.self) { i in
                         Rectangle()
                             .fill(Color(red: 129 / 255, green: 129 / 255, blue: 129 / 255))
                             .frame(width: 1, height: 1)
                     }
                 }
-                ForEach(0..<maxColumnIndex - 1) { i in
+                ForEach(0..<maxColumnIndex - 1, id: \.self) { i in
                     VStack(alignment: .center, spacing: Constants.standChartGridColumnSpacing) {
-                        ForEach(0..<maxColumnIndex - 3) { i in
+                        ForEach(0..<maxColumnIndex - 3, id: \.self) { i in
                             Rectangle()
                                 .fill(Color(red: 71 / 255, green: 72 / 255, blue: 73 / 255))
                                 .frame(width: 1, height: 1)
@@ -72,7 +72,7 @@ struct StandChartView: View {
                     }
                 }
                 VStack(alignment: .center, spacing: Constants.standChartGridColumnSpacing) {
-                    ForEach(0..<maxGridColumnIndex) { i in
+                    ForEach(0..<maxGridColumnIndex, id: \.self) { i in
                         Rectangle()
                             .fill(Color(red: 129 / 255, green: 129 / 255, blue: 129 / 255))
                             .frame(width: 1, height: 1)
@@ -80,7 +80,7 @@ struct StandChartView: View {
                 }
             }
             HStack(alignment: .center, spacing: Constants.standChartColumnSpacing) {
-                ForEach(0..<maxColumnIndex) { i in
+                ForEach(0..<maxColumnIndex, id: \.self) { i in
                     Rectangle()
                         .fill(LinearGradient(gradient: Gradient(colors: [self.barStartColor, self.barEndColor]), startPoint: .bottom, endPoint: .top))
                         .frame(width: Constants.standChartColumnWidth, height: (self.data[i] ?? false) ? CGFloat(maxGridColumnIndex - 1) * (Constants.standChartGridColumnSpacing + 1) + 1 : 0)

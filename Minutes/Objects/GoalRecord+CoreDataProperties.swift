@@ -9,7 +9,6 @@
 import Foundation
 import CoreData
 
-
 extension GoalRecord {
 
     @nonobjc public class func fetchRequest() -> NSFetchRequest<GoalRecord> {
@@ -26,22 +25,39 @@ extension GoalRecord {
 
     public var goalSaves: [Date:Double]? {
         get {
-            return try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(goalSavesData) as? [Date:Double]
+            do {
+                return try NSKeyedUnarchiver.unarchivedObject(ofClasses: [NSDictionary.self, NSDate.self, NSNumber.self], from: goalSavesData) as? [Date:Double]
+            } catch {
+                // handle or print error
+                return nil
+            }
         }
         set {
-            goalSavesData = try! NSKeyedArchiver.archivedData(withRootObject: newValue, requiringSecureCoding: false)
+            do {
+                goalSavesData = try NSKeyedArchiver.archivedData(withRootObject: newValue ?? [:], requiringSecureCoding: false)
+            } catch {
+                // handle or print error
+            }
         }
     }
 
     public var goalUpdates: [Int:Double]? {
         get {
-            return try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(goalUpdatesData) as? [Int:Double]
+            do {
+                return try NSKeyedUnarchiver.unarchivedObject(ofClasses: [NSDictionary.self, NSNumber.self], from: goalUpdatesData) as? [Int:Double]
+            } catch {
+                // handle or print error
+                return nil
+            }
         }
         set {
-            goalUpdatesData = try! NSKeyedArchiver.archivedData(withRootObject: newValue, requiringSecureCoding: false)
+            do {
+                goalUpdatesData = try NSKeyedArchiver.archivedData(withRootObject: newValue ?? [:], requiringSecureCoding: false)
+            } catch {
+                // handle or print error
+            }
         }
     }
-
 
 }
 

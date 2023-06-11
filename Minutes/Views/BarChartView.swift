@@ -56,28 +56,28 @@ struct BarChartView: View {
         return ZStack(alignment: .bottomLeading) {
             VStack(alignment: .center, spacing: 20) {
                 HStack(alignment: .center, spacing: Constants.barChartColumnWidth) {
-                    ForEach(0..<maxColumnIndex) { i in
+                    ForEach(0..<maxColumnIndex, id: \.self) { index in
                         Rectangle()
                             .fill(Color(red: 129 / 255, green: 129 / 255, blue: 129 / 255))
                             .frame(width: 1, height: 1)
                     }
                 }
                 HStack(alignment: .center, spacing: Constants.barChartColumnWidth) {
-                    ForEach(0..<maxColumnIndex) { i in
+                    ForEach(0..<maxColumnIndex, id: \.self) { index in
                         Rectangle()
                             .fill(Color(red: 71 / 255, green: 72 / 255, blue: 73 / 255))
                             .frame(width: 1, height: 1)
                     }
                 }
                 HStack(alignment: .center, spacing: Constants.barChartColumnWidth) {
-                    ForEach(0..<maxColumnIndex) { i in
+                    ForEach(0..<maxColumnIndex, id: \.self) { index in
                         Rectangle()
                             .fill(Color(red: 71 / 255, green: 72 / 255, blue: 73 / 255))
                             .frame(width: 1, height: 1)
                     }
                 }
                 HStack(alignment: .top, spacing: Constants.barChartColumnSpacing) {
-                    ForEach(0..<maxColumnIndex) { i in
+                    ForEach(0..<maxColumnIndex, id: \.self) { index in
                         Rectangle()
                             .fill(self.barStartColor)
                             .frame(width: Constants.barChartColumnWidth, height: Constants.barChartColumnWidth)
@@ -87,8 +87,8 @@ struct BarChartView: View {
             }
             //MARK: - DATA INPUT
             HStack(alignment: .bottom, spacing: Constants.barChartColumnSpacing) {
-                ForEach(0..<maxColumnIndex) { i in
-                    BarChartBarView(height: self.data[i] ?? Double(0), startColor: self.barStartColor, endColor: self.barEndColor)
+                ForEach(0..<maxColumnIndex, id: \.self) { index in
+                    BarChartBarView(height: self.data[index] ?? Double(0), startColor: self.barStartColor, endColor: self.barEndColor)
                 }
             }
             .drawingGroup()

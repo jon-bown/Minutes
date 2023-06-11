@@ -77,7 +77,7 @@ struct GoalForm: View {
                         }
                         if(self.goalFrequency == "Weekly"){
                             
-                            ForEach(0..<self.dayOTW.weekDays.count) { index in
+                            ForEach(0..<self.dayOTW.weekDays.count, id: \.self) { index in
                                 
                                 HStack {
                                     Button(action: {
