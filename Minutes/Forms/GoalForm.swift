@@ -71,6 +71,7 @@ struct GoalForm: View {
                         }
                         
                         Picker(selection: self.$goalFrequency, label: Text("Frequency").font(Constants.globalBodyTextFont).bold()) {
+                            Text("") // Empty string option
                             ForEach(self.freq, id: \.self) { freq in
                                 Text(freq).font(Constants.globalBodyTextFont)
                             }

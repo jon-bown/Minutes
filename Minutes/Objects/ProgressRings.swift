@@ -100,12 +100,18 @@ struct GoalRingView: View {
                                     endColor: goal.color,
                                     backgroundColor: goal.color,
                                     animate: animate,
-                                    dim: dim)
+                                    dim: calculateDim(index: goal_index)) // calculateDim now based on priority
         } else {
             EmptyView()
         }
     }
+    
+    private func calculateDim(index: Int) -> CGFloat{
+        let differenceAmount = (self.thickness * 2.0 + 4.0) * CGFloat(index)
+        return self.dim - differenceAmount
+    }
 }
+
 
 
 

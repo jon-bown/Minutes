@@ -206,6 +206,7 @@
 		FC0CF8F325C08F0500D1890D /* BlurView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurView.swift; sourceTree = "<group>"; };
 		FC0CF92925C23BFB00D1890D /* DropDownMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DropDownMenu.swift; sourceTree = "<group>"; };
 		FC0E481525CF3FC700DE3F92 /* ResetAppView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetAppView.swift; sourceTree = "<group>"; };
+		FC18F2AC2A3593FF00252D36 /* Minutes1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Minutes1.xcdatamodel; sourceTree = "<group>"; };
 		FC202E3725AA966B007D928D /* Minutes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Minutes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FC202E3A25AA966B007D928D /* MinutesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinutesApp.swift; sourceTree = "<group>"; };
 		FC202E3E25AA966B007D928D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -1205,6 +1206,7 @@
 		FC202E4525AA966B007D928D /* Minutes.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				FC18F2AC2A3593FF00252D36 /* Minutes1.xcdatamodel */,
 				FC202E4625AA966B007D928D /* Minutes.xcdatamodel */,
 			);
 			currentVersion = FC202E4625AA966B007D928D /* Minutes.xcdatamodel */;

@@ -12,41 +12,33 @@ import SwiftUI
 
 class CoreDataManager {
     let persistentContainer: NSPersistentCloudKitContainer
-    
+
     static let shared = CoreDataManager()
-    
+
     private init() {
-        //persistentContainer = PersistenceController.persistentContainer
         persistentContainer = NSPersistentCloudKitContainer(name: "Minutes")
-        persistentContainer.loadPersistentStores { (description, error) in
-            if let error = error {
-                fatalError("Failed to initialize Core Data \(error)")
-            }
-        }
 
         let storeURL = URL.storeURL(for: "group.com.appfactorial.tempus.anulum", databaseName: "Minutes")
         let storeDescription = NSPersistentStoreDescription(url: storeURL)
         storeDescription.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(containerIdentifier: "iCloud.com.minutes.icloud")
         persistentContainer.persistentStoreDescriptions = [storeDescription]
         persistentContainer.viewContext.automaticallyMergesChangesFromParent = true
-        persistentContainer.loadPersistentStores(completionHandler: { (storeDescription, error) in
-            if let error = error as NSError? {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
 
-                /*
-                 Typical reasons for an error here include:
-                 * The parent directory does not exist, cannot be created, or disallows writing.
-                 * The persistent store is not accessible, due to permissions or data protection when the device is locked.
-                 * The device is out of space.
-                 * The store could not be migrated to the current model version.
-                 Check the error message to determine what the actual problem was.
-                 */
-                fatalError("Unresolved error \(error), \(error.userInfo)")
+        do {
+            try persistentContainer.loadPersistentStores { _, error in
+                if let error = error {
+                    // Handle the error gracefully (e.g., show an error message to the user)
+                    print("Failed to initialize Core Data: \(error)")
+                }
             }
-        })
-    persistentContainer.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+        } catch {
+            // Handle the error gracefully (e.g., show an error message to the user)
+            print("Failed to initialize Core Data: \(error)")
+        }
+
+        persistentContainer.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
     }
+
     
     //TODO: Add Fetch Requests
     func saveContext () {
@@ -68,7 +60,7 @@ class CoreDataManager {
         
 //        let fetchRequest: NSFetchRequest<Goal> = Goal.fetchRequest()
         let fetchRequest: NSFetchRequest<Goal> = Goal.fetchRequest()
-        
+        print("get all goals")
         do {
             let items = try persistentContainer.viewContext.fetch(fetchRequest)
             print(items)
@@ -80,14 +72,12 @@ class CoreDataManager {
     }
     
     func getGoalByID(id: NSManagedObjectID) -> Goal? {
-        
         do {
             return try persistentContainer.viewContext.existingObject(with: id) as? Goal
         } catch {
-            print(error)
+            print("Failed to fetch Goal object: \(error)")
             return nil
         }
-        
     }
     
     func getGoalRecordByID(id: NSManagedObjectID) -> GoalRecord? {
@@ -291,7 +281,7 @@ class CoreDataManager {
     }
     
     func addGoalRecord(goal: GoalViewModel, date: Date, progress: Double, seconds: Double) {
-        
+        print("addGoalRecord")
         let newGoalRecord = GoalRecord(context: persistentContainer.viewContext)
         newGoalRecord.name = goal.name
         newGoalRecord.date = date
@@ -339,8 +329,10 @@ class CoreDataManager {
             else{
                 record.goalSaves![dateKey] = secondsToAdd
             }
-            let parentGoal = self.getGoalByID(id: record.goal.objectID)!
-            parentGoal.totalTime = record.dayTime
+            let coreDataManager = CoreDataManager.shared
+            if let goal = coreDataManager.getGoalByID(id: record.goal.objectID) {
+                goal.totalTime = record.dayTime
+            }
         }
 
         

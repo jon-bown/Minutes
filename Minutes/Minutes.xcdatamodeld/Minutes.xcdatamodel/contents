@@ -12,7 +12,7 @@
         <attribute name="startDate" attributeType="Date" defaultDateTimeInterval="634352880" usesScalarValueType="NO"/>
         <attribute name="totalTime" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="weekDay" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromDataTransformer" customClassName="[String]"/>
-        <relationship name="records" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="GoalRecord" inverseName="goal" inverseEntity="GoalRecord"/>
+        <relationship name="records" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="GoalRecord" inverseName="goal" inverseEntity="GoalRecord"/>
     </entity>
     <entity name="GoalRecord" representedClassName="GoalRecord" syncable="YES">
         <attribute name="date" attributeType="Date" defaultDateTimeInterval="634352940" usesScalarValueType="NO"/>
