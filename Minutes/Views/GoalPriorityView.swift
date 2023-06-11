@@ -13,8 +13,8 @@ struct GoalPriorityView: View {
     
     // MARK: - Properties
     @Environment(\.presentationMode) var presentationMode
-    @StateObject private var goalListVM = GoalListViewModel.sharedInstance
-    @StateObject private var goalRecordListVM = GoalRecordListViewModel.sharedInstance
+    @EnvironmentObject var goalListVM: GoalListViewModel
+    @EnvironmentObject var goalRecordListVM: GoalRecordListViewModel
     
     @State private var showError: Bool = false
     @State private var isEditable = false

@@ -11,8 +11,8 @@ import CoreData
 struct ResetAppView: View {
     @Environment(\.presentationMode) var presentationMode
     
-    @StateObject private var goalListVM = GoalListViewModel.sharedInstance
-    @StateObject private var goalRecordListVM = GoalRecordListViewModel.sharedInstance
+    @EnvironmentObject var goalListVM: GoalListViewModel
+    @EnvironmentObject var goalRecordListVM: GoalRecordListViewModel
     @State var simpleAlertMessageWithButtons = false
     
     var body: some View {

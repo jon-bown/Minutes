@@ -13,8 +13,8 @@ struct MainProgressView: View {
     
     //@StateObject private var goalListVM = GoalListViewModel.sharedInstance
     //@StateObject private var goalRecordListVM = GoalRecordListViewModel.sharedInstance
-    private let goalListVM = GoalListViewModel()
-    private let goalRecordListVM = GoalRecordListViewModel()
+    @EnvironmentObject var goalListVM: GoalListViewModel
+    @EnvironmentObject var goalRecordListVM: GoalRecordListViewModel
         
     @State private var showNewGoalForm: Bool = false
     @State private var goalFilterCriteria: String = "Today"

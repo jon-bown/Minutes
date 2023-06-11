@@ -14,7 +14,7 @@ class GoalRecordListViewModel: ObservableObject, Equatable {
         return lhs.goalRecords == rhs.goalRecords
     }
     
-    //static let sharedInstance = GoalRecordListViewModel()
+    static let sharedInstance = GoalRecordListViewModel()
     
     @Published var goalRecords = [GoalRecordViewModel]()
     let cal = Calendar.current

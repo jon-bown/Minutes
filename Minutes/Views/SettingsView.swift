@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @StateObject private var goalListVM = GoalListViewModel.sharedInstance
+    @EnvironmentObject var goalListVM: GoalListViewModel
     
 //    var buttonDisabled: Bool {
 //        return goalListVM.getGoalsArray().count == 0

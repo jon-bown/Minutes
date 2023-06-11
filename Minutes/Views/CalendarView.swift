@@ -140,8 +140,8 @@ struct CalendarView<DateView>: View where DateView: View {
 struct RootView: View {
     @Environment(\.calendar) var calendar
     
-    @StateObject private var goalListVM = GoalListViewModel.sharedInstance
-    @StateObject private var goalRecordListVM = GoalRecordListViewModel.sharedInstance
+    @EnvironmentObject var goalListVM: GoalListViewModel
+    @EnvironmentObject var goalRecordListVM: GoalRecordListViewModel
     
     private var year: DateInterval {
         if let minDate = goalRecordListVM.goalRecords.min(by: { $0.date < $1.date })?.date {
@@ -166,7 +166,7 @@ struct RootView: View {
                     VStack {
                         Text(String(self.calendar.component(.day, from: date))).font(Font.system(size: 18, weight: .regular, design: .default)).kerning(0.05).foregroundColor(.white)
                         //Text(date.dayOfTheWeek)
-                        ProgressRings(dateProvided: Date(), maxWidth: 35, maxLineWidth: Constants.weekdayRingThickness, maxRingLimit: Constants.progressRingViewMaxRingLimitStandard).padding(2).clipShape(Circle()).padding(.vertical, 2)
+                        ProgressRings(dateProvided: date, maxWidth: 35, maxLineWidth: Constants.weekdayRingThickness, maxRingLimit: Constants.progressRingViewMaxRingLimitStandard).padding(2).clipShape(Circle()).padding(.vertical, 2)
                         
                     }.frame(width: 45, height: 75)
                 }

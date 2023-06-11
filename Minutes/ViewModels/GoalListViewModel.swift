@@ -11,7 +11,7 @@ import SwiftUI
 
 class GoalListViewModel: ObservableObject, Equatable {
     
-    //static let sharedInstance = GoalListViewModel()
+    static let sharedInstance = GoalListViewModel()
     
     static func == (lhs: GoalListViewModel, rhs: GoalListViewModel) -> Bool {
         return lhs.goals == rhs.goals

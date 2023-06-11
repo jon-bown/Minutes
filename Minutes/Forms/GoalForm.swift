@@ -53,6 +53,8 @@ struct GoalForm: View {
     
     let screenSize = UIScreen.main.bounds.size
     
+
+    
     //MARK: - BODY
     var body: some View {
         NavigationView{
@@ -65,8 +67,25 @@ struct GoalForm: View {
                             Text("Color Theme").font(Constants.globalBodyTextFont).bold()
                         }
                         HStack{
+                            let goalDailyTimeBinding = Binding<String>(
+                                get: {
+                                    if self.goalDailyTime > 0 {
+                                        return String(self.goalDailyTime)
+                                    } else {
+                                        return ""
+                                    }
+                                },
+                                set: {
+                                    if let value = Int($0) {
+                                        self.goalDailyTime = value
+                                    } else {
+                                        self.goalDailyTime = 0
+                                    }
+                                }
+                            )
                             Text("Minutes:").font(Constants.globalBodyTextFont)
-                            NumberTextField(value: self.$goalDailyTime, formatter: NumberFormatter(), keyType: UIKeyboardType.numberPad)
+                            TextField("Minutes:", text: goalDailyTimeBinding)
+                                .keyboardType(.numberPad)
                             
                         }
                         

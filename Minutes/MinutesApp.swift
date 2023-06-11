@@ -10,10 +10,15 @@ import SwiftUI
 @main
 struct MinutesApp: App {
     @Environment(\.scenePhase) private var scenePhase
-    
+    let goalListVM = GoalListViewModel.sharedInstance
+    let goalRecordListVM = GoalRecordListViewModel.sharedInstance
+
     var body: some Scene {
         WindowGroup {
-            ContentView().accentColor(.white)
+            ContentView()
+                .accentColor(.white)
+                .environmentObject(goalListVM)
+                .environmentObject(goalRecordListVM)
         }.onChange(of: scenePhase) { (newScenePhase) in
             switch newScenePhase {
             case .active:
@@ -30,3 +35,4 @@ struct MinutesApp: App {
         }
     }
 }
+
