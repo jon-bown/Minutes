@@ -297,21 +297,20 @@ class CoreDataManager {
         newGoalRecord.date = date
         newGoalRecord.progress = progress
         newGoalRecord.dayTime = seconds
-        newGoalRecord.goal = goal.goal
+        // removed newGoalRecord.goal = goal.goal
         var hour = Calendar.current.component(.hour, from: Date())*4
         let minutes = (newGoalRecord.progress * 59).truncatingRemainder(dividingBy: 60)
         var entry = [Int:Double]()
         hour = hour + Date().minuteQuadrant
         entry[hour] = Double(minutes)
         newGoalRecord.goalUpdates = entry
-        
-        
+            
         var save = [Date:Double]()
         save[Date()] = seconds
         newGoalRecord.goalSaves = save
-        
+            
         goal.goal.addToRecords(newGoalRecord)
-        
+            
         saveContext()
     }
     
@@ -332,7 +331,7 @@ class CoreDataManager {
                 record.goalUpdates![hour] = Double(minutes)
             }
             //Goal Saves
-            let dateKey = Date()
+            let dateKey = AppUtil.getSimplifiedDate()
             let saveKeyExists = record.goalSaves![dateKey] != nil
             if(saveKeyExists){
                 record.goalSaves![dateKey] = (record.goalSaves![dateKey]! + secondsToAdd)

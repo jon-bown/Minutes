@@ -103,6 +103,12 @@ class AppUtil {
         return dateFormatter.string(from: Date())
     }
     
+    static func getSimplifiedDate() -> Date {
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.year, .month, .day], from: Date())
+        return calendar.date(from: components) ?? Date()
+    }
+    
     static func createWeekDaysString(days: [String]) -> String {
         var finalString = ""
         for goalDay in days {
