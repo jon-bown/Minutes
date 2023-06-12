@@ -29,17 +29,13 @@ struct DailyStatsView: View {
 
     var body: some View {
             Group {
-                if AppUtil.filterGoalRecords(goalRecords: self.goalRecordList).isEmpty && AppUtil.filterGoalRecordsByDate(records: self.goalRecordList, date: self.dateProvided).isEmpty {
+                if(self.goalList.isEmpty) {
                     NoGoalsView()
-                } else if AppUtil.filterGoalRecords(goalRecords: self.goalRecordList).isEmpty {
-                    if type == "Horizontal" {
-                        HorizontalGoalsView(maxStatLimit: maxStatLimit, dateProvided: dateProvided, goalList: goalList, goalRecordList: goalRecordList)
-                    } else {
-                        VerticalGoalsView(maxStatLimit: maxStatLimit, dateProvided: dateProvided, goalList: goalList, goalRecordList: goalRecordList)
-                    }
                 } else {
                     if type == "Horizontal" {
-                        OtherGoalsView(maxStatLimit: maxStatLimit, dateProvided: dateProvided, goalList: goalList, goalRecordList: goalRecordList)
+                        HorizontalGoalsView(maxStatLimit: self.maxStatLimit, goalList: self.goalList, goalRecordList: self.goalRecordList)
+                    } else {
+                        VerticalGoalsView(maxStatLimit: maxStatLimit, dateProvided: dateProvided, goalList: goalList, goalRecordList: goalRecordList)
                     }
                 }
             }
@@ -68,27 +64,21 @@ struct NoGoalsView: View {
 
 struct HorizontalGoalsView: View {
     var maxStatLimit: Int
-    var dateProvided: Date = Date()
     var goalList: [Goal]
     var goalRecordList: [GoalRecord]
     
     var body: some View {
-        EmptyView()
-//        VStack(alignment: .leading){
-//            ForEach(AppUtil.filterGoalRecordsByDate(records: self.goalRecordList, date: self.dateProvided), id: \.id){ goalRecord in
-//                if let index = AppUtil.sortGoalRecordsByPriority(goalRecords: self.goalRecordList).firstIndex(where: {$0.id == goalRecord.id}){
-//                    if(index < maxStatLimit){
-//                        VStack{
-//                            Text("\(goalRecord.name)").bold().foregroundColor(Color.white)
-//                            if let goalTime = goalRecord.goal?.goalTime {
-//                                Text("\(String(goalRecord.dayTime))/\(String(Int(goalTime))) MIN").foregroundColor(goalRecord.goal?.color ?? Color.black).bold().padding(.bottom, 4)
-//                            }
-//                        }
-//                    }
-//
-//                }
-//            }
-//        }
+        VStack(alignment: .leading){
+            ForEach(goalList.prefix(maxStatLimit), id: \.id){ goal in
+                let goalDayTime = AppUtil.getDayTimeForGoal(goal: goal, goalRecords: goalRecordList)
+                        VStack{
+                            Text("\(goal.name)").bold().foregroundColor(Color.white)
+                            
+                            Text("\(String(goalDayTime))/\(String(Int(goal.goalTime))) MIN").foregroundColor(Color(goal.color ?? UIColor.black)).bold().padding(.bottom, 4)
+                            
+                        }
+                    }
+                }
     }
 }
 

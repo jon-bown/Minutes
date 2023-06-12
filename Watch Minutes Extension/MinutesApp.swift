@@ -10,11 +10,17 @@ import SwiftUI
 @main
 struct MinutesApp: App {
     @WKExtensionDelegateAdaptor(ExtensionDelegate.self) var delegate
+
+    let goalListVM = GoalListViewModel.sharedInstance
+    let goalRecordListVM = GoalRecordListViewModel.sharedInstance
     
     @SceneBuilder var body: some Scene {
         WindowGroup {
             NavigationView {
-                ContentView().environment(\.appDelegate, delegate)
+                ContentView()
+                    .environmentObject(goalListVM)
+                    .environmentObject(goalRecordListVM)
+                    .environment(\.appDelegate, delegate)
             }
         }
 

@@ -16,7 +16,7 @@ class WCoreDataManager {
     
     init() {
         container = NSPersistentContainer(name: "Minutes")
-        let storeURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.appfactorial.tempus.anulum")!.appendingPathComponent("YourModel.sqlite")
+        let storeURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.appfactorial.tempus.anulum")!.appendingPathComponent("Minutes.sqlite")
         container.persistentStoreDescriptions = [NSPersistentStoreDescription(url: storeURL)]
         container.loadPersistentStores { (storeDescription, error) in
             if let error = error {
@@ -44,7 +44,7 @@ class WCoreDataManager {
 
         do {
             let result = try container.viewContext.fetch(request)
-            return result
+            return AppUtil.filterGoalRecordsByDate(records: result, date: Date())
         } catch {
             // Handle error
             print("Fetch failed")

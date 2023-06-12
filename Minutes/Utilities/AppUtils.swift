@@ -95,8 +95,16 @@ class AppUtil {
 
     }
     
-    static func getDayTimeForGoal(goal: Goal) -> Int {
-        if let record = self.getRecordTodayForGoal(goal: goal) {
+    static func getDayTimeForGoal(goal: Goal, goalRecords: [GoalRecord]) -> Int {
+        if (goal.records == nil){
+            print("Records Empty")
+            return 0
+        }
+        else if (goalRecords.isEmpty) {
+            print("No Records")
+            return 0
+        }
+        else if let record = goalRecords.first(where: { goal.id == $0.goal.id }) {
             return Int(record.dayTime/60)
         }
         else {

@@ -42,13 +42,13 @@ struct Provider: TimelineProvider {
         let currentDate = Date()
         let fetchedGoalList = dataManager.fetchGoals()
         let fetchedGoalRecordList = dataManager.fetchGoalRecords()
-        for hourOffset in 0 ..< 5 {
-            let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
+        for minuteOffset in 0 ..< 10 {
+            let entryDate = Calendar.current.date(byAdding: .minute, value: minuteOffset, to: currentDate)!
             let entry = SimpleEntry(date: entryDate, isDemo: "", goalList: fetchedGoalList, goalRecordList: fetchedGoalRecordList)
             entries.append(entry)
         }
-
-        let timeline = Timeline(entries: entries, policy: .atEnd)
+        let nextUpdateDate = Calendar.current.date(byAdding: .minute, value: 1, to: Date())!
+        let timeline = Timeline(entries: entries, policy: .after(nextUpdateDate))
         completion(timeline)
     }
 }
@@ -126,7 +126,7 @@ struct MinutesWidgetEntryView : View {
         VStack(alignment: .center){
             SmallCalendarViewDemo().padding(EdgeInsets(top: 5, leading: 5, bottom: 5, trailing: 5))
             Spacer()
-            //MiniBarChartWidgetView(goalRecordList: entry.goalRecordList)
+            MiniBarChartWidgetView(goalRecordList: entry.goalRecordList)
             Spacer()
             DailyStatsViewDemo(type: "V")
         }.frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -150,7 +150,7 @@ struct MinutesWidgetEntryView : View {
                 SmallCalendarView(goalList: entry.goalList, goalRecordList: entry.goalRecordList).padding(EdgeInsets(top: 8, leading: 0, bottom: 5, trailing: 0))
             }
             Spacer()
-            //MiniBarChartWidgetView(goalRecordList: entry.goalRecordList)
+            MiniBarChartWidgetView(goalRecordList: entry.goalRecordList)
             Spacer()
             HStack{
                 DailyStatsView(goalList: entry.goalList, goalRecordList: entry.goalRecordList, type: "V").padding(.leading, 5).padding(.bottom, 20)

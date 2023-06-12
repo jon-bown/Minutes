@@ -44,38 +44,25 @@ struct ProgressRingsStatic: View {
     }
     
     var body: some View {
-        EmptyView()
-//        ZStack {
-//            if(self.goalList.isEmpty){
-//                ProgressRingView(progress: 0.0, startColor: Color.clear, endColor: Color.clear, backgroundColor: Color.black)
-//            }
-//            else {
-//                ForEach(self.goalList, id: \.id){ goal in
-//                    //Main progress view
-//                    if let index = self.goalList.firstIndex(of: goal){
-//                        if(index < maxRingLimit){
-//                            if(self.goalRecordList.isEmpty){
-//                                ProgressRingViewStatic(progress: 0.0, thickness: self.maxLineWidth, startColor: tinted ? Color.white: goal.color, endColor: tinted ? Color.white: goal.color, backgroundColor: tinted ? Color.gray:goal.color, animate: animate).frame(width: calculateDim(index: index), height: calculateDim(index: index)).aspectRatio(contentMode: .fit)
-//                            }
-//                            else {
-//                                let progress = self.goalRecordList.first(where: { goal.id == $0.id })?.progress ?? 0.0
-//                                ProgressRingViewStatic(progress: progress, thickness: self.maxLineWidth, startColor: tinted ? Color.white: goal.color, endColor: tinted ? Color.white: goal.color, backgroundColor: tinted ? Color.gray:goal.color, animate: animate).frame(width: calculateDim(index: index), height: calculateDim(index: index)).aspectRatio(contentMode: .fit)
-//                            }
-//
-//                        }
-//                        else {
-//                            EmptyView()
-//                        }
-//                    }
-//                    else {
-//                        EmptyView()
-//                    }
-//
-//                }
-//            }
-//
-//
-//        }
+        //EmptyView()
+        ZStack {
+            if(self.goalList.isEmpty){
+                ProgressRingView(progress: 0.0, startColor: Color.clear, endColor: Color.clear, backgroundColor: Color.black)
+            }
+            else {
+                ForEach(goalList.prefix(maxRingLimit), id: \.id) { goal in
+                    let progress = self.goalRecordList.first(where: { goal.id == $0.goal.id })?.progress ?? 0.0
+                    ProgressRingViewStatic(progress: progress, thickness: self.maxLineWidth, startColor: tinted ? Color.white: Color(goal.color!), endColor: tinted ? Color.white: Color(goal.color!), backgroundColor: tinted ? Color.gray:Color(goal.color!), animate: animate)
+                        .frame(width: calculateDim(index: goalList.firstIndex(where: { $0.id == goal.id }) ?? 0), height: calculateDim(index: goalList.firstIndex(where: { $0.id == goal.id }) ?? 0))
+                        .aspectRatio(contentMode: .fit)
+                }
+
+
+                }
+            
+
+
+        }
     }
     
     private func calculateDim(index: Int) -> CGFloat{

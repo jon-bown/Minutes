@@ -12,7 +12,7 @@ struct MiniBarChartWidgetView: View {
     
     var goalRecordList: [GoalRecord]
         
-    private var barStartColor: Color = Color.red
+    var barStartColor: Color = Color.red
 //   var barEndColor: Color
     
     var body: some View {
