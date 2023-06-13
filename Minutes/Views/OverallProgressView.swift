@@ -42,7 +42,7 @@ struct OverallProgressView: View {
                             VStack {
                                 Spacer(minLength: Constants.navigationBarHeight).frame(width: geometry.size.width, height: Constants.navigationBarHeight+20, alignment: .top)
                                 //self.createRings()
-                                ProgressRings(goalList: self.goalListVM.goals, goalRecordList: self.goalRecordListVM.goalRecords, dateProvided: Date(), maxWidth: 150,
+                                ProgressRings(goalList: self.goalListVM.goals, goalRecordList: self.goalRecordListVM.goalRecords, dateProvided: self.selectedDate, maxWidth: 150,
                                               maxLineWidth: Constants.progressRingViewThicknessStandard, maxRingLimit: Constants.progressRingViewMaxRingLimitStandard, showClear: false).frame(width: Constants.progressRingViewFrameWidthStandard, height: Constants.progressRingViewFrameHeightStandard).aspectRatio(contentMode: .fit).padding(10)
                                 self.createCharts()
                                 //self.createFooter()
@@ -58,63 +58,21 @@ struct OverallProgressView: View {
     func createCharts() -> some View {
             Group {
                 // Move Chart
-                ForEach(goalListVM.filterCurrentGoalsByDate(date: dateProvided), id: \.id){ goal in
+                ForEach(goalListVM.filterCurrentGoalsByDate(date: self.selectedDate), id: \.id){ goal in
                     BarChartView(
                         title: goal.name, 
-                        progress: "\(round(Double(goalRecordListVM.filterGoalRecordsByDate(date: self.dateProvided).first(where: {$0.name == goal.name}) == nil ? 0: goalRecordListVM.filterGoalRecordsByDate(date: self.dateProvided).first(where: {$0.name == goal.name})!.dayTime/Double(60.0))*100)/100)", //goalRecord.progress
+                        progress: "\(round(Double(goalRecordListVM.filterGoalRecordsByDate(date: self.selectedDate).first(where: {$0.goal.id == goal.id}) == nil ? 0: goalRecordListVM.filterGoalRecordsByDate(date: self.selectedDate).first(where: {$0.goal.id == goal.id})!.dayTime/Double(60.0))*100)/100)", //goalRecord.progress
                         goal: "\(Int(goal.goalTime))",
                         total: "",
                         average: "",
                         unit: "MIN",
-                        data: goalRecordListVM.filterGoalRecordsByDate(date: self.dateProvided).first(where: {$0.name == goal.name}) == nil ? ActivityData.timeReduced:goalRecordListVM.filterGoalRecordsByDate(date: self.dateProvided).first(where: {$0.name == goal.name})!.goalUpdates!,
+                        data: goalRecordListVM.filterGoalRecordsByDate(date: self.selectedDate).first(where: {$0.goal.id == goal.id}) == nil ? ActivityData.timeReduced:goalRecordListVM.filterGoalRecordsByDate(date: self.dateProvided).first(where: {$0.goal.id == goal.id})!.goalUpdates!,
                         textColor: goal.color,
-                        barStartColor: goal.color.lighter(by: 30),
-                        barEndColor: goal.color.darker(by: 30)
+                        barStartColor: goal.color,
+                        barEndColor: goal.color
                     )
                         .padding([.bottom], 25)
                 }
-//                BarChartView(
-//                    title: "Move", //goalRecord.name
-//                    progress: "330", //goalRecord.progress
-//                    goal: "300",
-//                    total: "2 175 CAL",
-//                    average: "56",
-//                    unit: "CAL",
-//                    data: ActivityData.moveChartData,
-//                    textColor: Color.moveTextColor,
-//                    barStartColor: Color.moveBarStartColor,
-//                    barEndColor: Color.moveBarEndColor
-//                )
-//                    .padding([.bottom], 25)
-                
-//                // Exercise Chart
-//                BarChartView(
-//                    title: "Exercise",
-//                    progress: "22",
-//                    goal: "30",
-//                    total: "8H 42M",
-//                    average: "11",
-//                    unit: "MIN",
-//                    data: ActivityData.exerciseChartData,
-//                    textColor: Color.exerciseTextColor,
-//                    barStartColor: Color.exerciseBarStartColor,
-//                    barEndColor: Color.exerciseBarEndColor
-//                )
-//                    .padding([.bottom], 25)
-                
-                // Stand Chart
-//                StandChartView(
-//                    title: "Stand",
-//                    progress: "10",
-//                    goal: "12",
-//                    idle: "0",
-//                    unit: "HRS",
-//                    data: ActivityData.standChartData,
-//                    textColor: Color.standTextColor,
-//                    barStartColor: Color.standBarStartColor,
-//                    barEndColor: Color.standBarEndColor
-//                )
-//                    .padding([.bottom], 25)
             }
         }
         
@@ -193,6 +151,7 @@ struct OverallProgressView: View {
                                         .aspectRatio(contentMode: .fit)
                                 }
                             }.contentShape(Rectangle()).onTapGesture {
+                                print("Date tapped: \(item)")
                                 self.selectedDate = item
                             
                             }

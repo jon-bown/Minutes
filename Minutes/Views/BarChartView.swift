@@ -9,6 +9,9 @@ import SwiftUI
 
 struct BarChartView: View {
     
+    @EnvironmentObject var goalListVM: GoalListViewModel
+    @EnvironmentObject var goalRecordListVM: GoalRecordListViewModel
+    
     var title: String
     var progress: String
     var goal: String
@@ -24,11 +27,11 @@ struct BarChartView: View {
         VStack(alignment: .leading, spacing: 0) {
             VStack(alignment: .leading, spacing: 0) {
                 Text(title)
-                    .font(Font.system(size: 18, weight: .regular, design: .default))
+                    .font(Font.system(size: 18, weight: .bold, design: .default))
                     .kerning(0.05)
                     .foregroundColor(Color.white)
                     (
-                        Text("\(progress)/\(goal)")
+                        Text("\(progress)/\(goal) ")
                             .font(Font.system(size: 28, weight: .semibold, design: .rounded))
                             .kerning(0.25)
                             .foregroundColor(textColor)
@@ -52,6 +55,7 @@ struct BarChartView: View {
     }
     
     func createChart() -> some View {
+        print("Data: \(data)")
         let maxColumnIndex = Constants.barChartColumns - 1
         return ZStack(alignment: .bottomLeading) {
             VStack(alignment: .center, spacing: 20) {
@@ -147,6 +151,7 @@ struct BarChartBarShape: Shape {
 struct BarChartBarView: View {
     
     @State var currentHeight: Double = 0
+    
     
     var height: Double
     var startColor: Color

@@ -7,7 +7,7 @@
 
 import Foundation
 import CoreData
-
+//Mini-core data manager for widget extension
 class WCoreDataManager {
     
     static let shared = WCoreDataManager()

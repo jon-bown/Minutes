@@ -18,12 +18,12 @@ struct Provider: TimelineProvider {
         let placeholderGoalRecordList: [GoalRecord] = []
         return SimpleEntry(date: Date(), isDemo: "", goalList: placeholderGoalList, goalRecordList: placeholderGoalRecordList)
     }
-
+    
     func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> ()) {
         var entry: SimpleEntry
         if(context.isPreview){
-            let demoGoalList: [Goal] = [] // Populate with demo data if needed
-            let demoGoalRecordList: [GoalRecord] = [] // Populate with demo data if needed
+            let demoGoalList: [Goal] = []
+            let demoGoalRecordList: [GoalRecord] = []
             entry = SimpleEntry(date: Date(), isDemo: "Y", goalList: demoGoalList, goalRecordList: demoGoalRecordList)
         }
         else {
@@ -34,10 +34,10 @@ struct Provider: TimelineProvider {
         
         completion(entry)
     }
-
+    
     func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
         var entries: [SimpleEntry] = []
-
+        
         // Generate a timeline consisting of five entries an hour apart, starting from the current date.
         let currentDate = Date()
         let fetchedGoalList = dataManager.fetchGoals()
@@ -63,10 +63,10 @@ struct SimpleEntry: TimelineEntry {
 
 struct MinutesWidgetEntryView : View {
     @Environment(\.widgetFamily) var widgetFamily
-
+    
     var entry: Provider.Entry
     
-
+    
     var body: some View {
         if(entry.isDemo != ""){
             ZStack{
@@ -80,7 +80,7 @@ struct MinutesWidgetEntryView : View {
                 else {
                     self.createSystemLargeDemo()
                 }
-
+                
             }
         }
         else {
@@ -95,14 +95,14 @@ struct MinutesWidgetEntryView : View {
                 else {
                     self.createSystemLarge()
                 }
-
+                
             }
         }
     }
     
     func createSystemSmall() -> some View {
         ProgressRingsStatic(goals: entry.goalList, goalRecords: entry.goalRecordList, dateProvided: entry.date, maxWidth:120, maxLineWidth: 15, maxRingLimit: 3, animate: false).frame(width: 150, height: 150)
-        .aspectRatio(contentMode: .fit)
+            .aspectRatio(contentMode: .fit)
     }
     
     
@@ -137,15 +137,15 @@ struct MinutesWidgetEntryView : View {
     
     
     func createSystemMedium() -> some View {
-  
+        
         self.createHStackInfo()
-
+        
     }
     
     func createSystemLarge() -> some View {
         
         VStack(alignment: .center){
-  
+            
             HStack{
                 SmallCalendarView(goalList: entry.goalList, goalRecordList: entry.goalRecordList).padding(EdgeInsets(top: 8, leading: 0, bottom: 5, trailing: 0))
             }
@@ -156,7 +156,7 @@ struct MinutesWidgetEntryView : View {
                 DailyStatsView(goalList: entry.goalList, goalRecordList: entry.goalRecordList, type: "V").padding(.leading, 5).padding(.bottom, 20)
             }
         }
-
+        
     }
     
     func createHStackInfo() -> some View {

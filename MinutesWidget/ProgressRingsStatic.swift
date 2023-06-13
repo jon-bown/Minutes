@@ -19,7 +19,6 @@ struct ProgressRingsStatic: View {
     var maxRingLimit: Int = 4
     var animate: Bool = false
     var tinted: Bool = false
-    //var goalList: FetchedResults<Goal>
         
     
     private var cal = Calendar.current
@@ -27,10 +26,6 @@ struct ProgressRingsStatic: View {
     var goalList: [Goal]
     var goalRecordList: [GoalRecord]
 
-    // ... Rest of your variables
-
-    // Here, we expect the view models to be passed in when this View is instantiated.
-    // These view models should be previously fetched from the shared data source.
     init(goals: [Goal], goalRecords: [GoalRecord], dateProvided: Date, maxWidth: CGFloat, maxLineWidth: CGFloat, maxRingLimit: Int, animate: Bool = true, tinted: Bool = false) {
         
         self.goalList = AppUtil.filterCurrentGoalsByDate(goals: goals, date: dateProvided)
