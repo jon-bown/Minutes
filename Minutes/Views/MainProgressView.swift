@@ -27,6 +27,7 @@ struct MainProgressView: View {
     @State private var currentDate = Date()
     @State private var progressViewID = UUID()
     
+    @State private var objectWillChange = false
     
     private var cal = Calendar.current
     
@@ -52,8 +53,8 @@ struct MainProgressView: View {
                                 HStack{
                                     DailyStatsView(goalList: self.goalListVM.goals)
                                     Spacer()
-                                    ProgressRings(dateProvided: Date(), maxWidth: 135,
-                                                  maxLineWidth: Constants.progressRingViewThicknessStandard, maxRingLimit: Constants.progressRingViewMaxRingLimitStandard, showClear: false).frame(width: Constants.progressRingViewFrameWidthStandard, height: Constants.progressRingViewFrameHeightStandard).aspectRatio(contentMode: .fit).environmentObject(goalListVM).environmentObject(goalRecordListVM)
+                                    ProgressRings(goalList: self.goalListVM.goals, dateProvided: Date(), maxWidth: 135,
+                                                  maxLineWidth: Constants.progressRingViewThicknessStandard, maxRingLimit: Constants.progressRingViewMaxRingLimitStandard, showClear: false).frame(width: Constants.progressRingViewFrameWidthStandard, height: Constants.progressRingViewFrameHeightStandard).aspectRatio(contentMode: .fit)
                                 }
 
                             }.cornerRadius(15).padding()
@@ -96,6 +97,10 @@ struct MainProgressView: View {
                         listViewId = UUID()
                     }
                     self.currentDate = Date()
+                }
+                .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+                    self.objectWillChange = !self.objectWillChange
+                    // Update your view or viewModel here
                 }
                 
                 //self.createNavigationBar(geometry.size)

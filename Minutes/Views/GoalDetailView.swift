@@ -661,23 +661,26 @@ struct GoalDetailView: View {
             
             addGoalRecordVM.save()
             
-            self.goal.updateTotalTime(time: Double(self.stopWatch.totalAccumulatedTime.seconds()), add: true)
+            self.goal.updateTotalTime(time: Double(customSeconds), add: true)
 
 
 
         }
         
         else {
-            
-            addGoalRecordVM.goal = self.goal
-            addGoalRecordVM.dayTime = customSeconds
-            addGoalRecordVM.progress = self.progress
             let record = goalRecordListVM.getRecordTodayForGoal(goal: self.goal)
-            addGoalRecordVM.update(id: record!.id)
+            let updatedDayTime = record!.dayTime + customSeconds
+            self.progress = updatedDayTime/(self.goal.goalTime*60)
+            addGoalRecordVM.goal = self.goal
+            addGoalRecordVM.dayTime = updatedDayTime
+            addGoalRecordVM.progress = self.progress
+            addGoalRecordVM.update(goalRecord: record!)
+            self.goal.updateTotalTime(time: Double(customSeconds), add: true)
             
         }
-        self.updateProgress()
+        //self.updateProgress()
         self.goalRecordListVM.getAllGoalRecords()
+        self.goalListVM.getAllGoals()
     }
     
     //Save the current time into the proper goal entity
@@ -746,16 +749,16 @@ struct GoalDetailView: View {
         
         
         addGoalRecordVM.goal = self.goal
-        addGoalRecordVM.dayTime = Double(self.stopWatch.totalAccumulatedTime.seconds())
         addGoalRecordVM.progress = self.progress
+        let addedSeconds = Double(self.stopWatch.totalAccumulatedTime.seconds())
         
         if(newRecord){
             
 
-            
+            addGoalRecordVM.dayTime = addedSeconds
             addGoalRecordVM.save()
-            
-            self.goal.updateTotalTime(time: Double(self.stopWatch.totalAccumulatedTime.seconds()), add: false)
+            self.progress = addGoalRecordVM.dayTime/(self.goal.goalTime*60)
+            self.goal.updateTotalTime(time: Double(self.stopWatch.totalAccumulatedTime.seconds()), add: true)
 
 
         }
@@ -763,15 +766,14 @@ struct GoalDetailView: View {
         else {
             
             let record = goalRecordListVM.getRecordTodayForGoal(goal: self.goal)
-            addGoalRecordVM.update(id: record!.id)
-            
-//            self.goal.updateTotalTime(time: Double(self.stopWatch.totalAccumulatedTime.seconds()), add: true)
-            
-        }
-        //TODO Update this to check if active widget
-        //WidgetCenter.shared.reloadTimelines(ofKind: AppGroup.facts.rawValue)
-        //self.updateProgress()
+            let newDayTime = addedSeconds + record!.dayTime
+            self.progress = (newDayTime)/(self.goal.goalTime*60)
         
+            addGoalRecordVM.dayTime = addedSeconds
+            addGoalRecordVM.update(goalRecord: record!)
+            self.goal.updateTotalTime(time: Double(self.stopWatch.totalAccumulatedTime.seconds()), add: true)
+
+        }
     }
     
     func updateProgress() {

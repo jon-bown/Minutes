@@ -42,7 +42,7 @@ struct OverallProgressView: View {
                             VStack {
                                 Spacer(minLength: Constants.navigationBarHeight).frame(width: geometry.size.width, height: Constants.navigationBarHeight+20, alignment: .top)
                                 //self.createRings()
-                                ProgressRings(dateProvided: Date(), maxWidth: 150,
+                                ProgressRings(goalList: self.goalListVM.goals, dateProvided: Date(), maxWidth: 150,
                                               maxLineWidth: Constants.progressRingViewThicknessStandard, maxRingLimit: Constants.progressRingViewMaxRingLimitStandard, showClear: false).frame(width: Constants.progressRingViewFrameWidthStandard, height: Constants.progressRingViewFrameHeightStandard).aspectRatio(contentMode: .fit).padding(10)
                                 self.createCharts()
                                 //self.createFooter()

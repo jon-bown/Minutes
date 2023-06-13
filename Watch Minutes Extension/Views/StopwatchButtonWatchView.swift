@@ -156,7 +156,7 @@ struct StopwatchButtonWatchView: View {
             addGoalRecordVM.dayTime = Double(Double(Double(self.watchTotalTime)))
             addGoalRecordVM.progress = self.progress
             let record = goalRecordListVM.getRecordTodayForGoal(goal: self.goal)
-            addGoalRecordVM.update(id: record!.id)
+            addGoalRecordVM.update(goalRecord: record!)
             
             
 //            if let record = AppUtil.getRecordTodayForGoal(goalRecords: self.goalRecordsArray, goalID: self.goal.id) {

@@ -126,6 +126,7 @@ struct ProgressRings: View {
     @EnvironmentObject var goalRecordListVM: GoalRecordListViewModel
     //Parameters for minimized Ring View
     var dateProvided: Date = Date()
+    var goals: [GoalViewModel]
     var maxWidth: CGFloat = 100
     var maxLineWidth: CGFloat = 10
     var maxRingLimit: Int = 4
@@ -134,13 +135,14 @@ struct ProgressRings: View {
     
     private var cal = Calendar.current
     
-    init(dateProvided: Date, maxWidth: CGFloat, maxLineWidth: CGFloat, maxRingLimit: Int, animate: Bool = true, showClear: Bool = true){
+    init(goalList: [GoalViewModel], dateProvided: Date, maxWidth: CGFloat, maxLineWidth: CGFloat, maxRingLimit: Int, animate: Bool = true, showClear: Bool = true){
         self.dateProvided = dateProvided
         self.maxWidth = maxWidth
         self.maxLineWidth = maxLineWidth
         self.maxRingLimit = maxRingLimit
         self.animate = animate
         self.showClear = showClear
+        self.goals = goalList
         //self.goalList = goalList
 //        self.goalListVM.getAllGoals()
 //        self.goalRecordListVM.getAllGoalRecords()

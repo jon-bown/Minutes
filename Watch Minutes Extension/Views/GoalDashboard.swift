@@ -30,7 +30,7 @@ struct GoalDashboard: View {
                     else {
             VStack{
                 //parameterize this to fit any watch screen
-                ProgressRings(dateProvided: Date(), maxWidth: 150, maxLineWidth: 15, maxRingLimit: 3).padding(10)
+                ProgressRings(goalList: self.goalListVM.goals, dateProvided: Date(), maxWidth: 150, maxLineWidth: 15, maxRingLimit: 3).padding(10)
                 Divider()
                 Section(header: Text("Today").bold()){
                     ForEach(goalListVM.filterCurrentGoals(), id: \.id) { goal in

@@ -166,7 +166,7 @@ struct RootView: View {
                     VStack {
                         Text(String(self.calendar.component(.day, from: date))).font(Font.system(size: 18, weight: .regular, design: .default)).kerning(0.05).foregroundColor(.white)
                         //Text(date.dayOfTheWeek)
-                        ProgressRings(dateProvided: date, maxWidth: 35, maxLineWidth: Constants.weekdayRingThickness, maxRingLimit: Constants.progressRingViewMaxRingLimitStandard).padding(2).clipShape(Circle()).padding(.vertical, 2)
+                        ProgressRings(goalList: self.goalListVM.goals, dateProvided: date, maxWidth: 35, maxLineWidth: Constants.weekdayRingThickness, maxRingLimit: Constants.progressRingViewMaxRingLimitStandard).padding(2).clipShape(Circle()).padding(.vertical, 2)
                         
                     }.frame(width: 45, height: 75)
                 }
@@ -179,6 +179,9 @@ struct RootView: View {
 
 struct SmallCalendarView: View {
     @Environment(\.calendar) var calendar
+    
+    @EnvironmentObject var goalListVM: GoalListViewModel
+    @EnvironmentObject var goalRecordListVM: GoalRecordListViewModel
 
     private var year: DateInterval {
         
@@ -196,7 +199,7 @@ struct SmallCalendarView: View {
                 VStack(alignment: .center) {
                     Text(String(self.calendar.component(.day, from: date))).foregroundColor(.white)
                     //Text(date.dayOfTheWeek)
-                    ProgressRings(dateProvided: date, maxWidth: Constants.progressRingViewCalendarMaxWidth, maxLineWidth: Constants.weekdayRingThickness, maxRingLimit: 3).padding(2).clipShape(Circle()).padding(.vertical, 4)
+                    ProgressRings(goalList: self.goalListVM.goals, dateProvided: date, maxWidth: Constants.progressRingViewCalendarMaxWidth, maxLineWidth: Constants.weekdayRingThickness, maxRingLimit: 3).padding(2).clipShape(Circle()).padding(.vertical, 4)
                     
                 }
             }.frame(width: screenSize.width-80)

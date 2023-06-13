@@ -141,7 +141,9 @@ class GoalRecordListViewModel: ObservableObject, Equatable {
             $0.date.isInSameWeek(as: Date())
                 && $0.goal.id == goalID})
         var totalTime: Double = 0.0
+        print("this Week")
         for goalRecord in goalRecordsThisWeek {
+            print(goalRecord.dayTime)
             totalTime+=goalRecord.dayTime
         }
         

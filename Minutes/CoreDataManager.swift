@@ -281,7 +281,7 @@ class CoreDataManager {
     }
     
     func addGoalRecord(goal: GoalViewModel, date: Date, progress: Double, seconds: Double) {
-        print("addGoalRecord")
+
         let newGoalRecord = GoalRecord(context: persistentContainer.viewContext)
         newGoalRecord.name = goal.name
         newGoalRecord.date = date
@@ -298,17 +298,22 @@ class CoreDataManager {
         var save = [Date:Double]()
         save[Date()] = seconds
         newGoalRecord.goalSaves = save
-            
         goal.goal.addToRecords(newGoalRecord)
             
         saveContext()
     }
     
-    func updateGoalRecord(id: NSManagedObjectID, secondsToAdd: Double) {
-        if let record = getGoalRecordByID(id: id) {
+    func updateGoalRecord(goal: GoalViewModel, goalRecord: GoalRecordViewModel, secondsToAdd: Double) {
+        
+        if let record = getGoalRecordByID(id: goalRecord.id) {
+            
+            //let newGoalRecord = GoalRecord(context: persistentContainer.viewContext)
+            //newGoalRecord.name = goal.name
+            //newGoalRecord.date = record.date
             record.dayTime += secondsToAdd
             record.progress = record.dayTime/(record.goal.goalTime*60.0)
             
+            // removed newGoalRecord.goal = goal.goal
             var hour = Calendar.current.component(.hour, from: Date())*4
             let minutes = (record.progress * 59.0).truncatingRemainder(dividingBy: 60)
             hour = hour + Date().minuteQuadrant
@@ -320,6 +325,7 @@ class CoreDataManager {
             else{
                 record.goalUpdates![hour] = Double(minutes)
             }
+                
             //Goal Saves
             let dateKey = Date()
             let saveKeyExists = record.goalSaves![dateKey] != nil
@@ -329,14 +335,14 @@ class CoreDataManager {
             else{
                 record.goalSaves![dateKey] = secondsToAdd
             }
-            let coreDataManager = CoreDataManager.shared
-            if let goal = coreDataManager.getGoalByID(id: record.goal.objectID) {
-                goal.totalTime = record.dayTime
-            }
-        }
-
         
+            
+            goal.goal.removeFromRecords(record)
+            goal.goal.addToRecords(record)
+            
         saveContext()
+        }
+            
     }
     
     func removeTimeFromGoalRecord(id: NSManagedObjectID, datesToRemove: [Date]) {
