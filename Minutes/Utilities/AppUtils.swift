@@ -68,6 +68,8 @@ class AppUtil {
         return goals.filter({(date > $0.startDate || cal.isDate(date, inSameDayAs:$0.startDate)) && ($0.endDate == nil || date <= $0.endDate!) && (($0.frequency == "Weekly" && $0.weekDay!.contains(date.dayOfTheWeek)) || ($0.frequency == "Monthly" && $0.monthDay == date.dayOfTheMonth) || $0.frequency == "Daily")}).sorted(by: {$0.priority < $1.priority})
     }
     
+
+    
     static func fetchGoalDayTime(goal: Goal) -> Int {
         let goalRecords = filterGoalRecordsByDate(records: goal.records ?? [], date: Date())
         if(!goalRecords.isEmpty)

@@ -22,8 +22,8 @@ class AddGoalRecordViewModel: ObservableObject {
         
     }
     
-    func update(goalRecord: GoalRecordViewModel){
-        CoreDataManager.shared.updateGoalRecord(goal: self.goal!, goalRecord: goalRecord, secondsToAdd: dayTime)
+    func update(goalRecord: GoalRecordViewModel) -> GoalRecordViewModel? {
+        return CoreDataManager.shared.updateGoalRecord(goal: self.goal!, goalRecord: goalRecord, secondsToAdd: dayTime)
     }
     
 }

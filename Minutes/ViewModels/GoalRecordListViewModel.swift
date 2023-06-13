@@ -228,6 +228,13 @@ class GoalRecordListViewModel: ObservableObject, Equatable {
     func removeTimeFromGoalRecord(id: NSManagedObjectID, datesToRemove: [Date]){
         CoreDataManager.shared.removeTimeFromGoalRecord(id: id, datesToRemove: datesToRemove)
     }
+    
+    func update(_ goalRecord: GoalRecordViewModel) {
+        if let index = self.goalRecords.firstIndex(where: { $0.id == goalRecord.id }) {
+            self.goalRecords[index] = goalRecord
+            print(goalRecord.progress)
+        }
+    }
 }
 
 struct GoalRecordViewModel: Identifiable, Equatable {

@@ -772,12 +772,13 @@ struct GoalDetailView: View {
             let record = goalRecordListVM.getRecordTodayForGoal(goal: self.goal)
             let newDayTime = addedSeconds + record!.dayTime
             addGoalRecordVM.dayTime = addedSeconds
-            addGoalRecordVM.update(goalRecord: record!)
+            if let updatedRecord = addGoalRecordVM.update(goalRecord: record!) {
+                self.goalRecordListVM.update(updatedRecord)
+            }
+            
             self.goal.updateTotalTime(time: addedSeconds, add: true)
 
         }
-        
-        self.goalRecordListVM.getAllGoalRecords()
     }
     
     func updateProgress() {
@@ -939,11 +940,7 @@ struct GoalDetailView: View {
                 self.timer?.invalidate()
             }
         }
-        
-        
     }
-    
-    
 }
 
 

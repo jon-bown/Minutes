@@ -110,6 +110,10 @@
 		FCC91EE725F32B11003DD488 /* GroupBoxLabelButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCC91EE625F32B11003DD488 /* GroupBoxLabelButton.swift */; };
 		FCC91EEF25F34DE6003DD488 /* CustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCC91EEE25F34DE6003DD488 /* CustomTextField.swift */; };
 		FCC943232A367DB900D4CD66 /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8B5724266BB4E9005D1631 /* CoreDataManager.swift */; };
+		FCC943272A38ED2800D4CD66 /* ExtensionUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCC943262A38ED2800D4CD66 /* ExtensionUtils.swift */; };
+		FCC943282A38ED2800D4CD66 /* ExtensionUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCC943262A38ED2800D4CD66 /* ExtensionUtils.swift */; };
+		FCC9432A2A38ED4C00D4CD66 /* MinutesUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCC943292A38ED4C00D4CD66 /* MinutesUtils.swift */; };
+		FCC9432B2A38ED5800D4CD66 /* MinutesUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCC943292A38ED4C00D4CD66 /* MinutesUtils.swift */; };
 		FCDF947525EF0CCD00787F5D /* SettingsRowNavLinkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCDF947425EF0CCD00787F5D /* SettingsRowNavLinkView.swift */; };
 		FCDF948225EF415A00787F5D /* ProgressRingViewStatic.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCDF948125EF415A00787F5D /* ProgressRingViewStatic.swift */; };
 		FCDF948625EF422300787F5D /* ProgressRingViewStatic.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCDF948125EF415A00787F5D /* ProgressRingViewStatic.swift */; };
@@ -270,6 +274,8 @@
 		FCC8513E25B50A7B009678AB /* ProgressComplicationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressComplicationView.swift; sourceTree = "<group>"; };
 		FCC91EE625F32B11003DD488 /* GroupBoxLabelButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupBoxLabelButton.swift; sourceTree = "<group>"; };
 		FCC91EEE25F34DE6003DD488 /* CustomTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTextField.swift; sourceTree = "<group>"; };
+		FCC943262A38ED2800D4CD66 /* ExtensionUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtensionUtils.swift; sourceTree = "<group>"; };
+		FCC943292A38ED4C00D4CD66 /* MinutesUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinutesUtils.swift; sourceTree = "<group>"; };
 		FCDF947425EF0CCD00787F5D /* SettingsRowNavLinkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRowNavLinkView.swift; sourceTree = "<group>"; };
 		FCDF948125EF415A00787F5D /* ProgressRingViewStatic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressRingViewStatic.swift; sourceTree = "<group>"; };
 		FCE19B6525F70FE500CA85CB /* AppUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUtils.swift; sourceTree = "<group>"; };
@@ -438,6 +444,8 @@
 				FCE19B6525F70FE500CA85CB /* AppUtils.swift */,
 				FCE19B6B25F8227600CA85CB /* CheckListButton.swift */,
 				FCB6D6E9260AEE9B00933F95 /* WeekDay.swift */,
+				FCC943262A38ED2800D4CD66 /* ExtensionUtils.swift */,
+				FCC943292A38ED4C00D4CD66 /* MinutesUtils.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -708,6 +716,7 @@
 				FC8B5750266D6E93005D1631 /* GoalRecord+CoreDataProperties.swift in Sources */,
 				FCAD86E427C884B3008E6CA6 /* Minutes.xcdatamodeld in Sources */,
 				FC034C962623CDF30054405B /* Persistence.swift in Sources */,
+				FCC943282A38ED2800D4CD66 /* ExtensionUtils.swift in Sources */,
 				FC91768F267CF32700DC6A69 /* Goal+CoreDataClass.swift in Sources */,
 				FC8B574D266D6E93005D1631 /* GoalRecord+CoreDataClass.swift in Sources */,
 				FC034C822623BEF40054405B /* ProgressRingViewStatic.swift in Sources */,
@@ -741,6 +750,7 @@
 				FC917690267CF32700DC6A69 /* Goal+CoreDataProperties.swift in Sources */,
 				FC202E8525AA9F2B007D928D /* GoalRow.swift in Sources */,
 				FC202E8725AA9F2B007D928D /* ProgressRings.swift in Sources */,
+				FCC9432A2A38ED4C00D4CD66 /* MinutesUtils.swift in Sources */,
 				FC202E7925AA9EE8007D928D /* Extensions.swift in Sources */,
 				FC202E7825AA9EE8007D928D /* ContentView.swift in Sources */,
 				FCE19B6625F70FE500CA85CB /* AppUtils.swift in Sources */,
@@ -793,9 +803,11 @@
 				FC034C482623AEB80054405B /* ChangeGoalsView.swift in Sources */,
 				FCB6D6B725FAC47800933F95 /* StopWatch.swift in Sources */,
 				FCC8513A25B4BC6E009678AB /* Extensions.swift in Sources */,
+				FCC9432B2A38ED5800D4CD66 /* MinutesUtils.swift in Sources */,
 				FC7D827D2630D3210049D722 /* WKGoalDetailViewR.swift in Sources */,
 				FCC8513F25B50A7B009678AB /* ProgressComplicationView.swift in Sources */,
 				FC8B5753266F2113005D1631 /* AddGoalViewModel.swift in Sources */,
+				FCC943272A38ED2800D4CD66 /* ExtensionUtils.swift in Sources */,
 				FCE19B6725F70FE500CA85CB /* AppUtils.swift in Sources */,
 				FCE7F2A025C4B247000B82A5 /* StopWatchButton.swift in Sources */,
 				FC034C432623AC5C0054405B /* GoalCompletedNotificationView.swift in Sources */,

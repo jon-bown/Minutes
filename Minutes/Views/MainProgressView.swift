@@ -53,8 +53,9 @@ struct MainProgressView: View {
                                 HStack{
                                     DailyStatsView(goalList: self.goalListVM.goals)
                                     Spacer()
-                                    ProgressRings(goalList: self.goalListVM.goals, dateProvided: Date(), maxWidth: 135,
-                                                  maxLineWidth: Constants.progressRingViewThicknessStandard, maxRingLimit: Constants.progressRingViewMaxRingLimitStandard, showClear: false).frame(width: Constants.progressRingViewFrameWidthStandard, height: Constants.progressRingViewFrameHeightStandard).aspectRatio(contentMode: .fit)
+                                    ProgressRings(goalList: self.goalListVM.goals,
+                                                  goalRecordList: self.goalRecordListVM.goalRecords, dateProvided: Date(), maxWidth: 135,
+                                                  maxLineWidth: Constants.progressRingViewThicknessStandard, maxRingLimit: Constants.progressRingViewMaxRingLimitStandard, showClear: false, source: "Main").frame(width: Constants.progressRingViewFrameWidthStandard, height: Constants.progressRingViewFrameHeightStandard).aspectRatio(contentMode: .fit)
                                 }
 
                             }.cornerRadius(15).padding()
@@ -96,13 +97,8 @@ struct MainProgressView: View {
                     if selectedItem != nil {
                         listViewId = UUID()
                     }
-                    self.currentDate = Date()
+                    //self.currentDate = Date()
                 }
-                .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
-                    self.objectWillChange = !self.objectWillChange
-                    // Update your view or viewModel here
-                }
-                
                 //self.createNavigationBar(geometry.size)
             
             }

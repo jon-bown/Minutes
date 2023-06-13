@@ -83,6 +83,11 @@ struct GoalRecordRingView: View {
 }
 
 struct GoalRingView: View {
+    
+    @EnvironmentObject var goalListVM: GoalListViewModel
+    @EnvironmentObject var goalRecordListVM: GoalRecordListViewModel
+    
+    
     var goal: GoalViewModel
     var goalRecordList: [GoalRecordViewModel]
     var maxRingLimit: Int
@@ -93,7 +98,7 @@ struct GoalRingView: View {
     var body: some View {
         let goal_index = Int(goal.priority) - 1
         if goal_index < maxRingLimit {
-            let progress = goalRecordList.isEmpty ? 0.0 : (goalRecordList.first(where: { $0.goal.id == goal.id })?.progress ?? 0.0)
+            let progress = self.calculateProgress()
             ProgressRingViewWrapper(progress: progress,
                                     thickness: thickness,
                                     startColor: goal.color,
@@ -101,9 +106,14 @@ struct GoalRingView: View {
                                     backgroundColor: goal.color,
                                     animate: animate,
                                     dim: calculateDim(index: goal_index)) // calculateDim now based on priority
-        } else {
-            EmptyView()
         }
+    }
+    
+    private func calculateProgress() -> Double {
+        let progress = goalRecordList.isEmpty ? 0.0 : (goalRecordList.first(where: { $0.goal.id == goal.id })?.progress ?? 0.0)
+        print(goalRecordList)
+        print("Progress: \(progress)")
+        return progress
     }
     
     private func calculateDim(index: Int) -> CGFloat{
@@ -127,6 +137,7 @@ struct ProgressRings: View {
     //Parameters for minimized Ring View
     var dateProvided: Date = Date()
     var goals: [GoalViewModel]
+    var goalRecords: [GoalRecordViewModel]
     var maxWidth: CGFloat = 100
     var maxLineWidth: CGFloat = 10
     var maxRingLimit: Int = 4
@@ -135,7 +146,7 @@ struct ProgressRings: View {
     
     private var cal = Calendar.current
     
-    init(goalList: [GoalViewModel], dateProvided: Date, maxWidth: CGFloat, maxLineWidth: CGFloat, maxRingLimit: Int, animate: Bool = true, showClear: Bool = true){
+    init(goalList: [GoalViewModel], goalRecordList: [GoalRecordViewModel], dateProvided: Date, maxWidth: CGFloat, maxLineWidth: CGFloat, maxRingLimit: Int, animate: Bool = true, showClear: Bool = true, source: String = "Other"){
         self.dateProvided = dateProvided
         self.maxWidth = maxWidth
         self.maxLineWidth = maxLineWidth
@@ -143,6 +154,7 @@ struct ProgressRings: View {
         self.animate = animate
         self.showClear = showClear
         self.goals = goalList
+        self.goalRecords = goalRecordList
         //self.goalList = goalList
 //        self.goalListVM.getAllGoals()
 //        self.goalRecordListVM.getAllGoalRecords()
@@ -151,23 +163,18 @@ struct ProgressRings: View {
     
     var body: some View {
         ZStack {
-            if self.goalListVM.filterCurrentGoalsByDate(date: dateProvided).isEmpty
-                && self.goalRecordListVM.filterGoalRecordsByDate(date: dateProvided).isEmpty {
+            
+            if filterGoals(dateProvided: self.dateProvided).isEmpty
+                && filterGoalRecords(dateProvided: self.dateProvided).isEmpty {
                 EmptyProgressRingView(showClear: showClear,
                                       dim: calculateDim(index: 0),
                                       thickness: maxLineWidth)
             }
-            else if self.goalListVM.filterCurrentGoalsByDate(date: dateProvided).isEmpty {
-                GoalRecordRingView(goalRecordList: self.goalRecordListVM.filterGoalRecordsByDate(date: dateProvided),
-                                   maxRingLimit: maxRingLimit,
-                                   thickness: maxLineWidth,
-                                   animate: animate,
-                                   dim: calculateDim(index: 0))
-            } else {
+            else {
                 
-                ForEach(self.goalListVM.filterCurrentGoalsByDate(date: dateProvided), id: \.id) { goal in
+                ForEach(filterGoals(dateProvided: self.dateProvided), id: \.id) { goal in
                     GoalRingView(goal: goal,
-                                 goalRecordList: self.goalRecordListVM.filterGoalRecordsByDate(date: dateProvided),
+                                 goalRecordList: filterGoalRecords(dateProvided: self.dateProvided),
                                  maxRingLimit: maxRingLimit,
                                  thickness: maxLineWidth,
                                  animate: animate,
@@ -178,7 +185,15 @@ struct ProgressRings: View {
         }
     }
     
+    private func filterGoals(dateProvided: Date) -> [GoalViewModel]{
+        return MinutesUtils.filterCurrentGoals(goals: self.goals, date: self.dateProvided)
+    }
     
+    private func filterGoalRecords(dateProvided: Date) -> [GoalRecordViewModel] {
+        return MinutesUtils.filterGoalRecordsByDate(records: self.goalRecords, date: self.dateProvided)
+    }
+    
+
     private func calculateDim(index: Int) -> CGFloat{
         let differenceAmount = (self.maxLineWidth*2.0+4.0)*(CGFloat(index)-1.0)
         return self.maxWidth - differenceAmount
@@ -191,8 +206,6 @@ struct ProgressRings: View {
 
 
 struct ProgressRingsStatic: View {
-    
-    
     
     @EnvironmentObject var goalListVM: GoalListViewModel
     @EnvironmentObject var goalRecordListVM: GoalRecordListViewModel

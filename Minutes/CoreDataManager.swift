@@ -60,10 +60,8 @@ class CoreDataManager {
         
 //        let fetchRequest: NSFetchRequest<Goal> = Goal.fetchRequest()
         let fetchRequest: NSFetchRequest<Goal> = Goal.fetchRequest()
-        print("get all goals")
         do {
             let items = try persistentContainer.viewContext.fetch(fetchRequest)
-            print(items)
            return items
         }
         catch {
@@ -303,7 +301,7 @@ class CoreDataManager {
         saveContext()
     }
     
-    func updateGoalRecord(goal: GoalViewModel, goalRecord: GoalRecordViewModel, secondsToAdd: Double) {
+    func updateGoalRecord(goal: GoalViewModel, goalRecord: GoalRecordViewModel, secondsToAdd: Double) -> GoalRecordViewModel? {
         
         if let record = getGoalRecordByID(id: goalRecord.id) {
             
@@ -337,11 +335,20 @@ class CoreDataManager {
             }
         
             
-            goal.goal.removeFromRecords(record)
-            goal.goal.addToRecords(record)
+            //goal.goal.removeFromRecords(record)
+            //goal.goal.addToRecords(record)
             
-        saveContext()
+            saveContext()
+                
+            
+            let newGoalRecord = GoalRecordViewModel(record: record)
+            
+            
+            
+        
+            return newGoalRecord
         }
+        return nil
             
     }
     
