@@ -8,6 +8,7 @@
 import Foundation
 import CoreData
 import SwiftUI
+import WidgetKit
 
 class GoalListViewModel: ObservableObject, Equatable {
     
@@ -27,13 +28,6 @@ class GoalListViewModel: ObservableObject, Equatable {
         
         NotificationCenter.default.addObserver(self, selector: #selector(didSave(_:)), name: didSaveNotification, object: nil)
         
-        
-        
-        
-//        let didChangeNotification = NSManagedObjectContext.didChangeObjectsNotification
-//
-//        NotificationCenter.default.addObserver(self, selector: #selector(didChange(_:)), name: didChangeNotification,  object: nil)
-        
         self.getAllGoals()
     }
     
@@ -42,9 +36,6 @@ class GoalListViewModel: ObservableObject, Equatable {
             self.getAllGoals()
         }
         
-//        DispatchQueue.main.async {
-//            self.objectWillChange.send()
-//        }
     }
     
     @objc func didChange(_ notification: Notification){

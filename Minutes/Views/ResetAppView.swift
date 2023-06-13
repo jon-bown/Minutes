@@ -7,6 +7,7 @@
 
 import SwiftUI
 import CoreData
+import WidgetKit
 
 struct ResetAppView: View {
     @Environment(\.presentationMode) var presentationMode
@@ -39,6 +40,7 @@ struct ResetAppView: View {
                         self.goalListVM.deleteAllGoals()
                         self.goalRecordListVM.deleteAllGoalRecords()
                         self.deleteAllNotifications()
+//                        WidgetCenter.shared.reloadTimelines(ofKind: "MinutesWidget")
                         self.presentationMode.wrappedValue.dismiss()
                     }
                      let secondButton = Alert.Button.destructive(Text("Cancel"))

@@ -232,7 +232,7 @@ class GoalRecordListViewModel: ObservableObject, Equatable {
     func update(_ goalRecord: GoalRecordViewModel) {
         if let index = self.goalRecords.firstIndex(where: { $0.id == goalRecord.id }) {
             self.goalRecords[index] = goalRecord
-            print(goalRecord.progress)
+            
         }
     }
 }

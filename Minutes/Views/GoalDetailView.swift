@@ -758,19 +758,20 @@ struct GoalDetailView: View {
         addGoalRecordVM.goal = self.goal
         
         if(newRecord){
-            
-
             addGoalRecordVM.dayTime = addedSeconds
             addGoalRecordVM.progress = addedSeconds/(self.goal.goalTime*60)
             addGoalRecordVM.save()
             self.goal.updateTotalTime(time: addedSeconds, add: true)
-
         }
         
         else {
             
             let record = goalRecordListVM.getRecordTodayForGoal(goal: self.goal)
             let newDayTime = addedSeconds + record!.dayTime
+            if(newDayTime < goal.goalTime){
+                self.goalCompleted = false
+                self.showedCompleted = false
+            }
             addGoalRecordVM.dayTime = addedSeconds
             if let updatedRecord = addGoalRecordVM.update(goalRecord: record!) {
                 self.goalRecordListVM.update(updatedRecord)
@@ -809,8 +810,10 @@ struct GoalDetailView: View {
         
 
         if(self.progress >= 1.0 && !self.showedCompleted){
-            self.alertUserCompletedAfterFirst()
-            self.complexSuccess()
+            if(UserDefaults.standard.bool(forKey: Constants.generalCompletionReminder)){
+                self.alertUserCompletedAfterFirst()
+                self.complexSuccess()
+            }
         }
 
     }
@@ -878,6 +881,7 @@ struct GoalDetailView: View {
     
     func alertUserCompletedAfterFirst() {
         //TODO: Check if app is in foreground and display alert instead
+        guard !self.goalCompleted && !self.showedCompleted else { return }
         self.goalCompleted = true
         let center = UNUserNotificationCenter.current()
         let options: UNAuthorizationOptions = [.alert, .badge, .sound]
