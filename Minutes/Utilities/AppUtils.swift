@@ -12,7 +12,7 @@ import UIKit
 
 //Contains functions that are used throughout the app to prevent repretition and to consolidate filtering logic for lists of goals and goal records
 class AppUtil {
-
+    
     
     //MARK: - FILTERING
     static func filterCurrentGoalsByDate(goals: [Goal], date: Date) -> [Goal] {
@@ -24,7 +24,7 @@ class AppUtil {
         else{
             return []
         }
-
+        
     }
     
     
@@ -52,7 +52,7 @@ class AppUtil {
     
     static func sortGoalRecordsByPriority(goalRecords: [GoalRecord]) -> [GoalRecord] {
         if(!goalRecords.isEmpty){
-                return goalRecords.sorted(by: {$0.goal.priority < $1.goal.priority})
+            return goalRecords.sorted(by: {$0.goal.priority < $1.goal.priority})
             
         }
         else{
@@ -68,7 +68,7 @@ class AppUtil {
         return goals.filter({(date > $0.startDate || cal.isDate(date, inSameDayAs:$0.startDate)) && ($0.endDate == nil || date <= $0.endDate!) && (($0.frequency == "Weekly" && $0.weekDay!.contains(date.dayOfTheWeek)) || ($0.frequency == "Monthly" && $0.monthDay == date.dayOfTheMonth) || $0.frequency == "Daily")}).sorted(by: {$0.priority < $1.priority})
     }
     
-
+    
     
     static func fetchGoalDayTime(goal: Goal) -> Int {
         let goalRecords = filterGoalRecordsByDate(records: goal.records ?? [], date: Date())
@@ -94,7 +94,7 @@ class AppUtil {
         else {
             return nil
         }
-
+        
     }
     
     static func getDayTimeForGoal(goal: Goal, goalRecords: [GoalRecord]) -> Int {
@@ -116,82 +116,82 @@ class AppUtil {
         
         
     }
-//
-//    static func filterGoalRecordsByGoalID(goalRecords: [GoalRecord], goalID: UUID?) -> [GoalRecord]{
-//        if(goalRecords.isEmpty || goalID == nil){
-//            return []
-//        }
-//        return goalRecords.filter({goalID! == $0.id!})
-//    }
-//
-//
-//    static func getRecordTodayForGoal(goalRecords: [GoalRecord], goalID: UUID?) -> GoalRecord? {
-//        if let ID = goalID {
-//            if(goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs: $0.date) && ID == $0.id}).isEmpty){
-//                return nil
-//            }
-//            return goalRecords.first(where: {Calendar.current.isDate(Date(), inSameDayAs: $0.date!) && ID == $0.id})!
-//        }
-//        else{
-//            return nil
-//        }
-//
-//
-//    }
+    //
+    //    static func filterGoalRecordsByGoalID(goalRecords: [GoalRecord], goalID: UUID?) -> [GoalRecord]{
+    //        if(goalRecords.isEmpty || goalID == nil){
+    //            return []
+    //        }
+    //        return goalRecords.filter({goalID! == $0.id!})
+    //    }
+    //
+    //
+    //    static func getRecordTodayForGoal(goalRecords: [GoalRecord], goalID: UUID?) -> GoalRecord? {
+    //        if let ID = goalID {
+    //            if(goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs: $0.date) && ID == $0.id}).isEmpty){
+    //                return nil
+    //            }
+    //            return goalRecords.first(where: {Calendar.current.isDate(Date(), inSameDayAs: $0.date!) && ID == $0.id})!
+    //        }
+    //        else{
+    //            return nil
+    //        }
+    //
+    //
+    //    }
     
-//    static func filterGoalRecordsTodayForGoal(goalRecords: [GoalRecord], goalID: UUID?) -> [GoalRecord] {
-//        if(goalRecords.isEmpty || goalID == nil){
-//            return []
-//        }
-//        return goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs: $0.date!) && goalID! == $0.id})
-//
-//    }
+    //    static func filterGoalRecordsTodayForGoal(goalRecords: [GoalRecord], goalID: UUID?) -> [GoalRecord] {
+    //        if(goalRecords.isEmpty || goalID == nil){
+    //            return []
+    //        }
+    //        return goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs: $0.date!) && goalID! == $0.id})
+    //
+    //    }
     
-//    static func filterGoalRecordsByDate(goalRecords: [GoalRecord], date: Date) -> [GoalRecord] {
-//        if(goalRecords.isEmpty){
-//            return []
-//        }
-//        return goalRecords.filter({Calendar.current.isDate(date, inSameDayAs:$0.date!)})
-//
-//    }
+    //    static func filterGoalRecordsByDate(goalRecords: [GoalRecord], date: Date) -> [GoalRecord] {
+    //        if(goalRecords.isEmpty){
+    //            return []
+    //        }
+    //        return goalRecords.filter({Calendar.current.isDate(date, inSameDayAs:$0.date!)})
+    //
+    //    }
     
-//    static func filterGoalRecordSavesTodayByID(goalRecords: [GoalRecord], goalID: UUID?) -> [Date: Double] {
-//        if(goalRecords.isEmpty || goalID == nil){
-//            return [:]
-//        }
-//        else if(goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs:$0.date!) && goalID == $0.id}).isEmpty){
-//            return [:]
-//        }
-//        else {
-//            
-//            let firstItem = (goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs:$0.date!) && goalID == $0.id}).first!)
-//            if(!(firstItem.goalSaves == nil)){
-//                //it has goal saves
-//                return firstItem.goalSaves!
-//            }
-//            else {
-//                return [:]
-//            }
-//            
-//            
-//        }
-//        
-//    }
+    //    static func filterGoalRecordSavesTodayByID(goalRecords: [GoalRecord], goalID: UUID?) -> [Date: Double] {
+    //        if(goalRecords.isEmpty || goalID == nil){
+    //            return [:]
+    //        }
+    //        else if(goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs:$0.date!) && goalID == $0.id}).isEmpty){
+    //            return [:]
+    //        }
+    //        else {
+    //
+    //            let firstItem = (goalRecords.filter({Calendar.current.isDate(Date(), inSameDayAs:$0.date!) && goalID == $0.id}).first!)
+    //            if(!(firstItem.goalSaves == nil)){
+    //                //it has goal saves
+    //                return firstItem.goalSaves!
+    //            }
+    //            else {
+    //                return [:]
+    //            }
+    //
+    //
+    //        }
+    //
+    //    }
     
-//    static func getGoalColorFromRecord(goals: [Goal], id: UUID) -> UIColor{
-//        guard let goalColor = goals.first(where: {$0.id == id})?.color else {
-//            return UIColor.blue
-//        }
-//        return  goalColor
-//    }
+    //    static func getGoalColorFromRecord(goals: [Goal], id: UUID) -> UIColor{
+    //        guard let goalColor = goals.first(where: {$0.id == id})?.color else {
+    //            return UIColor.blue
+    //        }
+    //        return  goalColor
+    //    }
     
     
     
-//    static func sortGoalRecordsByPriority(goalRecords: [GoalRecord], goals: [Goal]) -> [GoalRecord]{
-//        return goalRecords.sorted(by: {getGoalPriorityFromRecord(goals: goals, id: $0.id!) < getGoalPriorityFromRecord(goals: goals, id: $1.id!)})
-//    }
+    //    static func sortGoalRecordsByPriority(goalRecords: [GoalRecord], goals: [Goal]) -> [GoalRecord]{
+    //        return goalRecords.sorted(by: {getGoalPriorityFromRecord(goals: goals, id: $0.id!) < getGoalPriorityFromRecord(goals: goals, id: $1.id!)})
+    //    }
     
-
+    
     //MARK: DATES & TIMES
     static func getCurrentDate(with format: String = "EEEE, MMM d") -> String { let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = format
@@ -260,7 +260,7 @@ class AppUtil {
             return "\(remSec)"
         }
     }
-
+    
     
     //MARK: - NOTIFICATIONS
     static func getNotificationTime(id: UUID) -> String {
@@ -356,10 +356,10 @@ class AppUtil {
     
     //MARK: DEVICE TYPE
     
-//    static let isIpad: Bool = UIDevice.current.userInterfaceIdiom == .pad
-//    static let isIphone: Bool = UIDevice.current.userInterfaceIdiom == .phone
-//    
-
+    //    static let isIpad: Bool = UIDevice.current.userInterfaceIdiom == .pad
+    //    static let isIphone: Bool = UIDevice.current.userInterfaceIdiom == .phone
+    //
+    
     
     
     //MARK: ID Strings
@@ -383,6 +383,6 @@ public enum AppGroup: String {
     }
     
     
-
+    
     
 }

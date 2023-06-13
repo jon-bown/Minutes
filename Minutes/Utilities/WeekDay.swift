@@ -6,28 +6,26 @@
 //
 
 import Foundation
-
-
 /*
- Published array of weekdays that monitors if certain days of the week are selected. 
+ Published array of weekdays that monitors if certain days of the week are selected.
  */
 class WeekDays: ObservableObject {
     @Published var weekDays: [WeekDay]
-
-    init(){
-
-            self.weekDays = [
-                WeekDay(2, name: "Mon"), WeekDay(3, name: "Tue"), WeekDay(4, name: "Wed"), WeekDay(5, name: "Thu"), WeekDay(6, name: "Fri"), WeekDay(7, name: "Sat"), WeekDay(1, name: "Sun")
-            ]
     
-        }
-
+    init(){
+        
+        self.weekDays = [
+            WeekDay(2, name: "Mon"), WeekDay(3, name: "Tue"), WeekDay(4, name: "Wed"), WeekDay(5, name: "Thu"), WeekDay(6, name: "Fri"), WeekDay(7, name: "Sat"), WeekDay(1, name: "Sun")
+        ]
+        
+    }
+    
     
     func populateSelections(currentDays: [String]){
         if(currentDays.isEmpty){
             for index in 0..<self.weekDays.count {
-               
-                    self.weekDays[index].reset()
+                
+                self.weekDays[index].reset()
             }
         }
         else {

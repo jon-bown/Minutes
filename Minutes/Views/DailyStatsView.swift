@@ -83,15 +83,15 @@ struct DailyStatsView: View {
                                     Text("\(goal.name)").foregroundColor(Color.white).font(Font.system(size: 15, weight: .semibold, design: .rounded))
                                     Text("\(Int(fetchGoalDayTime(goal: goal)))/\(Int(goal.goalTime)) MIN").foregroundColor(goal.color).font(Font.system(size: 15, weight: .semibold, design: .rounded))
                                         .foregroundColor(goal.color)
-//                                    Text(String(self.goalRecordListVM.calculateCurrentStreak(goalID: goal.uuid)))
-//                                        .font(Constants.globalBodyTextFont)
-//                                        .foregroundColor(goal.color)
-//                                    Text(String(self.goalRecordListVM(goalID: goal.uuid)))
-//                                        .font(Font.system(size: 15, weight: .semibold, design: .rounded))
-//                                        .foregroundColor(goal.color)
-//                                    Text(self.goalRecordListVM.calculateTimeThisWeek(goalID: goal.uuid))
-//                                        .font(Font.system(size: 15, weight: .semibold, design: .rounded))
-//                                        .foregroundColor(goal.color)
+                                    //                                    Text(String(self.goalRecordListVM.calculateCurrentStreak(goalID: goal.uuid)))
+                                    //                                        .font(Constants.globalBodyTextFont)
+                                    //                                        .foregroundColor(goal.color)
+                                    //                                    Text(String(self.goalRecordListVM(goalID: goal.uuid)))
+                                    //                                        .font(Font.system(size: 15, weight: .semibold, design: .rounded))
+                                    //                                        .foregroundColor(goal.color)
+                                    //                                    Text(self.goalRecordListVM.calculateTimeThisWeek(goalID: goal.uuid))
+                                    //                                        .font(Font.system(size: 15, weight: .semibold, design: .rounded))
+                                    //                                        .foregroundColor(goal.color)
                                     //                                    Text(String(AppUtil.getTotalTimeString(seconds: Double(0.0))))
                                     //                                                                            .font(Font.system(size: 15, weight: .semibold, design: .rounded))
                                     //                                                                            .foregroundColor(Color(goal.color!))
@@ -145,8 +145,8 @@ struct DailyStatsView: View {
     
     private func fetchGoalDayTimeFromRecord(goalRec: GoalRecord) -> Int {
         
-            return Int(goalRec.dayTime/60)
-
+        return Int(goalRec.dayTime/60)
+        
     }
     
 }

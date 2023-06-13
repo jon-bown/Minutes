@@ -21,25 +21,25 @@ struct GoalPriorityView: View {
     @State private var refreshingID = UUID()
     
     var body: some View {
-            
-            List {
-                ForEach(goalListVM.getGoalsArray(), id: \.id) { goal in
-                    GroupBox{
-                        HStack{
-                            Text(goal.name)
-                            Spacer()
-                            Text("\(goal.priority)")
-                        }
+        
+        List {
+            ForEach(goalListVM.getGoalsArray(), id: \.id) { goal in
+                GroupBox{
+                    HStack{
+                        Text(goal.name)
+                        Spacer()
+                        Text("\(goal.priority)")
                     }
-                    
                 }
-                .onMove(perform: onMove).onDelete(perform: onDelete).id(self.refreshingID)
-            }
-            .alert(isPresented: self.$showError) {
-                return Alert(title: Text("Error Saving Goal"), message: Text("Try again!"), dismissButton: .default(Text("Ok")))
                 
             }
-            .environment(\.editMode, isEditable ? .constant(.active) : .constant(.inactive)).padding().toolbar{
+            .onMove(perform: onMove).onDelete(perform: onDelete).id(self.refreshingID)
+        }
+        .alert(isPresented: self.$showError) {
+            return Alert(title: Text("Error Saving Goal"), message: Text("Try again!"), dismissButton: .default(Text("Ok")))
+            
+        }
+        .environment(\.editMode, isEditable ? .constant(.active) : .constant(.inactive)).padding().toolbar{
             ToolbarItem(placement: .primaryAction) {
                 Button(self.isEditable ? "Done":"Edit"){
                     self.isEditable.toggle()
@@ -76,21 +76,18 @@ struct GoalPriorityView: View {
             
             for goal in goalsArray {
                 let marker = goalsArray.firstIndex(of: goalListVM.goals.first(where: {$0.id == goal.id})!)
-                goal.updatePriority(new: Int(marker!)+1) 
+                goal.updatePriority(new: Int(marker!)+1)
             }
             
             
         }
-
+        
     }
     
     func onDelete(at offsets: IndexSet) {
         
         for index in offsets {
             let goal = self.goalListVM.goals.sorted(by: {$0.priority < $1.priority})[index]
-            //self.goalListVM.deleteAllGoals()
-            //THESE WORK!!!
-            //goalListVM.deleteGoal(goal: goal)
             DispatchQueue.main.async {
                 
                 var goalsArray = goalListVM.getGoalsArray()
@@ -100,22 +97,12 @@ struct GoalPriorityView: View {
                     let marker = goalsArray.firstIndex(of: goalListVM.goals.first(where: {$0.id == goal.id})!)
                     goal.updatePriority(new: Int(marker!)+1)
                 }
-//                if(self.goalListVM.goals.count == 1){
-//                    presentationMode.wrappedValue.dismiss()
-//                }
-                
-                //goalRecordListVM.getAllGoalRecords()
             }
-
-            //goalListVM.resetGoalsPriority()
-            //presentationMode.wrappedValue.dismiss()
+            
             
         }
-        //presentationMode.wrappedValue.dismiss()
+
         UIApplication.shared.windows.first?.rootViewController?.dismiss(animated: true, completion: nil)
-        
-        
-        
     }
     
 }

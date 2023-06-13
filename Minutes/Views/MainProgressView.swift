@@ -11,8 +11,6 @@ import CoreData
 struct MainProgressView: View {
     @Environment(\.presentationMode) var presentationMode
     
-    //@StateObject private var goalListVM = GoalListViewModel.sharedInstance
-    //@StateObject private var goalRecordListVM = GoalRecordListViewModel.sharedInstance
     @EnvironmentObject var goalListVM: GoalListViewModel
     @EnvironmentObject var goalRecordListVM: GoalRecordListViewModel
         
@@ -173,9 +171,6 @@ struct MainProgressView: View {
         .frame(width: geometrySize.width, height: Constants.navigationBarHeight, alignment: .top)
 
     }
-    
-    
-
 }
 
 #if DEBUG

@@ -6,7 +6,7 @@
 //
 
 import UIKit
-
+//Utils for the Watch/Main App
 class MinutesUtils: NSObject {
     
     static func filterCurrentGoals(goals: [GoalViewModel], date: Date) -> [GoalViewModel] {
