@@ -92,7 +92,7 @@ struct GoalDetailView: View {
                 Spacer()
                 Button(action: {
                     if(!self.stopWatch.isRunning){
-                        self.updateGoalRecord()
+                        self.saveStopwatchMinutesSession()
                         self.resetTimer()
                         self.complexSuccess()
                     }
@@ -635,52 +635,59 @@ struct GoalDetailView: View {
     }
     
     private func saveCustomMinuteSession(){
-        var newRecord = true
-        let record = self.goalRecordListVM.getRecordTodayForGoal(goal: self.goal)
-
-        if(record != nil){
-            newRecord = false
-        }
-        
         guard let customMinutes = Int(self.newSessionText)
         else {
             return
         }
-
         let customSeconds = Double(customMinutes) * 60.0
-        //Add date to array of records for the goal record
-        if(newRecord){
-
-            self.progress = customSeconds/(self.goal.goalTime*60)
-
-            
-            //TODO: Add method to add goalrecord
-            addGoalRecordVM.goal = self.goal
-            addGoalRecordVM.dayTime = customSeconds
-            addGoalRecordVM.progress = self.progress
-            
-            addGoalRecordVM.save()
-            
-            self.goal.updateTotalTime(time: Double(customSeconds), add: true)
-
-
-
-        }
+        self.updateGoalRecord(addedSeconds: customSeconds)
+        self.updateProgress()
         
-        else {
-            let record = goalRecordListVM.getRecordTodayForGoal(goal: self.goal)
-            let updatedDayTime = record!.dayTime + customSeconds
-            self.progress = updatedDayTime/(self.goal.goalTime*60)
-            addGoalRecordVM.goal = self.goal
-            addGoalRecordVM.dayTime = updatedDayTime
-            addGoalRecordVM.progress = self.progress
-            addGoalRecordVM.update(goalRecord: record!)
-            self.goal.updateTotalTime(time: Double(customSeconds), add: true)
-            
-        }
-        //self.updateProgress()
-        self.goalRecordListVM.getAllGoalRecords()
-        self.goalListVM.getAllGoals()
+//        var newRecord = true
+//        let record = self.goalRecordListVM.getRecordTodayForGoal(goal: self.goal)
+//
+//        if(record != nil){
+//            newRecord = false
+//        }
+//
+//
+//
+//
+//        //Add date to array of records for the goal record
+//        if(newRecord){
+//
+//            self.progress = customSeconds/(self.goal.goalTime*60)
+//
+//
+//            //TODO: Add method to add goalrecord
+//            addGoalRecordVM.goal = self.goal
+//            addGoalRecordVM.dayTime = customSeconds
+//            addGoalRecordVM.progress = self.progress
+//
+//            addGoalRecordVM.save()
+//
+//            self.goal.updateTotalTime(time: Double(customSeconds), add: true)
+//
+//
+//
+//        }
+//
+//        else {
+//            let record = goalRecordListVM.getRecordTodayForGoal(goal: self.goal)
+//            let updatedDayTime = record!.dayTime + customSeconds
+//            self.progress = updatedDayTime/(self.goal.goalTime*60)
+//            addGoalRecordVM.goal = self.goal
+//            addGoalRecordVM.dayTime = customSeconds
+//            addGoalRecordVM.progress = self.progress
+//            addGoalRecordVM.update(goalRecord: record!)
+//            self.goal.updateTotalTime(time: Double(customSeconds), add: true)
+//
+//        }
+    }
+    
+    private func saveStopwatchMinutesSession() {
+        let addedSeconds = Double(self.stopWatch.totalAccumulatedTime.seconds())
+        self.updateGoalRecord(addedSeconds: addedSeconds)
     }
     
     //Save the current time into the proper goal entity
@@ -741,7 +748,7 @@ struct GoalDetailView: View {
     
     //MARK: UPDATES
     
-    func updateGoalRecord() {
+    func updateGoalRecord(addedSeconds: Double) {
         var newRecord = true
         if(self.goalRecordListVM.getRecordTodayForGoal(goal: self.goal) != nil) {
             newRecord = false
@@ -749,17 +756,14 @@ struct GoalDetailView: View {
         
         
         addGoalRecordVM.goal = self.goal
-        addGoalRecordVM.progress = self.progress
-        let addedSeconds = Double(self.stopWatch.totalAccumulatedTime.seconds())
         
         if(newRecord){
             
 
             addGoalRecordVM.dayTime = addedSeconds
+            addGoalRecordVM.progress = addedSeconds/(self.goal.goalTime*60)
             addGoalRecordVM.save()
-            self.progress = addGoalRecordVM.dayTime/(self.goal.goalTime*60)
-            self.goal.updateTotalTime(time: Double(self.stopWatch.totalAccumulatedTime.seconds()), add: true)
-
+            self.goal.updateTotalTime(time: addedSeconds, add: true)
 
         }
         
@@ -767,13 +771,13 @@ struct GoalDetailView: View {
             
             let record = goalRecordListVM.getRecordTodayForGoal(goal: self.goal)
             let newDayTime = addedSeconds + record!.dayTime
-            self.progress = (newDayTime)/(self.goal.goalTime*60)
-        
             addGoalRecordVM.dayTime = addedSeconds
             addGoalRecordVM.update(goalRecord: record!)
-            self.goal.updateTotalTime(time: Double(self.stopWatch.totalAccumulatedTime.seconds()), add: true)
+            self.goal.updateTotalTime(time: addedSeconds, add: true)
 
         }
+        
+        self.goalRecordListVM.getAllGoalRecords()
     }
     
     func updateProgress() {
@@ -784,11 +788,7 @@ struct GoalDetailView: View {
             else {
             self.dayTime = 0.0
             self.progress = 0.0
-            return
         }
-
-        
-        
     }
     
     func recalculateDayTime() {
@@ -932,7 +932,7 @@ struct GoalDetailView: View {
     func resetTimer() {
         _ = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: false) { timer in
             withAnimation() {
-                recalculateDayTime()
+                self.updateProgress()
                 self.stopWatch.reset()
                 //remove pending completion notifications
                 UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [AppUtil.getGoalNotificationSpecificIdString(id: goal.uuid)])
